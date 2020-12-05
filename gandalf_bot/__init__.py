@@ -1,3 +1,5 @@
+import logging
+
 import discord
 from discord import Message
 from discord.ext import commands
@@ -16,6 +18,7 @@ __version__ = "0.1.0"
 # ===========
 
 
+logging.basicConfig(level=logging.WARN)  # for discord.py library logging
 intents = discord.Intents.default()
 intents.members = True
 bot = commands.Bot(command_prefix="!", description="Gandalf the Grey", intents=intents)
