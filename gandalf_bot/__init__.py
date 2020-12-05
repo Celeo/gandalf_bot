@@ -1,5 +1,3 @@
-import os
-
 import discord
 from discord import Message
 from discord.ext import commands
@@ -20,7 +18,7 @@ __version__ = "0.1.0"
 
 intents = discord.Intents.default()
 intents.members = True
-bot = commands.Bot(command_prefix="!", description="", intents=intents)
+bot = commands.Bot(command_prefix="!", description="Gandalf the Grey", intents=intents)
 
 
 @bot.event
@@ -39,7 +37,7 @@ def command_perms_check(context: Context) -> bool:
 # ===================
 
 
-@bot.command(brief="Put an SCP into containment")
+@bot.command(brief="Put someone into containment")
 @commands.check(command_perms_check)
 async def breach(context: Context, *args: str) -> None:
     logger.debug(
@@ -52,7 +50,7 @@ async def breach(context: Context, *args: str) -> None:
 @commands.check(command_perms_check)
 async def unbreach(context: Context, *args: str) -> None:
     logger.debug(
-        f"Bot::comand::unbreach by {context.author.name} in {context.channel.name}"
+        f"Bot::command::unbreach by {context.author.name} in {context.channel.name}"
     )
     await context.send("Command not implemented!")
 
@@ -61,7 +59,7 @@ async def unbreach(context: Context, *args: str) -> None:
 @commands.check(command_perms_check)
 async def sitrep(context: Context, *args: str) -> None:
     logger.debug(
-        f"Bot::comand::sitrep by {context.author.name} in {context.channel.name}"
+        f"Bot::command::sitrep by {context.author.name} in {context.channel.name}"
     )
     await context.send("Command not implemented!")
 
@@ -73,6 +71,7 @@ async def sitrep(context: Context, *args: str) -> None:
 
 @bot.event
 async def on_message(message: Message) -> None:
+    await bot.process_commands(message)
     if message.author == bot.user:
         return
     if message.author.id not in Config.from_disk().blessable_user_ids:
