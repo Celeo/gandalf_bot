@@ -1,28 +1,26 @@
 import os
 
 import discord
+from discord import Message
 from discord.ext import commands
 from discord.ext.commands import Context
-from dotenv import load_dotenv
 from loguru import logger
+
+from config import Config  # type: ignore
+from message_util import is_incoherent, BLESS_YOU_EMOJI  # type: ignore
 
 
 __version__ = "0.1.0"
 
-bot_description = ""
-intents = discord.Intens.default()
+
+# ===========
+#   General
+# ===========
+
+
+intents = discord.Intents.default()
 intents.members = True
-bot = commands.Bot(command_prefix="!", description=bot_description, intents=intents)
-
-
-# ========
-#   Util
-# ========
-
-
-def get_token() -> str:
-    load_dotenv()
-    return os.environ["DISCORD_TOKEN"]
+bot = commands.Bot(command_prefix="!", description="", intents=intents)
 
 
 @bot.event
@@ -73,7 +71,15 @@ async def sitrep(context: Context, *args: str) -> None:
 # ======================
 
 
-# TODO
+@bot.event
+async def on_message(message: Message) -> None:
+    if message.author == bot.user:
+        return
+    if message.author.id not in Config.from_disk().blessable_user_ids:
+        return
+    if not is_incoherent(message.content):
+        return
+    await message.add_reaction(BLESS_YOU_EMOJI)
 
 
 # ===========
@@ -83,8 +89,8 @@ async def sitrep(context: Context, *args: str) -> None:
 
 def main() -> None:
     logger.debug("Setting up")
-    token = get_token()
-    bot.run(token)
+    config = Config.from_disk()
+    bot.run(config.token)
     logger.warning("Bot terminated")
 
 
