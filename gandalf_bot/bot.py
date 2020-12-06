@@ -9,6 +9,7 @@ from loguru import logger
 
 from .config import Config
 from .message_util import is_incoherent, BLESS_YOU_EMOJI
+from .quotes import get_random_quote
 
 
 # ===========
@@ -117,11 +118,12 @@ async def on_message(message: Message) -> None:
     await bot.process_commands(message)
     if message.author == bot.user:
         return
-    if message.author.id not in Config.from_disk().blessable_user_ids:
-        return
-    if not is_incoherent(message.content):
-        return
-    await message.add_reaction(BLESS_YOU_EMOJI)
+    if message.author.id in Config.from_disk().blessable_user_ids and is_incoherent(
+        message.content
+    ):
+        await message.add_reaction(BLESS_YOU_EMOJI)
+    if bot.user in message.mentions:
+        await message.channel.send(get_random_quote())
 
 
 # ===========
