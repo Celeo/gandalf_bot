@@ -1,0 +1,12 @@
+[Unit]
+Description=Discord Bot
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/srv/gandalf_bot
+ExecStart=poetry run python run.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
