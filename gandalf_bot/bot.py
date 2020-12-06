@@ -10,11 +10,12 @@ from loguru import logger
 from .config import Config
 from .message_util import is_incoherent, BLESS_YOU_EMOJI
 from .quotes import get_random_quote
+from .dice import roll_dice, roll_dice_help
 
 
-# ===========
-#   General
-# ===========
+# =======
+# General
+# =======
 
 
 logging.basicConfig(level=logging.WARN)  # for discord.py library logging
@@ -34,9 +35,9 @@ def command_perms_check(context: Context) -> bool:
     return context.author.guild_permissions.administrator
 
 
-# ===================
-#   SCP Containment
-# ===================
+# ===============
+# SCP Containment
+# ===============
 
 
 async def _get_containment_role(
@@ -108,9 +109,9 @@ async def sitrep(context: Context, *args: str) -> None:
         await context.send("No one is currently contained")
 
 
-# ======================
-#   Bless-you reaction
-# ======================
+# ==================
+# Bless-you reaction
+# ==================
 
 
 @bot.event
@@ -126,9 +127,22 @@ async def on_message(message: Message) -> None:
         await message.channel.send(get_random_quote())
 
 
-# ===========
-#   Startup
-# ===========
+# ============
+# Dice rolling
+# ============
+
+
+@bot.command(brief="Roll some Chronicles of Darkness dice")
+async def roll(context: Context, *args: str) -> None:
+    if "help" in args:
+        await context.send(roll_dice_help())
+        return
+    await context.send(roll_dice(" ".join(args)))
+
+
+# =======
+# Startup
+# =======
 
 
 def main() -> None:
