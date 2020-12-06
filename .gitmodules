@@ -1,0 +1,3 @@
+[submodule "merit_screenshots"]
+	path = merit_screenshots
+	url = github:celeo/cod_merit_screenshots
