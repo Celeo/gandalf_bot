@@ -1,8 +1,9 @@
 import logging
+import os
 from typing import Optional
 
 import discord
-from discord import Message, Role
+from discord import File, Message, Role
 from discord.ext import commands
 from discord.ext.commands import Context
 from loguru import logger
@@ -138,6 +139,32 @@ async def roll(context: Context, *args: str) -> None:
         await context.send(roll_dice_help())
         return
     await context.send(roll_dice(" ".join(args)))
+
+
+# =================
+# Merit screenshots
+# =================
+
+
+@bot.command()
+async def merit(context: Context, *args: str) -> None:
+    if len(args) == 0:
+        await context.send("Usage: `!merit [name]`")
+        return
+    merit_screenshots = "merit_screenshots"
+    if not os.path.exists(merit_screenshots):
+        await context.send("No screenshots folder")
+        return
+    name = "_".join(args).replace(" ", "_")
+    found = False
+    screenshot_files = sorted(os.listdir(merit_screenshots))
+    for f_name in screenshot_files:
+        if f_name.startswith(name):
+            with open(f"{merit_screenshots}/{f_name}", "rb") as f:
+                await context.send(file=File(f))
+                found = True
+    if not found:
+        await context.send("Could not find any matching merit screenshots")
 
 
 # =======
