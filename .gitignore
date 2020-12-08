@@ -1,5 +1,7 @@
 config.json
 config.test.json
+roles.db
+roles.test.db
 .pytest_cache
 __pycache__
 *.pyc

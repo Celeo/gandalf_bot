@@ -8,7 +8,7 @@ from discord.ext import commands
 from discord.ext.commands import Context
 from loguru import logger
 
-from .config import Config
+from .config import BasicConfig
 from .message_util import is_incoherent, BLESS_YOU_EMOJI
 from .quotes import get_random_quote
 from .dice import roll_dice, roll_dice_help
@@ -42,7 +42,7 @@ def command_perms_check(context: Context) -> bool:
 
 
 async def _get_containment_role(
-    context: Context, config=Config.from_disk()
+    context: Context, config=BasicConfig.from_disk()
 ) -> Optional[Role]:
     role = context.guild.get_role(config.containment_role_id)
     if not role:
@@ -62,7 +62,7 @@ async def breach(context: Context, *args: str) -> None:
             "Command is: `!breach [name] (name2 ...)` and you have to reference the "
             + "users, like with the @[name]<tab>"
         )
-    config = Config.from_disk()
+    config = BasicConfig.from_disk()
     containment_role = await _get_containment_role(context, config)
     if not containment_role:
         return
@@ -120,7 +120,7 @@ async def on_message(message: Message) -> None:
     await bot.process_commands(message)
     if message.author == bot.user:
         return
-    if message.author.id in Config.from_disk().blessable_user_ids and is_incoherent(
+    if message.author.id in BasicConfig.from_disk().blessable_user_ids and is_incoherent(
         message.content
     ):
         await message.add_reaction(BLESS_YOU_EMOJI)
@@ -174,6 +174,6 @@ async def merit(context: Context, *args: str) -> None:
 
 def main() -> None:
     logger.debug("Setting up")
-    config = Config.from_disk()
+    config = BasicConfig.from_disk()
     bot.run(config.token)
     logger.warning("Bot terminated")
