@@ -47,28 +47,28 @@ def test_count_dice_to_roll():
 def test_roll_dice_10again(monkeypatch):
     results = [10, 4]
     monkeypatch.setattr(dice, "_roll_single", lambda: results.pop(0))
-    assert roll_dice("1") == "10 (4)"
+    assert roll_dice("1") == "Successes: 1\n10 (4)"
 
 
 def test_roll_dice_9again(monkeypatch):
     results = [10, 9, 4]
     monkeypatch.setattr(dice, "_roll_single", lambda: results.pop(0))
-    assert roll_dice("1 9again") == "10 (9) (4)"
+    assert roll_dice("1 9again") == "Successes: 2\n10 (9) (4)"
 
 
 def test_roll_dice_8again(monkeypatch):
     results = [10, 9, 8, 4]
     monkeypatch.setattr(dice, "_roll_single", lambda: results.pop(0))
-    assert roll_dice("1 8again") == "10 (9) (8) (4)"
+    assert roll_dice("1 8again") == "Successes: 3\n10 (9) (8) (4)"
 
 
 def test_roll_dice_multiple(monkeypatch):
     results = [4, 2, 5, 3]
     monkeypatch.setattr(dice, "_roll_single", lambda: results.pop(0))
-    assert roll_dice("4") == "4 2 5 3"
+    assert roll_dice("4") == "Successes: 0\n4 2 5 3\nFool of a Took!"
 
 
 def test_roll_dice_add(monkeypatch):
     results = [4, 2, 5, 3]
     monkeypatch.setattr(dice, "_roll_single", lambda: results.pop(0))
-    assert roll_dice("2 2") == "4 2 5 3"
+    assert roll_dice("2 2") == "Successes: 0\n4 2 5 3\nFool of a Took!"

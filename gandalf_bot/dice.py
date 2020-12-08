@@ -78,7 +78,10 @@ def roll_dice(s: str) -> str:
             if val < roll_type.value[1]:
                 break
             is_bonus = True
-    return " ".join([str(p) for p in results])
+    successes = len([r for r in results if r.value >= 8])
+    roll_result_str = " ".join([str(r) for r in results])
+    sass = "\nFool of a Took!" if successes == 0 else ""
+    return "Successes: {}\n{}{}".format(successes, roll_result_str, sass)
 
 
 def roll_dice_help() -> str:

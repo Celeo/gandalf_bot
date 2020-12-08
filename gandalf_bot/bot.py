@@ -156,7 +156,8 @@ async def roll(context: Context, *args: str) -> None:
     if "help" in args:
         await context.send(roll_dice_help())
         return
-    await context.send(roll_dice(" ".join(args)))
+    result = roll_dice(" ".join(args))
+    await context.send(f"{context.message.author.mention} {result}")
 
 
 # =================
