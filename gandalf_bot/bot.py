@@ -200,14 +200,22 @@ async def _handle_rection(payload: RawReactionActionEvent, add: bool) -> None:
         if conf_role.matches(channel_id, message_id, emoji_name):
             for role_obj in member.guild.roles:
                 if role_obj.name == conf_role.role_name:
-                    verb = "Adding" if add else "Removing"
-                    logger.debug(
-                        f'{verb} role "{conf_role.role_name}" for "{member.display_name}"'
-                    )
                     if add:
+                        logger.debug(
+                            f'Adding role "{conf_role.role_name}" to "{member.display_name}"'
+                        )
                         await member.add_roles(role_obj)
+                        await member.send(
+                            f'You have been granted the role "{conf_role.role_name}" on the server "{member.guild.name}"'
+                        )
                     else:
+                        logger.debug(
+                            f'Removing role "{conf_role.role_name}" from "{member.display_name}"'
+                        )
                         await member.remove_roles(role_obj)
+                        await member.send(
+                            f'You have been stripped of the role "{conf_role.role_name}" on the server "{member.guild.name}"'
+                        )
                     return
             logger.warning(f'Could not find a role with name "{conf_role.role_name}"')
             return
