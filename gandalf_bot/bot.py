@@ -1,4 +1,3 @@
-from enum import Enum, auto
 import logging
 import os
 from typing import Optional
@@ -13,11 +12,11 @@ from discord import (
 from discord.ext import commands
 from discord.ext.commands import Context, CommandError
 from loguru import logger
+from more_itertools import grouper
 from prettytable import PrettyTable
 
 from .config import (
     BasicConfig,
-    ROLE_CONFIG_FILE_NAME,
     RoleConfigEntry,
     connect_to_db,
     load_roles_from_disk,
@@ -57,7 +56,6 @@ def admin_command_check(context: Context) -> bool:
 # ===============
 # SCP Containment
 # ===============
-
 
 async def _get_containment_role(
     context: Context, config=BasicConfig.from_disk()
@@ -288,26 +286,35 @@ async def reactionroles(context: Context) -> None:
     if len(roles) == 0:
         await context.send("There are no configured reaction roles")
         return
-    table = PrettyTable()
-    table.field_names = [
+    header = "**Configured reaction roles**\n"
+    field_names = [
         "Index",
         "Channel ID",
         "Message ID",
         "Role name",
         "Emoji",
     ]
-    for index, role in enumerate(roles):
-        table.add_row(
-            [
-                index,
-                role.channel_id,
-                role.message_id,
-                role.role_name,
-                role.emoji_name,
-            ]
-        )
-    s = "**Configured reaction roles**\n```\n{}\n```".format(table.get_string())
-    await context.send(s)
+    row_index = 0
+    for group_index, group in enumerate(grouper(roles, 10)):
+        table = PrettyTable()
+        table.field_names = field_names
+        for role in group:
+            if not role:
+                continue
+            table.add_row(
+                [
+                    row_index,
+                    role.channel_id,
+                    role.message_id,
+                    role.role_name,
+                    role.emoji_name,
+                ]
+            )
+            row_index += 1
+        s = "```\n{}\n```".format(table.get_string())
+        if group_index == 0:
+            s = header + s
+        await context.send(s)
 
 
 # =======
