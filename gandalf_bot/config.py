@@ -47,6 +47,13 @@ class RoleConfigEntry(Model):
     class Meta:
         database = db["proxy"]
 
+    def matches(self, channel_id: int, message_id: int, emoji_name: str) -> bool:
+        return (
+            self.channel_id == channel_id
+            and self.message_id == message_id
+            and self.emoji_name == emoji_name
+        )
+
     def __str__(self) -> str:
         return f"<RoleConfigEntry {self.role_name}>"
 

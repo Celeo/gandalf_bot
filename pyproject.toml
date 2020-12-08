@@ -10,6 +10,7 @@ python = "^3.9"
 loguru = "^0.5.3"
 httpx = "^0.16.1"
 peewee = "^3.14.0"
+prettytable = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

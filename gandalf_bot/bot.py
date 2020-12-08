@@ -1,14 +1,27 @@
+from enum import Enum, auto
 import logging
 import os
 from typing import Optional
 
 import discord
-from discord import File, Message, Role
+from discord import (
+    File,
+    Message,
+    Role,
+    RawReactionActionEvent,
+)
 from discord.ext import commands
-from discord.ext.commands import Context
+from discord.ext.commands import Context, CommandError
 from loguru import logger
+from prettytable import PrettyTable
 
-from .config import BasicConfig
+from .config import (
+    BasicConfig,
+    ROLE_CONFIG_FILE_NAME,
+    RoleConfigEntry,
+    connect_to_db,
+    load_roles_from_disk,
+)
 from .message_util import is_incoherent, BLESS_YOU_EMOJI
 from .quotes import get_random_quote
 from .dice import roll_dice, roll_dice_help
@@ -31,7 +44,12 @@ async def on_ready() -> None:
     logger.info("Bot::on_ready")
 
 
-def command_perms_check(context: Context) -> bool:
+@bot.event
+async def on_command_error(context: Context, error: CommandError) -> None:
+    pass
+
+
+def admin_command_check(context: Context) -> bool:
     """Command check gate that prevents commands from being issued by non-admins."""
     return context.author.guild_permissions.administrator
 
@@ -52,7 +70,7 @@ async def _get_containment_role(
 
 
 @bot.command(brief="Put someone into containment")
-@commands.check(command_perms_check)
+@commands.check(admin_command_check)
 async def breach(context: Context, *args: str) -> None:
     logger.debug(
         f"Bot::command::breach by {context.author.name} in {context.channel.name}"
@@ -75,7 +93,7 @@ async def breach(context: Context, *args: str) -> None:
 
 
 @bot.command(brief="Let someone out of containment")
-@commands.check(command_perms_check)
+@commands.check(admin_command_check)
 async def unbreach(context: Context, *args: str) -> None:
     logger.debug(
         f"Bot::command::unbreach by {context.author.name} in {context.channel.name}"
@@ -90,7 +108,7 @@ async def unbreach(context: Context, *args: str) -> None:
 
 
 @bot.command(brief="Get a situation report of the containment")
-@commands.check(command_perms_check)
+@commands.check(admin_command_check)
 async def sitrep(context: Context, *args: str) -> None:
     logger.debug(
         f"Bot::command::sitrep by {context.author.name} in {context.channel.name}"
@@ -120,8 +138,9 @@ async def on_message(message: Message) -> None:
     await bot.process_commands(message)
     if message.author == bot.user:
         return
-    if message.author.id in BasicConfig.from_disk().blessable_user_ids and is_incoherent(
-        message.content
+    if (
+        message.author.id in BasicConfig.from_disk().blessable_user_ids
+        and is_incoherent(message.content)
     ):
         await message.add_reaction(BLESS_YOU_EMOJI)
     if bot.user in message.mentions:
@@ -133,7 +152,7 @@ async def on_message(message: Message) -> None:
 # ============
 
 
-@bot.command(brief="Roll some Chronicles of Darkness dice")
+@bot.command(brief="Roll some CoD dice")
 async def roll(context: Context, *args: str) -> None:
     if "help" in args:
         await context.send(roll_dice_help())
@@ -146,7 +165,7 @@ async def roll(context: Context, *args: str) -> None:
 # =================
 
 
-@bot.command()
+@bot.command(brief="Show a CoD merit screenshot")
 async def merit(context: Context, *args: str) -> None:
     if len(args) == 0:
         await context.send("Usage: `!merit [name]`")
@@ -167,6 +186,122 @@ async def merit(context: Context, *args: str) -> None:
         await context.send("Could not find any matching merit screenshots")
 
 
+# ==============
+# Reaction roles
+# ==============
+
+
+async def _handle_rection(payload: RawReactionActionEvent, add: bool) -> None:
+    member = payload.member
+    channel_id = payload.channel_id
+    message_id = payload.message_id
+    emoji_name = payload.emoji.name
+    for conf_role in load_roles_from_disk():
+        if conf_role.matches(channel_id, message_id, emoji_name):
+            for role_obj in member.guild.roles:
+                if role_obj.name == conf_role.role_name:
+                    verb = "Adding" if add else "Removing"
+                    logger.debug(
+                        f'{verb} role "{conf_role.role_name}" for "{member.display_name}"'
+                    )
+                    if add:
+                        await member.add_roles(role_obj)
+                    else:
+                        await member.remove_roles(role_obj)
+                    return
+            logger.warning(f'Could not find a role with name "{conf_role.role_name}"')
+            return
+
+
+@bot.event
+async def on_raw_reaction_add(payload: RawReactionActionEvent) -> None:
+    await _handle_rection(payload, True)
+
+
+@bot.event
+async def on_raw_reaction_remove(payload: RawReactionActionEvent) -> None:
+    # This payload contains `member == None`, so pull the needed data from
+    # the client and populate the payload with a `Member` before processing.
+    guild = bot.get_guild(payload.guild_id)
+    member = guild.get_member(payload.user_id)
+    payload.member = member
+    await _handle_rection(payload, False)
+
+
+@bot.command(brief="Add or remove a reaction role assignment")
+@commands.check(admin_command_check)
+async def reactionrole(
+    context: Context,
+    add_or_remove: str,
+    channel_id: int,
+    message_id: int,
+    emoji_name: str,
+    role: Role,
+) -> None:
+    if add_or_remove.lower() in ("add", "create"):
+        for existing in load_roles_from_disk():
+            if existing.matches(
+                channel_id=channel_id,
+                message_id=message_id,
+                emoji_name=emoji_name,
+            ):
+                await context.send(
+                    "A configuration for that combination already exists"
+                )
+                return
+        RoleConfigEntry.create(
+            channel_id=channel_id,
+            message_id=message_id,
+            emoji_name=emoji_name,
+            role_name=role.name,
+        )
+        await context.send("Reaction role created")
+    elif add_or_remove.lower() in ("remove", "delete"):
+        for existing in load_roles_from_disk():
+            if existing.matches(
+                channel_id=channel_id,
+                message_id=message_id,
+                emoji_name=emoji_name,
+            ):
+                existing.delete_instance()
+                await context.send("Reaction role removed")
+                return
+        await context.send("No matching reaction role found")
+    else:
+        await context.send(
+            f'Unknown <add_or_remove> parameter: "{add_or_remove}". Try "add" or "remove" next time.'
+        )
+
+
+@bot.command(brief="List configured reaction roles")
+@commands.check(admin_command_check)
+async def reactionroles(context: Context) -> None:
+    roles = load_roles_from_disk()
+    if len(roles) == 0:
+        await context.send("There are no configured reaction roles")
+        return
+    table = PrettyTable()
+    table.field_names = [
+        "Index",
+        "Channel ID",
+        "Message ID",
+        "Role name",
+        "Emoji",
+    ]
+    for index, role in enumerate(roles):
+        table.add_row(
+            [
+                index,
+                role.channel_id,
+                role.message_id,
+                role.role_name,
+                role.emoji_name,
+            ]
+        )
+    s = "**Configured reaction roles**\n```\n{}\n```".format(table.get_string())
+    await context.send(s)
+
+
 # =======
 # Startup
 # =======
@@ -175,5 +310,6 @@ async def merit(context: Context, *args: str) -> None:
 def main() -> None:
     logger.debug("Setting up")
     config = BasicConfig.from_disk()
+    connect_to_db()
     bot.run(config.token)
     logger.warning("Bot terminated")
