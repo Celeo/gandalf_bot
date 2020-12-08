@@ -57,6 +57,7 @@ def admin_command_check(context: Context) -> bool:
 # SCP Containment
 # ===============
 
+
 async def _get_containment_role(
     context: Context, config=BasicConfig.from_disk()
 ) -> Optional[Role]:
@@ -191,6 +192,8 @@ async def merit(context: Context, *args: str) -> None:
 
 async def _handle_rection(payload: RawReactionActionEvent, add: bool) -> None:
     member = payload.member
+    if member.bot:
+        return
     channel_id = payload.channel_id
     message_id = payload.message_id
     emoji_name = payload.emoji.name
