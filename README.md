@@ -39,6 +39,14 @@ cd bless_you_bot
 poetry install
 ```
 
+### Running tests
+
+| | |
+| --- | --- |
+| No coverage | `poetry run pytest`
+| Coverage printout | `poetry run pytest --cov=gandalf_bot` |
+| Coverage report | `poetry run pytest --cov=gandalf_bot --cov-report=html` |
+
 ## License
 
 Licensed under MIT ([LICENSE](LICENSE)).

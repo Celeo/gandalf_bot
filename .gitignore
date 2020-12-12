@@ -6,3 +6,5 @@ roles.test.db
 __pycache__
 *.pyc
 words.txt
+.coverage
+htmlcov
