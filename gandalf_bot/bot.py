@@ -48,7 +48,7 @@ async def on_command_error(context: Context, error: CommandError) -> None:
     pass
 
 
-def admin_command_check(context: Context) -> bool:
+def _admin_command_check(context: Context) -> bool:
     """Command check gate that prevents commands from being issued by non-admins."""
     return context.author.guild_permissions.administrator
 
@@ -69,7 +69,7 @@ async def _get_containment_role(
 
 
 @bot.command(brief="Put someone into containment")
-@commands.check(admin_command_check)
+@commands.check(_admin_command_check)
 async def breach(context: Context, *args: str) -> None:
     logger.debug(
         f"Bot::command::breach by {context.author.name} in {context.channel.name}"
@@ -92,7 +92,7 @@ async def breach(context: Context, *args: str) -> None:
 
 
 @bot.command(brief="Let someone out of containment")
-@commands.check(admin_command_check)
+@commands.check(_admin_command_check)
 async def unbreach(context: Context, *args: str) -> None:
     logger.debug(
         f"Bot::command::unbreach by {context.author.name} in {context.channel.name}"
@@ -107,7 +107,7 @@ async def unbreach(context: Context, *args: str) -> None:
 
 
 @bot.command(brief="Get a situation report of the containment")
-@commands.check(admin_command_check)
+@commands.check(_admin_command_check)
 async def sitrep(context: Context, *args: str) -> None:
     logger.debug(
         f"Bot::command::sitrep by {context.author.name} in {context.channel.name}"
@@ -239,7 +239,7 @@ async def on_raw_reaction_remove(payload: RawReactionActionEvent) -> None:
 
 
 @bot.command(brief="Add or remove a reaction role assignment")
-@commands.check(admin_command_check)
+@commands.check(_admin_command_check)
 async def reactionrole(
     context: Context,
     add_or_remove: str,
@@ -284,7 +284,7 @@ async def reactionrole(
 
 
 @bot.command(brief="List configured reaction roles")
-@commands.check(admin_command_check)
+@commands.check(_admin_command_check)
 async def reactionroles(context: Context) -> None:
     roles = load_roles_from_disk()
     if len(roles) == 0:
