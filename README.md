@@ -1,6 +1,9 @@
 # gandalf_bot
 
 ![CI](https://github.com/Celeo/gandalf_bot/workflows/CI/badge.svg?branch=master)
+![Python version](https://img.shields.io/badge/Python-3.7+-blue)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 A Discord bot.
 
