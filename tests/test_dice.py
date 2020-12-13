@@ -1,5 +1,11 @@
 from gandalf_bot import dice
-from gandalf_bot.dice import RollType, roll_dice_help, roll_dice, count_dice_to_roll
+from gandalf_bot.dice import (
+    RollType,
+    roll_dice_help,
+    roll_dice,
+    count_dice_to_roll,
+    _roll_single,
+)
 
 
 def test_roll_type_parse_nothing():
@@ -72,3 +78,11 @@ def test_roll_dice_add(monkeypatch):
     results = [4, 2, 5, 3]
     monkeypatch.setattr(dice, "_roll_single", lambda: results.pop(0))
     assert roll_dice("2 2") == "Successes: 0\n4 2 5 3\nFool of a Took!"
+
+
+def tet_roll_dice_none():
+    assert roll_dice(" ") == "Could not parse any dice to roll"
+
+
+def test_roll_single():
+    assert 0 < _roll_single() <= 10

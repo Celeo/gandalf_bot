@@ -72,3 +72,19 @@ def test_db_load_roles_from_disk():
     roles = load_roles_from_disk()
     assert len(roles) == 1
     assert roles[0] == rce
+
+
+def role_config_entry_matches():
+    a = RoleConfigEntry(1, 2, "a")
+    assert a.matches(1, 2, "a")
+    assert not a.matches(1, 2, "b")
+
+
+def role_config_entry_str():
+    a = RoleConfigEntry(1, 2, "a")
+    assert str(a) == "<RoleConfigEntry a>"
+
+
+def role_config_entry_repr():
+    a = RoleConfigEntry(1, 2, "a")
+    assert repr(a) == "<RoleConfigEntry 1 1 a None>"

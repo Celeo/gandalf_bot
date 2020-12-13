@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from enum import Enum
 import re
 from random import randint
-from typing import List
 
 from loguru import logger
 

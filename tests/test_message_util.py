@@ -23,6 +23,10 @@ def test_is_incoherent_patterns():
     assert not is_incoherent("<:Screampackman2:754148436906999888>")
 
 
+def test_is_incoherent():
+    assert is_incoherent("kljasdfjldiksafjklsda")
+
+
 def test_strip_formatting():
     assert "word" == strip_formatting("word")
     assert "word" == strip_formatting("*word*")
