@@ -34,8 +34,8 @@ If you want to enable the functionality to post screenshots of merits, you'll ne
 ### Steps
 
 ```sh
-git clone https://github.com/Celeo/bless_you_bot
-cd bless_you_bot
+git clone https://github.com/Celeo/gandalf_bot
+cd gandalf_bot
 poetry install
 ```
 
