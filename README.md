@@ -1,6 +1,7 @@
 # gandalf_bot
 
 [![CI](https://github.com/Celeo/gandalf_bot/workflows/CI/badge.svg?branch=master)](https://github.com/Celeo/gandalf_bot/actions?query=workflow%3ACI)
+[![codecov](https://codecov.io/gh/Celeo/gandalf_bot/branch/master/graph/badge.svg?token=2R9RY3P229)](https://codecov.io/gh/Celeo/gandalf_bot)
 [![Python version](https://img.shields.io/badge/Python-3.7+-blue)](https://www.python.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
@@ -29,7 +30,7 @@ If you want to enable the functionality to post screenshots of merits, you'll ne
 
 * Git
 * Poetry
-* Python 3.9
+* Python 3.7+
 
 ### Steps
 
