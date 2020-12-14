@@ -1,7 +1,0 @@
-{
-  "python.pythonPath": "/home/matt/.cache/pypoetry/virtualenvs/gandalf-bot-bSC2GxYM-py3.9/bin/python",
-  "[python]": {
-    "editor.formatOnSave": true
-  },
-  "python.formatting.provider": "black"
-}

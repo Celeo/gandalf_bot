@@ -9,3 +9,4 @@ words.txt
 .coverage
 htmlcov
 coverage.xml
+.vscode/settings.json
