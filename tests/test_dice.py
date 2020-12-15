@@ -80,7 +80,7 @@ def test_roll_dice_add(monkeypatch):
     assert roll_dice("2 2") == "Successes: 0\n4 2 5 3\nFool of a Took!"
 
 
-def tet_roll_dice_none():
+def test_roll_dice_none():
     assert roll_dice(" ") == "Could not parse any dice to roll"
 
 

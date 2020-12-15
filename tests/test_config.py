@@ -48,6 +48,16 @@ def clean_test_files():
         os.remove(ROLES_DB_FILE_TEST_NAME)
 
 
+@pytest.fixture
+def sample_rce():
+    rce = RoleConfigEntry()
+    rce.channel_id = 1
+    rce.message_id = 2
+    rce.emoji_name = "a"
+    rce.role_name = "b"
+    return rce
+
+
 def test_from_disk():
     with open(BASIC_CONFIG_FILE_TEST_NAME, "w") as f:
         f.write(BASIC_CONFIG_FILE_TEST_CONTENT)
@@ -74,17 +84,14 @@ def test_db_load_roles_from_disk():
     assert roles[0] == rce
 
 
-def role_config_entry_matches():
-    a = RoleConfigEntry(1, 2, "a")
-    assert a.matches(1, 2, "a")
-    assert not a.matches(1, 2, "b")
+def test_role_config_entry_matches(sample_rce):
+    assert sample_rce.matches(1, 2, "a")
+    assert not sample_rce.matches(1, 2, "b")
 
 
-def role_config_entry_str():
-    a = RoleConfigEntry(1, 2, "a")
-    assert str(a) == "<RoleConfigEntry a>"
+def test_role_config_entry_str(sample_rce):
+    assert str(sample_rce) == "<RoleConfigEntry b>"
 
 
-def role_config_entry_repr():
-    a = RoleConfigEntry(1, 2, "a")
-    assert repr(a) == "<RoleConfigEntry 1 1 a None>"
+def test_role_config_entry_repr(sample_rce):
+    assert repr(sample_rce) == "<RoleConfigEntry 1 2 a b>"
