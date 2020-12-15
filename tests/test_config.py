@@ -51,10 +51,10 @@ def clean_test_files():
 @pytest.fixture
 def sample_rce():
     rce = RoleConfigEntry()
-    rce.channel_id = 1
-    rce.message_id = 2
-    rce.emoji_name = "a"
-    rce.role_name = "b"
+    rce.channel_id = 1  # type: ignore
+    rce.message_id = 2  # type: ignore
+    rce.emoji_name = "a"  # type: ignore
+    rce.role_name = "b"  # type: ignore
     return rce
 
 
