@@ -9,7 +9,7 @@ from loguru import logger
 ENGLISH_WORDS_FILE_URL = (
     "https://raw.githubusercontent.com/dwyl/english-words/master/words.txt"
 )
-ENGLISH_WORDS_FILE = "words.txt"
+ENGLISH_WORDS_FILE_NAME = "words.txt"
 MINIMUM_MESSAGE_LENGTH = 8
 BLESS_YOU_EMOJI = "🤧"
 IGNORE_PATTERNS = [
@@ -23,14 +23,14 @@ IGNORE_PATTERNS = [
 
 
 def _fetch_english_words() -> List[str]:
-    if os.path.exists(ENGLISH_WORDS_FILE):
-        with open(ENGLISH_WORDS_FILE) as f:
+    if os.path.exists(ENGLISH_WORDS_FILE_NAME):
+        with open(ENGLISH_WORDS_FILE_NAME) as f:
             return [line.strip() for line in f.readlines()]
     logger.debug("Downloading word list from GitHub")
     resp = httpx.get(ENGLISH_WORDS_FILE_URL)
     if resp.status_code != 200:
-        raise ValueError(f"Got status for {resp.status_code} from GitHub")
-    with open(ENGLISH_WORDS_FILE, "w") as f:
+        raise ValueError(f"Got status code {resp.status_code} from GitHub")
+    with open(ENGLISH_WORDS_FILE_NAME, "w") as f:
         f.write(resp.text)
     return resp.text.split("\n")
 
