@@ -24,11 +24,15 @@ async def test_on_command_error():
     await on_command_error(None, None)
 
 
-def test_admin_command_check(mocker):
+def test_admin_command_check_success(mocker):
     context = mocker.MagicMock()
     context.author.guild_permissions.administrator = True
     ret = _admin_command_check(context)
     assert ret
+
+
+def test_admin_command_check_fail(mocker):
+    context = mocker.MagicMock()
     context.author.guild_permissions.administrator = False
     ret = _admin_command_check(context)
     assert not ret
@@ -42,9 +46,9 @@ async def test_get_containment_role(mocker):
     config = mocker.MagicMock()
     config.containment_role_id = 1
     ret = await _get_containment_role(context, config)
+    assert ret == role
     context.guild.get_role.assert_called_with(1)
     context.send.assert_not_called()
-    assert ret == role
 
 
 @pytest.mark.asyncio
