@@ -6,8 +6,8 @@ import pytest
 from gandalf_bot import message_util
 from gandalf_bot.message_util import (
     is_incoherent,
-    strip_formatting,
-    strip_punctuation,
+    _strip_formatting,
+    _strip_punctuation,
     _fetch_english_words,
 )
 
@@ -91,17 +91,17 @@ def test_is_incoherent(offline_word_list):
     assert is_incoherent("kljasdfjldiksafjklsda")
 
 
-def test_strip_formatting():
-    assert "word" == strip_formatting("word")
-    assert "word" == strip_formatting("*word*")
-    assert "word" == strip_formatting("**word**")
-    assert "word" == strip_formatting("_word_")
-    assert "word" == strip_formatting("~~word~~")
-    assert "word" == strip_formatting("`word`")
-    assert "word" == strip_formatting("***word***")
+def test__strip_formatting():
+    assert "word" == _strip_formatting("word")
+    assert "word" == _strip_formatting("*word*")
+    assert "word" == _strip_formatting("**word**")
+    assert "word" == _strip_formatting("_word_")
+    assert "word" == _strip_formatting("~~word~~")
+    assert "word" == _strip_formatting("`word`")
+    assert "word" == _strip_formatting("***word***")
 
 
-def test_strip_punctuation():
-    assert "word" == strip_punctuation('"word"')
-    assert "word" == strip_punctuation("word!!")
-    assert "word" == strip_punctuation("word???")
+def test__strip_punctuation():
+    assert "word" == _strip_punctuation('"word"')
+    assert "word" == _strip_punctuation("word!!")
+    assert "word" == _strip_punctuation("word???")

@@ -35,11 +35,11 @@ def _fetch_english_words() -> List[str]:
     return resp.text.split("\n")
 
 
-def strip_formatting(content: str) -> str:
+def _strip_formatting(content: str) -> str:
     return content.replace("*", "").replace("_", "").replace("~", "").replace("`", "")
 
 
-def strip_punctuation(content: str) -> str:
+def _strip_punctuation(content: str) -> str:
     return content.replace("?", "").replace("!", "").replace('"', "")
 
 
@@ -47,7 +47,7 @@ def is_incoherent(content: str) -> bool:
     if " " in content:
         logger.debug("Message contains a space")
         return False
-    content = strip_formatting(strip_punctuation(content.lower()))
+    content = _strip_formatting(_strip_punctuation(content.lower()))
     if len(content) < MINIMUM_MESSAGE_LENGTH:
         logger.debug(f"Message was only {len(content)} chars long")
         return False
