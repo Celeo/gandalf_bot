@@ -3,7 +3,7 @@ from gandalf_bot.dice import (
     RollType,
     roll_dice_help,
     roll_dice,
-    count_dice_to_roll,
+    _count_dice_to_roll,
     _roll_single,
 )
 
@@ -43,41 +43,50 @@ def test_roll_dice_chance_fail(monkeypatch):
 
 
 def test_count_dice_to_roll():
-    assert count_dice_to_roll("1") == 1
-    assert count_dice_to_roll("1 1") == 2
-    assert count_dice_to_roll("1 9again") == 1
-    assert count_dice_to_roll("10 8again") == 10
-    assert count_dice_to_roll("chance") == 0
+    assert _count_dice_to_roll("1") == 1
+    assert _count_dice_to_roll("1 1") == 2
+    assert _count_dice_to_roll("1 9again") == 1
+    assert _count_dice_to_roll("10 8again") == 10
+    assert _count_dice_to_roll("chance") == 0
+    assert _count_dice_to_roll("1 + 3 - 2") == 2
+    assert _count_dice_to_roll("1+3-2") == 2
+    assert _count_dice_to_roll("1 +3 -2") == 2
+    assert _count_dice_to_roll("1 + 3 - 2 8again") == 2
 
 
 def test_roll_dice_10again(monkeypatch):
     results = [10, 4]
     monkeypatch.setattr(dice, "_roll_single", lambda: results.pop(0))
     assert roll_dice("1") == "Successes: 1\n10 (4)"
+    assert not results
 
 
 def test_roll_dice_9again(monkeypatch):
     results = [10, 9, 4]
     monkeypatch.setattr(dice, "_roll_single", lambda: results.pop(0))
     assert roll_dice("1 9again") == "Successes: 2\n10 (9) (4)"
+    assert not results
 
 
 def test_roll_dice_8again(monkeypatch):
     results = [10, 9, 8, 4]
     monkeypatch.setattr(dice, "_roll_single", lambda: results.pop(0))
     assert roll_dice("1 8again") == "Successes: 3\n10 (9) (8) (4)"
+    assert not results
 
 
 def test_roll_dice_multiple(monkeypatch):
     results = [4, 2, 5, 3]
     monkeypatch.setattr(dice, "_roll_single", lambda: results.pop(0))
     assert roll_dice("4") == "Successes: 0\n4 2 5 3\nFool of a Took!"
+    assert not results
 
 
-def test_roll_dice_add(monkeypatch):
+def test_roll_dice_math(monkeypatch):
     results = [4, 2, 5, 3]
     monkeypatch.setattr(dice, "_roll_single", lambda: results.pop(0))
-    assert roll_dice("2 2") == "Successes: 0\n4 2 5 3\nFool of a Took!"
+    assert roll_dice("2 +3  - 1") == "Successes: 0\n4 2 5 3\nFool of a Took!"
+    assert not results
 
 
 def test_roll_dice_none():

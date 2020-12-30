@@ -8,6 +8,8 @@ from loguru import logger
 
 RESULT_MINIMUM_FOR_SUCCESS = 8
 NUMERIC_REGEX = re.compile(r"^\d+$")
+SYMBOL_REGEX = re.compile(r"^[+|-]$")
+DICE_INPUT_SPLIT_REGEX = re.compile(r"([ |\-|+])")
 
 
 class RollType(Enum):
@@ -32,6 +34,12 @@ class RollType(Enum):
         return RollType.EXPLODE_10
 
 
+class RollPartMod(Enum):
+
+    ADD = "+"
+    SUBTRACT = "-"
+
+
 @dataclass
 class Roll:
 
@@ -44,11 +52,21 @@ class Roll:
         return f"{self.value}"
 
 
-def count_dice_to_roll(s: str) -> int:
-    val = 0
-    for part in s.split():
-        if NUMERIC_REGEX.match(part):
-            val += int(part)
+def _count_dice_to_roll(s: str) -> int:
+    """Determine how many dice the user has requested.
+
+    This method handles single values ("3", "10") and
+    math combinations ("1 + 3 - 2").
+    """
+    val, mod = 0, RollPartMod.ADD
+    parts = DICE_INPUT_SPLIT_REGEX.split(s)
+    for part in parts:
+        if not part:
+            continue
+        elif NUMERIC_REGEX.match(part):
+            val += int(part) * (1 if mod == RollPartMod.ADD else -1)
+        elif SYMBOL_REGEX.match(part):
+            mod = RollPartMod(part)
     return val
 
 
@@ -64,7 +82,7 @@ def roll_dice(s: str) -> str:
         if val == 10:
             return "Chance succeeded!"
         return f"Chance failed ({val})"
-    dice_count = count_dice_to_roll(s)
+    dice_count = _count_dice_to_roll(s)
     if dice_count == 0:
         return "Could not parse any dice to roll"
     logger.debug(f"Rolling a total of {dice_count} dice with type {roll_type}")
@@ -85,10 +103,13 @@ def roll_dice(s: str) -> str:
 
 def roll_dice_help() -> str:
     return """Roll dice for Chronicles of Darkness
-Command: `!roll [#|chance] (10again|9again|8again)`
+
+Command: `!roll [#|chance] (10again|9again|8again) [...]`
 Examples:
 -- `!roll 4`
 -- `!roll 3 10again`
 -- `!roll 8 9again`
 -- `!roll 2 8again`
--- `!roll chance`"""
+-- `!roll chance`
+-- `!roll 1 + 3 - 2`
+"""
