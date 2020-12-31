@@ -182,7 +182,7 @@ QUOTES = [
     "Fool of a Took!",
     "Shadowfax. He is the lord of all horses and has been my friend through many dangers.",
     "No. No it isn't.",
-    "Now listen carefully. Lord Denethor is Boromir's father. To give him news of his beloved son's death would be most unwise. And do not mention Frodo or the Ring. And say nothing of Aragorn either. In fact, its better if you don't speak at all DiscoShaman.",
+    "Now listen carefully. Lord Denethor is Boromir's father. To give him news of his beloved son's death would be most unwise. And do not mention Frodo or the Ring. And say nothing of Aragorn either. In fact, its better if you don't speak at all.",
     "Ooh! The long expected party! So how is the old rascal? I hear it's got to be a party of special magnificence",
     "So passes Denethor, son of Ecthelion.",
     "So do all who live to see such times. But that is not for them to decide. All we have to decide is what to do with the time that is given to us.",
