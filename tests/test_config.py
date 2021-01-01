@@ -95,3 +95,9 @@ def test_role_config_entry_str(sample_rce):
 
 def test_role_config_entry_repr(sample_rce):
     assert repr(sample_rce) == "<RoleConfigEntry 1 2 a b>"
+
+
+def test_connect_to_db():
+    connect_to_db()
+    os.remove(ROLES_DB_FILE_TEST_NAME)
+    connect_to_db()
