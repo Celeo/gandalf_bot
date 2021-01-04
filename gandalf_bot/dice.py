@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 import re
-from random import randint
+from random import SystemRandom
 
 from loguru import logger
 
@@ -10,6 +10,8 @@ RESULT_MINIMUM_FOR_SUCCESS = 8
 NUMERIC_REGEX = re.compile(r"^\d+$")
 SYMBOL_REGEX = re.compile(r"^[+|-]$")
 DICE_INPUT_SPLIT_REGEX = re.compile(r"([ |\-|+])")
+
+rand = SystemRandom()
 
 
 class RollType(Enum):
@@ -71,7 +73,7 @@ def _count_dice_to_roll(s: str) -> int:
 
 
 def _roll_single() -> int:
-    return randint(1, 10)
+    return rand.randint(1, 10)
 
 
 def roll_dice(s: str) -> str:
