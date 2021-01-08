@@ -12,6 +12,7 @@ httpx = "^0.16.1"
 peewee = "^3.14.0"
 prettytable = "^2.0.0"
 more-itertools = "^8.6.0"
+crontab = "^0.22.9"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

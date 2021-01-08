@@ -2,5 +2,6 @@
   "token": "",
   "containment_role_id": 0,
   "containment_response_gif": null,
-  "blessable_user_ids": []
+  "blessable_user_ids": [],
+  "scheduled": []
 }

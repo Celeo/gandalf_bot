@@ -75,7 +75,7 @@ def test_main(monkeypatch, mocker):
     bot_mock = mocker.MagicMock()
     monkeypatch.setattr(bot, "bot", bot_mock)
     monkeypatch.setattr(
-        BasicConfig, "from_disk", lambda: BasicConfig("abc", 0, None, [])
+        BasicConfig, "from_disk", lambda: BasicConfig("abc", 0, None, [], [])
     )
     main()
     bot_mock.run.assert_called_once_with("abc")

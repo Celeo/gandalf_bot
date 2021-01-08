@@ -1,3 +1,4 @@
+from asyncio import sleep
 import logging
 import os
 from typing import Optional
@@ -11,6 +12,7 @@ from discord import (
 )
 from discord.ext import commands
 from discord.ext.commands import Context, CommandError
+from discord.ext.commands.bot import Bot
 from loguru import logger
 from more_itertools import grouper
 from prettytable import PrettyTable
@@ -321,6 +323,24 @@ async def reactionroles(context: Context) -> None:
         await context.send(s)
 
 
+# ===============
+# Scheduled pings
+# ===============
+
+
+async def background_task(bot: Bot) -> None:
+    logger.debug("Background task started")
+    await bot.wait_until_ready()
+    while not bot.is_closed():
+        logger.debug("Background task :: tick")
+        config = BasicConfig.from_disk()
+        for ping in config.scheduled:
+            if ping.should_ping():
+                channel = bot.get_channel(ping.channel_id)
+                await channel.send(ping.message)
+        await sleep(60)
+
+
 # =======
 # Startup
 # =======
@@ -330,5 +350,6 @@ def main() -> None:
     logger.debug("Setting up")
     config = BasicConfig.from_disk()
     connect_to_db()
+    bot.loop.create_task(background_task(bot))
     bot.run(config.token)
     logger.warning("Bot terminated")

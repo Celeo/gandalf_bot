@@ -1,9 +1,11 @@
+from datetime import datetime
 import os
 
 import pytest
 
 from gandalf_bot.config import (
     BasicConfig,
+    ScheduledPing,
     load_roles_from_disk,
     db,
     connect_to_db,
@@ -21,6 +23,13 @@ BASIC_CONFIG_FILE_TEST_CONTENT = """
   "blessable_user_ids": [
       123,
       456
+  ],
+  "scheduled": [
+      {
+        "channel_id": 123456,
+        "message": "Let's go",
+        "cron": "30 17 * * 3"
+      }
   ]
 }
 """
@@ -66,6 +75,9 @@ def test_from_disk():
     assert c.containment_role_id == 1234567890
     assert c.containment_response_gif == "https://example.com"
     assert c.blessable_user_ids == [123, 456]
+    assert c.scheduled == [
+        ScheduledPing(channel_id=123456, message="Let's go", cron="30 17 * * 3")
+    ]
 
 
 def test_db_create_empty():
@@ -101,3 +113,15 @@ def test_connect_to_db():
     connect_to_db()
     os.remove(ROLES_DB_FILE_TEST_NAME)
     connect_to_db()
+
+
+def test_scheduled_ping_should_ping():
+    ping = ScheduledPing(channel_id=123456, message="Let's go", cron="30 17 * * 3")
+    assert ping.should_ping(datetime(2021, 1, 6, 17, 0, 0)) == False
+    assert ping.should_ping(datetime(2021, 1, 6, 17, 28, 0)) == False
+    assert ping.should_ping(datetime(2021, 1, 6, 17, 30, 1)) == False
+    assert ping.should_ping(datetime(2021, 1, 6, 17, 28, 59)) == False
+    assert ping.should_ping(datetime(2021, 1, 6, 17, 29))
+    assert ping.should_ping(datetime(2021, 1, 6, 17, 29, 30))
+    assert ping.should_ping(datetime(2021, 1, 6, 17, 29, 59))
+    assert ping.should_ping(datetime(2021, 1, 6, 17, 30)) == False
