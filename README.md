@@ -18,7 +18,7 @@ A Discord bot.
 
 1. Copy the `config.example.json` file to `config.json`
 1. Populate with at least your bot's token and the containment role id. The other fields are optional.
-1. Run with `poetry run python gandalf_bot/__init__.py`
+1. Run with `poetry run python run.py`
 
 If you want to enable the functionality to post screenshots of merits, you'll need to create your own screenshots. Sorry, but copyright.
 
