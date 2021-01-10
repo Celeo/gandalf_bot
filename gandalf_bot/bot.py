@@ -81,11 +81,15 @@ async def breach(context: Context, *args: str) -> None:
             "Command is: `!breach [name] (name2 ...)` and you have to reference the "
             + "users, like with the @[name]<tab>"
         )
+        return
     config = BasicConfig.from_disk()
     containment_role = await _get_containment_role(context, config)
     if not containment_role:
         return
     mentions = context.message.mentions
+    if not mentions:
+        await context.send("No one specified")
+        return
     for member in mentions:
         await member.add_roles(containment_role)
     if config.containment_response_gif:
@@ -99,10 +103,19 @@ async def unbreach(context: Context, *args: str) -> None:
     logger.debug(
         f"Bot::command::unbreach by {context.author.name} in {context.channel.name}"
     )
+    if not args:
+        await context.send(
+            "Command is: `!unbreach [name] (name2 ...)` and you have to reference the "
+            + "users, like with the @[name]<tab>"
+        )
+        return
     containment_role = await _get_containment_role(context)
     if not containment_role:
         return
     mentions = context.message.mentions
+    if not mentions:
+        await context.send("No one specified")
+        return
     for member in mentions:
         await member.remove_roles(containment_role)
     await context.send("It is done.")
