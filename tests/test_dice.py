@@ -95,3 +95,23 @@ def test_roll_dice_none():
 
 def test_roll_single():
     assert 0 < _roll_single() <= 10
+
+
+def test_roll_dice_rote(monkeypatch):
+    results = [4, 10, 8]
+    monkeypatch.setattr(dice, "_roll_single", lambda: results.pop(0))
+    assert roll_dice("1 rote") == "Successes: 2\n4\nExtra successes from rote: 2"
+
+
+def test_roll_dice_rote_no_extra(monkeypatch):
+    results = [8, 1]
+    monkeypatch.setattr(dice, "_roll_single", lambda: results.pop(0))
+    assert roll_dice("1 rote") == "Successes: 1\n8\nNo additional successes from rote"
+
+
+def test_roll_dice_rote_total_failure(monkeypatch):
+    results = [1, 1]
+    monkeypatch.setattr(dice, "_roll_single", lambda: results.pop(0))
+    assert roll_dice("1 rote") == (
+        "Successes: 0\n1\nFool of a Took!\n" + "No additional successes from rote"
+    )

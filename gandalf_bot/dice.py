@@ -84,10 +84,13 @@ def roll_dice(s: str) -> str:
         if val == 10:
             return "Chance succeeded!"
         return f"Chance failed ({val})"
+    is_rote = "rote" in s.lower()
     dice_count = _count_dice_to_roll(s)
     if dice_count == 0:
         return "Could not parse any dice to roll"
-    logger.debug(f"Rolling a total of {dice_count} dice with type {roll_type}")
+    logger.debug(
+        f"Rolling a total of {dice_count} dice with type {roll_type}{' (rote)' if is_rote else ''}"
+    )
     results = []
     for _ in range(dice_count):
         is_bonus = False
@@ -99,8 +102,20 @@ def roll_dice(s: str) -> str:
             is_bonus = True
     successes = len([r for r in results if r.value >= 8])
     roll_result_str = " ".join([str(r) for r in results])
+    failures = len(results) - successes
+    rote_successes = 0
+    if failures and is_rote:
+        logger.debug(f"Rote roll had {failures} failures, rolling them again")
+        nested_result = roll_dice(f"{failures} {roll_type.value[0]}")
+        rote_successes = int(nested_result.split()[1])
+        successes += rote_successes
     sass = "\nFool of a Took!" if successes == 0 else ""
-    return "Successes: {}\n{}{}".format(successes, roll_result_str, sass)
+    ret_msg = "Successes: {}\n{}{}".format(successes, roll_result_str, sass)
+    if rote_successes:
+        ret_msg += f"\nExtra successes from rote: {rote_successes}"
+    elif is_rote:
+        ret_msg += "\nNo additional successes from rote"
+    return ret_msg
 
 
 def roll_dice_help() -> str:
@@ -112,6 +127,7 @@ Examples:
 -- `!roll 3 10again`
 -- `!roll 8 9again`
 -- `!roll 2 8again`
+-- `!roll 5 rote`
 -- `!roll chance`
 -- `!roll 1 + 3 - 2`
 """
