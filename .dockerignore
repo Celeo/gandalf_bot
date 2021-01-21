@@ -1,0 +1,11 @@
+.git
+.github
+.pytest_cache
+.coverage
+.vscode
+tests
+config.json
+gandalf_bot.service
+LICENSE
+README.md
+roles.db
