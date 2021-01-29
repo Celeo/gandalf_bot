@@ -50,6 +50,13 @@ async def on_command_error(context: Context, error: CommandError) -> None:
     pass
 
 
+@bot.event
+async def on_command(context: Context) -> None:
+    logger.debug(
+        f"Command {context.invoked_with} used by {context.author.display_name}"
+    )
+
+
 def _admin_command_check(context: Context) -> bool:
     """Command check gate that prevents commands from being issued by non-admins."""
     return context.author.guild_permissions.administrator
@@ -257,12 +264,23 @@ async def on_raw_reaction_remove(payload: RawReactionActionEvent) -> None:
 @commands.check(_admin_command_check)
 async def reactionrole(
     context: Context,
-    add_or_remove: str,
-    channel_id: int,
-    message_id: int,
-    emoji_name: str,
-    role: Role,
+    add_or_remove: Optional[str],
+    channel_id: Optional[int],
+    message_id: Optional[int],
+    emoji_name: Optional[str],
+    role: Optional[Role],
 ) -> None:
+    if (
+        not add_or_remove
+        or not channel_id
+        or not message_id
+        or not emoji_name
+        or not role
+    ):
+        await context.send(
+            "!reactionrole [add/remove] [channel_id] [message_id] [emoji_name] [@role]"
+        )
+        return
     if add_or_remove.lower() in ("add", "create"):
         for existing in load_roles_from_disk():
             if existing.matches(
