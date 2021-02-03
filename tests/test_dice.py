@@ -115,3 +115,11 @@ def test_roll_dice_rote_total_failure(monkeypatch):
     assert roll_dice("1 rote") == (
         "Successes: 0\n1\nFool of a Took!\n" + "No additional successes from rote"
     )
+
+
+def test_roll_dice_exceptional(monkeypatch):
+    results = [8, 8, 8, 8, 8]
+    monkeypatch.setattr(dice, "_roll_single", lambda: results.pop(0))
+    assert roll_dice("5") == (
+        "Successes: 5\n8 8 8 8 8\nExceptional success!"
+    )

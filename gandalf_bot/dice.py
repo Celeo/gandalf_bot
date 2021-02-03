@@ -110,7 +110,10 @@ def roll_dice(s: str) -> str:
         rote_successes = int(nested_result.split()[1])
         successes += rote_successes
     sass = "\nFool of a Took!" if successes == 0 else ""
-    ret_msg = "Successes: {}\n{}{}".format(successes, roll_result_str, sass)
+    exceptional = "\nExceptional success!" if successes >= 5 else ""
+    ret_msg = "Successes: {}\n{}{}".format(
+        successes, roll_result_str, sass or exceptional
+    )
     if rote_successes:
         ret_msg += f"\nExtra successes from rote: {rote_successes}"
     elif is_rote:

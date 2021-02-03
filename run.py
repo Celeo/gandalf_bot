@@ -11,6 +11,9 @@ if not os.path.exists("config.json"):
     print("Using 'config.json' from '/data'")
 
 
+# TODO need to think about where the 'roles.db' will be stored ... /data/roles.db unless a ./roles.db file exists?
+
+
 from gandalf_bot import main
 
 
