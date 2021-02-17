@@ -21,6 +21,7 @@ QUOTES = [
     "You shall not pass!",
     "If you're referring to the incident with the dragon, I was barely involved. All I did was give your uncle a little nudge out of the door.",
     "Left.",
+    "Right.",
     "And what about very old friends?",
     "Hold out your hand, Frodo. Its quite cool. What can you see? Can you see anything?",
     "Oh not at all!",
@@ -45,7 +46,6 @@ QUOTES = [
     "There are many magic rings in this world, Bilbo, and none of them should be used lightly",
     "Many that live deserve death. And some that die deserve life. Can you give it to them? Then do not be too eager to deal out death in judgement.",
     "Saruman believes it is only great power that can hold evil in check, but that is not what I have found. I found it is the small things, everyday deeds of ordinary folk that keeps the darkness at bay. Simple acts of love and kindness.",
-    "You are in the House of Elrond and it is ten o'clock in the morning on October the 24th, if you want to know. Yes, I am here and you're lucky to be here too. A few more hours and you would have been beyond our aid, but you have some strength in you my dear Frodo",
     "Pity? It was pity that stayed Bilbo's hand. Many that live deserve death and many that die, deserve life. Can you give it to them Frodo? Do not be too eager to deal out death and judgement. Even the very wise cannot see all ends. My heart tells me that Gollum has some part to play, yet for good or ill before this is over. The pity of Bilbo, may rule the fate of many",
     "Let the Ringbearer decide",
     "Home is now behind you, the world is ahead!",
@@ -139,6 +139,7 @@ QUOTES = [
     "No, no it doesn't.",
     "I will help you bear this burden, as long as it is yours to bear",
     "What?",
+    "Oh I'm sorry Frodo, I was delayed."
     "Gandalf?... Yes. That was what they used to call me. Gandalf the Grey... That was my name. I am Gandalf the White. And I come back to you now at the turn of the tide. One stage of your journey is over. Another begins. We must travel to Edoras with all speed.",
     "Theoden King stands alone.",
     "You cannot pass!",
@@ -244,6 +245,11 @@ QUOTES = [
     "I suppose you think that was terribly clever.",
     "I am Saruman. Or rather, Saruman as he should have been.",
     "I once knew every spell in all the tongues of elves, men and orcs",
+    "You are in the House of Elrond and it is ten o'clock in the morning on October the 24th, if you want to know. Yes, I am here and you're lucky to be here too. A few more hours and you would have been beyond our aid, but you have some strength in you my dear Hobbit.",
+    "A wizard is never late. Nor is he early, he arrives precisely when he means to.",
+    "Yes, there it lies. This city has dwelt ever in the sight of its shadow.",
+    "Do not take me for some conjurer of cheap tricks. I am not trying to rob you. I’m trying to help you.",
+    "Don't tempt me Frodo! I dare not take it. Not even to keep it safe. Understand Frodo, I would use this Ring from the desire to do good. But through me, it would wield a power too great and terrible to imagine.",
 ]
 
 
