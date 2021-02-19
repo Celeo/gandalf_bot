@@ -69,6 +69,10 @@ def test_is_incoherent_space(offline_word_list):
     assert not is_incoherent("a a")
 
 
+def test_is_incoherent_newline(offline_word_list):
+    assert not is_incoherent("a\na")
+
+
 def test_is_incoherent_length(offline_word_list):
     assert not is_incoherent("bbb")
 

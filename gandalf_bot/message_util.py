@@ -47,6 +47,9 @@ def is_incoherent(content: str) -> bool:
     if " " in content:
         logger.debug("Message contains a space")
         return False
+    if "\n" in content:
+        logger.debug("Message contains a newline")
+        return False
     content = _strip_formatting(_strip_punctuation(content.lower()))
     if len(content) < MINIMUM_MESSAGE_LENGTH:
         logger.debug(f"Message was only {len(content)} chars long")
