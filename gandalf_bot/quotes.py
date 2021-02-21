@@ -223,7 +223,6 @@ QUOTES = [
     "And the Ring? You feel its power growing don't you. I've felt it too. You must be careful now. Evil will be drawn to you from outside the Fellowship and I fear from within.",
     "We come to it at last. The great battle of our time. The board is set, the pieces are moving",
     "You will tell him won't you? He's very fond of you",
-    "Confound it all KrashTess! Have you been eavesdropping?!",
     "A thing is about to happen that has not happened since the Elder Days. The Ents are going to wake up and find that they are strong.",
     "Run, Shadowfax show us the meaning of haste.",
     "Be careful what you say. Do not look for welcome here.",
