@@ -19,6 +19,7 @@ BASIC_CONFIG_FILE_TEST_CONTENT = """
 {
   "token": "abc123",
   "containment_role_id": 1234567890,
+  "valheim_role_id": 1234567891,
   "containment_response_gif": "https://example.com",
   "blessable_user_ids": [
       123,
@@ -73,6 +74,7 @@ def test_from_disk():
     c = BasicConfig.from_disk()
     assert c.token == "abc123"
     assert c.containment_role_id == 1234567890
+    assert c.valheim_role_id == 1234567891
     assert c.containment_response_gif == "https://example.com"
     assert c.blessable_user_ids == [123, 456]
     assert c.scheduled == [
