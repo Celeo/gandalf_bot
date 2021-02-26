@@ -88,7 +88,9 @@ def test_is_incoherent_patterns(offline_word_list):
     assert not is_incoherent("http://example.com")
     assert not is_incoherent("https://google.com")
     assert not is_incoherent("reeeeeeeeee")
-    assert not is_incoherent("<:Screampackman2:754148436906999888>")
+    assert not is_incoherent("<:Screampackman2:123456>")
+    assert not is_incoherent("<@!123456>")
+    assert not is_incoherent("<@123456>")
 
 
 def test_is_incoherent(offline_word_list):
