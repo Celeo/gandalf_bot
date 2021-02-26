@@ -20,6 +20,7 @@ IGNORE_PATTERNS = [
     re.compile(r"^re{5,}"),
     re.compile(r"^<:\w+:\d+>$"),
     re.compile(r"^<@!?\d+>$"),
+    re.compile(r"^!"),
 ]
 
 

@@ -91,6 +91,7 @@ def test_is_incoherent_patterns(offline_word_list):
     assert not is_incoherent("<:Screampackman2:123456>")
     assert not is_incoherent("<@!123456>")
     assert not is_incoherent("<@123456>")
+    assert not is_incoherent("!foobar")
 
 
 def test_is_incoherent(offline_word_list):
