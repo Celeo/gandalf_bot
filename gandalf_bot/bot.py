@@ -1,4 +1,4 @@
-from asyncio import sleep
+from asyncio import sleep, create_subprocess_shell
 import logging
 import os
 from typing import Optional
@@ -58,8 +58,21 @@ async def on_command(context: Context) -> None:
 
 
 def _admin_command_check(context: Context) -> bool:
-    """Command check gate that prevents commands from being issued by non-admins."""
+    """Command check gate.
+
+    Prevents commands from being issued by non-admins.
+    """
     return context.author.guild_permissions.administrator
+
+
+async def _valheim_command_check(context: Context) -> bool:
+    """Command check gate.
+
+    Prevents commands from being issued by non-admins or
+    or those in the configured Valheim group.
+    """
+    valheim_role = await _get_valheim_role(context)
+    return _admin_command_check(context) or valheim_role in context.author.roles
 
 
 # ===============
@@ -352,6 +365,63 @@ async def reactionroles(context: Context) -> None:
         if group_index == 0:
             s = header + s
         await context.send(s)
+
+
+# ======================
+# Valheim server restart
+# ======================
+
+
+async def _get_valheim_role(
+    context: Context, config=BasicConfig.from_disk()
+) -> Optional[Role]:
+    role = context.guild.get_role(config.valheim_role_id)
+    if not role:
+        await context.send("The bot configuration is borked")
+        return None
+    return role
+
+
+@bot.command(brief="Restart the Valheim server")
+@commands.check(_valheim_command_check)
+async def valheim_restart(context: Context) -> None:
+    async def run(cmd: str) -> bool:
+        logger.debug(f"Running shell command {cmd}")
+        process = await create_subprocess_shell(cmd)
+        result = await process.wait()
+        if result != 0:
+            await context.send("Could not complete task")
+            return False
+        return True
+
+    context.send("Process started; wait a few minutes")
+    try:
+        logger.debug("Stopping Valheim server")
+        result = await run("systemctl stop valheimserver")
+        if result:
+            return
+
+        logger.debug("Taking backup")
+        result = await run(
+            "rsync -azv /home/steam/.config/unity3d/IronGate/Valheim/worlds /root/valheim/$(date +%s)/"
+        )
+        if result:
+            return
+
+        logger.debug("Waiting 60 seconds before starting Valheim server again")
+        sleep(60)
+
+        result = await run("systemctl start valheimserver")
+        if result:
+            return
+
+        result = await run("systemctl stop valheimserver")
+        if result:
+            return
+
+        await context.send("Server should be up shortly")
+    except Exception as e:
+        context.send(f"There was an error during processing: {e}")
 
 
 # ===============

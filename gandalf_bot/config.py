@@ -51,6 +51,7 @@ class BasicConfig:
 
     token: str
     containment_role_id: int
+    valheim_role_id: int
     containment_response_gif: Optional[str]
     blessable_user_ids: List[int]
     scheduled: List[ScheduledPing]
@@ -65,6 +66,7 @@ class BasicConfig:
         return BasicConfig(
             token=data["token"],
             containment_role_id=data["containment_role_id"],
+            valheim_role_id=data["valheim_role_id"],
             containment_response_gif=data.get("containment_response_gif"),
             blessable_user_ids=data["blessable_user_ids"],
             scheduled=scheduled,
