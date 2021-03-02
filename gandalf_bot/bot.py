@@ -397,26 +397,26 @@ async def valheim_restart(context: Context) -> None:
     await context.send("Process started; wait a few minutes")
     try:
         logger.debug("Stopping Valheim server")
-        result = await run("systemctl stop valheimserver")
-        if result:
+        success = await run("systemctl stop valheimserver")
+        if not success:
             return
 
         logger.debug("Taking backup")
-        result = await run(
+        success = await run(
             "rsync -azv /home/steam/.config/unity3d/IronGate/Valheim/worlds /root/valheim/$(date +%s)/"
         )
-        if result:
+        if not success:
             return
 
         logger.debug("Waiting 60 seconds before starting Valheim server again")
         sleep(60)
 
-        result = await run("systemctl start valheimserver")
-        if result:
+        success = await run("systemctl start valheimserver")
+        if not success:
             return
 
-        result = await run("systemctl stop valheimserver")
-        if result:
+        success = await run("systemctl stop valheimserver")
+        if not success:
             return
 
         await context.send("Server should be up shortly")
