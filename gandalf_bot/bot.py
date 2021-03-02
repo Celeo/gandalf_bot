@@ -394,7 +394,7 @@ async def valheim_restart(context: Context) -> None:
             return False
         return True
 
-    context.send("Process started; wait a few minutes")
+    await context.send("Process started; wait a few minutes")
     try:
         logger.debug("Stopping Valheim server")
         result = await run("systemctl stop valheimserver")
@@ -421,7 +421,7 @@ async def valheim_restart(context: Context) -> None:
 
         await context.send("Server should be up shortly")
     except Exception as e:
-        context.send(f"There was an error during processing: {e}")
+        await context.send(f"There was an error during processing: {e}")
 
 
 # ===============
