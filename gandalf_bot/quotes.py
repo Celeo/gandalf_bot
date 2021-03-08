@@ -159,7 +159,7 @@ QUOTES = [
     "Yes, for sixty years the Ring lay quiet in Bilbo's keeping prolonging his life. Delaying old age. But no longer BartekRandomLad. Evil is stirring in Mordor. The Ring has awoken. Its heard its master's call.",
     "Evidently we look so much alike that your desire to make an incurable dent in my hat must be excused.",
     "Yes, and it will not be easily cured.",
-    "White shores, and beyond that a far green country Samtastic33",
+    "White shores, and beyond that a far green country.",
     "Be gone!",
     "You cannot offer me this Ring",
     "Owwwh!",
