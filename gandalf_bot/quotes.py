@@ -156,7 +156,7 @@ QUOTES = [
     "Precious? It's been called that before. Not by you!",
     "Riddles in the dark...",
     "There is only one Lord of the Ring. Only one who can bend it to his will and he does not share power.",
-    "Yes, for sixty years the Ring lay quiet in Bilbo's keeping prolonging his life. Delaying old age. But no longer BartekRandomLad. Evil is stirring in Mordor. The Ring has awoken. Its heard its master's call.",
+    "Yes, for sixty years the Ring lay quiet in Bilbo's keeping prolonging his life. Delaying old age. But no longer. Evil is stirring in Mordor. The Ring has awoken. Its heard its master's call.",
     "Evidently we look so much alike that your desire to make an incurable dent in my hat must be excused.",
     "Yes, and it will not be easily cured.",
     "White shores, and beyond that a far green country.",
