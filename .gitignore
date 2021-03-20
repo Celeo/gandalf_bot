@@ -10,3 +10,5 @@ tmp-*.tar
 
 .env
 /data
+config.json
+roles.db

@@ -38,5 +38,5 @@ defmodule Bot.Consumer do
   #   # ...
   # end
 
-  def handle_event(_event), do: :noop
+  # def handle_event(_event), do: :noop
 end

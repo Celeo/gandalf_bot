@@ -20,7 +20,9 @@ defmodule GandalfDiscordBot.MixProject do
 
   defp deps do
     [
-      {:nostrum, "~> 0.4"}
+      {:nostrum, "~> 0.4"},
+      {:poison, "~> 3.1"},
+      {:exqlite, "~> 0.5.1"}
     ]
   end
 end
