@@ -3,7 +3,7 @@ defmodule GandalfDiscordBot.MixProject do
 
   def project do
     [
-      app: :bobby_discord_bot,
+      app: :gandalf_discord_bot,
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
