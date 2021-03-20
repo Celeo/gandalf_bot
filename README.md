@@ -2,23 +2,17 @@
 
 [![CI](https://github.com/Celeo/gandalf_bot/workflows/CI/badge.svg?branch=master)](https://github.com/Celeo/gandalf_bot/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/Celeo/gandalf_bot/branch/master/graph/badge.svg?token=2R9RY3P229)](https://codecov.io/gh/Celeo/gandalf_bot)
-[![Python version](https://img.shields.io/badge/Python-3.7+-blue)](https://www.python.org/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 A Discord bot.
 
 ## Installing
 
-1. Install [poetry](https://python-poetry.org/)
-1. Clone the repo
-1. Install dependencies with `poetry install`
+TBD
 
 ## Using
 
-1. Copy the `config.example.json` file to `config.json`
-1. Populate with at least your bot's token and the containment role id. The other fields are optional.
-1. Run with `poetry run python run.py`
+TBD
 
 If you want to enable the functionality to post screenshots of merits, you'll need to create your own screenshots. Sorry, but copyright.
 
@@ -29,24 +23,22 @@ If you want to enable the functionality to post screenshots of merits, you'll ne
 ### Requirements
 
 * Git
-* Poetry
-* Python 3.7+
+* Elixir
 
 ### Steps
 
 ```sh
 git clone https://github.com/Celeo/gandalf_bot
 cd gandalf_bot
-poetry install
+mix deps.get
+mix compile
 ```
 
 ### Running tests
 
-| | |
-| --- | --- |
-| No coverage | `poetry run pytest`
-| Coverage printout | `poetry run pytest --cov=gandalf_bot` |
-| Coverage report | `poetry run pytest --cov=gandalf_bot --cov-report=html` |
+```sh
+mix test
+```
 
 ## License
 
