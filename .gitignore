@@ -12,3 +12,4 @@ tmp-*.tar
 /data
 config.json
 roles.db
+/priv/words.txt

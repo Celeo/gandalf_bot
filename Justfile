@@ -2,6 +2,9 @@ SSH_TARGET := "do"
 
 default:
 
+download_words:
+  wget https://raw.githubusercontent.com/dwyl/english-words/master/words.txt -O priv/words.txt
+
 build:
   #!/usr/bin/env bash
   set -euxo pipefail

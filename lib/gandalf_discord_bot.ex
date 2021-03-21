@@ -38,5 +38,7 @@ defmodule Bot.Consumer do
   #   # ...
   # end
 
-  # def handle_event(_event), do: :noop
+  def handle_event(_event), do: :noop
 end
+
+# Application.app_dir(:my_app, "priv/path/to/file")
