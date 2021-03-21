@@ -139,7 +139,7 @@ QUOTES = [
     "No, no it doesn't.",
     "I will help you bear this burden, as long as it is yours to bear",
     "What?",
-    "Oh I'm sorry Frodo, I was delayed."
+    "Oh I'm sorry Frodo, I was delayed.",
     "Gandalf?... Yes. That was what they used to call me. Gandalf the Grey... That was my name. I am Gandalf the White. And I come back to you now at the turn of the tide. One stage of your journey is over. Another begins. We must travel to Edoras with all speed.",
     "Theoden King stands alone.",
     "You cannot pass!",
