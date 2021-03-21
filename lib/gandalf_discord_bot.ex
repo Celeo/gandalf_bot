@@ -3,7 +3,7 @@ defmodule Bot.Application do
   require Logger
 
   @impl true
-  def start(_type, _args) do
+  def start(_, _) do
     Logger.info("Starting application")
     Supervisor.start_link([Bot.Supervisor], strategy: :one_for_one)
   end
@@ -19,8 +19,8 @@ defmodule Bot.Supervisor do
   end
 
   @impl true
-  def init(_args) do
-    Supervisor.init([Bot.Consumer], strategy: :one_for_one)
+  def init(_) do
+    Supervisor.init([Bot.Consumer, Bot.MessageCheck.Words], strategy: :one_for_one)
   end
 end
 
@@ -40,5 +40,3 @@ defmodule Bot.Consumer do
 
   def handle_event(_event), do: :noop
 end
-
-# Application.app_dir(:my_app, "priv/words.txt")

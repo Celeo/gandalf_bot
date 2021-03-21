@@ -62,6 +62,8 @@ defmodule Bot.Config.DB do
     rows
   end
 
+  # Dialyzer thinks that the third argument in `Exqlite.Sqlite3.bind` can only be `nil | []`
+  # but that's because the spec is wrong. The code here works, and is exercised in a unit test.
   def insert!(channel_id, message_id, emoji_name, role_name) do
     conn = connect!()
     {:ok, statement} = Exqlite.Sqlite3.prepare(conn, @sql_insert)
