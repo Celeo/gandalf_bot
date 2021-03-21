@@ -5,4 +5,10 @@ config :nostrum,
   shards: 1
 
 config :logger,
-  level: :info
+  level: :warn
+
+config :gandalf_discord_bot,
+  config_file_name: "config.json",
+  db_file_name: "roles.db"
+
+import_config "#{config_env()}.exs"

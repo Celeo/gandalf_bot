@@ -11,5 +11,6 @@ tmp-*.tar
 .env
 /data
 config.json
-roles.db
+config.test.json
+roles*.db
 /priv/words.txt

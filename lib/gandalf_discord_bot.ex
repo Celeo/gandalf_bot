@@ -41,4 +41,4 @@ defmodule Bot.Consumer do
   def handle_event(_event), do: :noop
 end
 
-# Application.app_dir(:my_app, "priv/path/to/file")
+# Application.app_dir(:my_app, "priv/words.txt")
