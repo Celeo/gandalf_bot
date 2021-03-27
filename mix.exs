@@ -22,7 +22,8 @@ defmodule GandalfDiscordBot.MixProject do
     [
       {:nostrum, "~> 0.4"},
       {:poison, "~> 3.1"},
-      {:exqlite, "~> 0.5.1"}
+      {:exqlite, "~> 0.5.1"},
+      {:enum_type, "~> 1.1"}
     ]
   end
 end

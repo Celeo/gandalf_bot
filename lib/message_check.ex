@@ -50,7 +50,7 @@ defmodule Bot.MessageCheck do
         end
 
       :patterns ->
-        if Enum.any?(@ignore_patterns, fn pattern -> Regex.match?(pattern, content) end) do
+        if Enum.any?(@ignore_patterns, &Regex.match?(&1, content)) do
           Logger.debug("is_incoherent false, matches ignore pattern")
           false
         else
