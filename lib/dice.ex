@@ -46,15 +46,27 @@ defmodule Bot.Dice do
 
   defp roll_die(), do: Enum.random(1..10)
 
-  # TODO this isn't handling exploding die yet
-  def roll_all_dice(count, type, roll_fn \\ &roll_die/0) do
+  def roll_all_dice(count, type, roll_fn \\ &roll_die/0, is_bonus \\ false) do
     case count do
+      # if no dice to roll, then return empty array for recursion termination
       0 ->
         []
 
+      # otherwise,
       _ ->
+        # roll 1 die
         result = roll_fn.()
-        [result | roll_all_dice(count - 1, type, roll_fn)]
+        # check if it should explode
+        {_, explode_threshold} = type.value()
+        should_explode = result >= explode_threshold
+
+        # check explosion and whether this roll is already a bonus
+        case {should_explode, is_bonus} do
+          # no explosion? keep rolling the rest, reset is_bonus to false
+          {false, b} -> [{result, b} | roll_all_dice(count - 1, type, roll_fn, false)]
+          # explosion? keep rolling, set is_bonus to true
+          {true, b} -> [{result, b} | roll_all_dice(count, type, roll_fn, true)]
+        end
     end
   end
 

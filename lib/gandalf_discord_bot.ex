@@ -27,7 +27,7 @@ end
 defmodule Bot.Consumer do
   use Nostrum.Consumer
   require Logger
-  # alias Nostrum.Api
+  alias Nostrum.Api
 
   def start_link do
     Logger.info("Starting consumer")
