@@ -249,7 +249,8 @@ defmodule Bot.Quotes do
       "A wizard is never late. Nor is he early, he arrives precisely when he means to.",
       "Yes, there it lies. This city has dwelt ever in the sight of its shadow.",
       "Do not take me for some conjurer of cheap tricks. I am not trying to rob you. I’m trying to help you.",
-      "Don't tempt me Frodo! I dare not take it. Not even to keep it safe. Understand Frodo, I would use this Ring from the desire to do good. But through me, it would wield a power too great and terrible to imagine."
+      "Don't tempt me Frodo! I dare not take it. Not even to keep it safe. Understand Frodo, I would use this Ring from the desire to do good. But through me, it would wield a power too great and terrible to imagine.",
+      "https://tenor.com/view/the-lord-of-the-rings-gandalf-nod-gandalf-approves-gif-3520584"
     ]
   end
 end
