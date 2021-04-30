@@ -1,5 +1,6 @@
 defmodule Bot.Dice do
   use EnumType
+  require Logger
 
   @regex_modifier ~r/^[+|-]$/
   @regex_numeric ~r/^\d+$/
@@ -46,7 +47,7 @@ defmodule Bot.Dice do
 
   defp roll_die(), do: Enum.random(1..10)
 
-  def roll_all_dice(count, type, roll_fn \\ &roll_die/0, is_bonus \\ false) do
+  defp roll_all_dice(count, type, roll_fn, is_bonus \\ false) do
     case count do
       # if no dice to roll, then return empty array for recursion termination
       0 ->
@@ -54,7 +55,7 @@ defmodule Bot.Dice do
 
       # otherwise,
       _ ->
-        # roll 1 die
+        # roll a single die
         result = roll_fn.()
         # check if it should explode
         {_, explode_threshold} = type.value()
@@ -70,7 +71,7 @@ defmodule Bot.Dice do
     end
   end
 
-  def handle_roll(str) do
+  def handle_roll(str, roll_fn \\ &roll_die/0) do
     type = RollType.from_input(str)
 
     parts =
@@ -78,7 +79,46 @@ defmodule Bot.Dice do
       |> Enum.map(&identify_part/1)
       |> Enum.filter(fn {type, _} -> type !== :invalid end)
 
-    dice_to_roll = Enum.reduce(parts, %{mod: "+", total: 0}, &count_reduce_fn(&1, &2))
-    roll_all_dice(dice_to_roll, type)
+    # TODO handle rote
+
+    dice_setup = Enum.reduce(parts, %{mod: "+", total: 0}, &count_reduce_fn(&1, &2))
+
+    {type, roll_all_dice(dice_setup[:total], type, roll_fn)}
+  end
+
+  def roll_results_to_string(data) do
+    {type, results} = data
+
+    case results do
+      [] ->
+        "Did not roll any dice"
+
+      results ->
+        success_count = Enum.count(results, fn {value, _} -> value >= 8 end)
+
+        dice_str =
+          Enum.map(results, fn {value, bonus} ->
+            case bonus do
+              true -> "(#{value})"
+              false -> "#{value}"
+            end
+          end)
+          |> Enum.join(" ")
+          |> String.trim()
+
+        # TODO handle rote
+
+        case type do
+          Bot.Dice.RollType.Chance ->
+            "Chance failed! (#{dice_str})"
+
+          _ ->
+            case success_count do
+              0 -> "#{dice_str}\nFool of a Took!"
+              n when n >= 5 -> "#{dice_str}\nExceptional success!"
+              _ -> "#{dice_str}"
+            end
+        end
+    end
   end
 end
