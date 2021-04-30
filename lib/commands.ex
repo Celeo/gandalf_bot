@@ -10,6 +10,8 @@ defmodule Bot.Commands do
       "!unbreach" -> cmd_unbreach!(args)
       "!sitrep" -> cmd_sitrep!(args)
       "!roll" -> cmd_roll!(args)
+      "!merit" -> cmd_merit!(args)
+      _ -> :notfound
     end
   end
 
@@ -30,6 +32,11 @@ defmodule Bot.Commands do
 
   defp cmd_roll!(_args) do
     Logger.debug("cmd_roll!()")
+    # TODO
+  end
+
+  defp cmd_merit!(_args) do
+    Logger.debug("cmd_merit!()")
     # TODO
   end
 end
