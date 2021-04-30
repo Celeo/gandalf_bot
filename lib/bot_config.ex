@@ -58,12 +58,12 @@ defmodule Bot.Config.DB do
     conn = connect!()
     {:ok, statement} = Exqlite.Sqlite3.prepare(conn, @sql_query_all)
     {:ok, rows} = Exqlite.Sqlite3.fetch_all(conn, statement)
-    Exqlite.Sqlite3.close(conn)
+    :ok = Exqlite.Sqlite3.close(conn)
     rows
   end
 
-  # Dialyzer thinks that the third argument in `Exqlite.Sqlite3.bind` can only be `nil | []`
-  # but that's because the spec is wrong. The code here works, and is exercised in a unit test.
+  # Dialyzer thinks that the third argument in `Exqlite.Sqlite3.bind` can only be `nil | []`.
+  # The code here works, and is exercised in a unit test.
   def insert!(channel_id, message_id, emoji_name, role_name) do
     conn = connect!()
     {:ok, statement} = Exqlite.Sqlite3.prepare(conn, @sql_insert)
