@@ -1,7 +1,6 @@
 defmodule Bot.MessageCheck do
   require Logger
 
-  @words_file_name "words.txt"
   @minimum_message_length 8
   @ignore_patterns [
     ~r/^[hue]{5,}$/i,
@@ -13,11 +12,6 @@ defmodule Bot.MessageCheck do
     ~r/^<@!?\d+>$/,
     ~r/^!/
   ]
-
-  def read_in_words!() do
-    File.read!(Application.app_dir(:gandalf_discord_bot, "priv/#{@words_file_name}"))
-    |> String.split("\n")
-  end
 
   defp strip_formatting(content), do: content |> String.replace(["*", "_", "~", "`"], "")
   defp strip_punctuation(content), do: content |> String.replace(["?", "!", "\""], "")
