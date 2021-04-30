@@ -28,3 +28,13 @@ defmodule Bot.MessageCheck.Test do
     assert not MessageCheck.is_incoherent!("dictionary???")
   end
 end
+
+defmodule Bot.MessageCheck.Words.Test do
+  alias Bot.MessageCheck.Words
+  use ExUnit.Case
+
+  test "can load words file" do
+    words = Words.load_words!()
+    assert length(words) > 100_000
+  end
+end
