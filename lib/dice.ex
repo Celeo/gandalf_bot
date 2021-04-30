@@ -86,9 +86,7 @@ defmodule Bot.Dice do
     {type, roll_all_dice(dice_setup[:total], type, roll_fn)}
   end
 
-  def roll_results_to_string(data) do
-    {type, results} = data
-
+  def roll_results_to_string({type, results}) do
     case results do
       [] ->
         "Did not roll any dice"

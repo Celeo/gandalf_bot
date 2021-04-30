@@ -21,6 +21,26 @@ defmodule Bot.Dice.Test do
                {Dice.RollType.Explode_8,
                 [{8, false}, {4, true}, {5, false}, {9, false}, {2, true}]}
     end
+
+    test "handles math - addition" do
+      {_, results} = Dice.handle_roll("3 + 3", fn -> 8 end)
+      assert length(results) == 6
+    end
+
+    test "handles math - no modifiers" do
+      {_, results} = Dice.handle_roll("3 3", fn -> 8 end)
+      assert length(results) == 6
+    end
+
+    test "handles math - negative" do
+      {_, results} = Dice.handle_roll("3 - 2", fn -> 8 end)
+      assert length(results) == 1
+    end
+
+    test "handles math - down to zero" do
+      {_, results} = Dice.handle_roll("3 - 3", fn -> 8 end)
+      assert length(results) == 0
+    end
   end
 
   describe "roll_results_to_string()" do
