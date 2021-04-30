@@ -2,11 +2,6 @@ defmodule Bot.MessageCheck.Test do
   alias Bot.MessageCheck
   use ExUnit.Case
 
-  test "can load words file" do
-    words = MessageCheck.read_in_words!()
-    assert length(words) > 100_000
-  end
-
   test "is_incoherent" do
     assert MessageCheck.is_incoherent!("kljasdfjldiksafjklsda")
 

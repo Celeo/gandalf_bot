@@ -8,15 +8,16 @@ defmodule Bot.MessageCheck.Words do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
 
+  def load_words!() do
+    File.read!(Application.app_dir(:gandalf_discord_bot, "priv/#{@words_file_name}"))
+    |> String.split("\n")
+  end
+
   @impl GenServer
   def init(_) do
     Logger.debug("Loading word list into memory")
 
-    words =
-      File.read!(Application.app_dir(:gandalf_discord_bot, "priv/#{@words_file_name}"))
-      |> String.split("\n")
-
-    {:ok, words}
+    {:ok, load_words!()}
   end
 
   @impl GenServer
