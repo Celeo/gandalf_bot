@@ -14,7 +14,7 @@ defmodule Bot.MessageCheck do
     ~r/^!/
   ]
 
-  def read_in_words! do
+  def read_in_words!() do
     File.read!(Application.app_dir(:gandalf_discord_bot, "priv/#{@words_file_name}"))
     |> String.split("\n")
   end

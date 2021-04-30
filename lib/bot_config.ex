@@ -11,11 +11,11 @@ defmodule Bot.Config.File do
     :scheduled
   ]
 
-  def file_name! do
+  def file_name!() do
     Application.fetch_env!(:gandalf_discord_bot, :config_file_name)
   end
 
-  def read_from_disk! do
+  def read_from_disk!() do
     content = File.read!(file_name!())
     Poison.decode!(content, as: %Bot.Config.File{scheduled: [%Bot.Config.File.Schedule{}]})
   end
@@ -37,24 +37,24 @@ defmodule Bot.Config.DB do
     INSERT INTO role_config VALUES (?1, ?2, ?3, ?4)
   """
 
-  def file_name! do
+  def file_name!() do
     Application.fetch_env!(:gandalf_discord_bot, :db_file_name)
   end
 
-  defp connect! do
+  defp connect!() do
     case Exqlite.Sqlite3.open(file_name!()) do
       {:ok, conn} -> conn
       {:error, reason} -> throw(reason)
     end
   end
 
-  def create_table! do
+  def create_table!() do
     conn = connect!()
     Exqlite.Sqlite3.execute(conn, @sql_create_table)
     Exqlite.Sqlite3.close(conn)
   end
 
-  def get! do
+  def get!() do
     conn = connect!()
     {:ok, statement} = Exqlite.Sqlite3.prepare(conn, @sql_query_all)
     {:ok, rows} = Exqlite.Sqlite3.fetch_all(conn, statement)
