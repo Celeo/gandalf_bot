@@ -1,18 +1,52 @@
 defmodule Bot.Roles do
   require Logger
 
-  # %{channel_id: 758513911833427971, emoji: %{id: nil, name: "👋"}, guild_id: 758513911833427968,
-  # member: %{deaf: false, hoisted_role: nil, joined_at: "2020-09-24T02:23:29.090000+00:00", mute: false,
-  # roles: [758528744406122526, 814995473331912756], user: %{avatar: "3118c26ea7e40350212196e1d9d7f5c9", discriminator: "1453", id: 110245175636312064, username: "Celeo"}},
-  # message_id: 837806766200586301, user_id: 110245175636312064}
   def reaction_add(data) do
-    Logger.debug("reaction_add: #{inspect(data)}")
-    # TODO
+    db_roles = Bot.Config.DB.get!()
+    guild_id = data[:guild_id]
+    guild_roles = Nostrum.Api.get_guild_roles!(guild_id)
+
+    matches_from_db =
+      Enum.filter(db_roles, fn row ->
+        Enum.at(row, 0) == data[:channel_id] &&
+          Enum.at(row, 1) == data[:message_id] &&
+          Enum.at(row, 2) == data[:emoji][:name]
+      end)
+
+    if length(matches_from_db) == 0 do
+      Logger.debug("No matching roles in DB for added reaction")
+    end
+
+    Enum.each(matches_from_db, fn db_entry ->
+      db_entry_name = Enum.at(db_entry, 3)
+      guild_role = Enum.find(guild_roles, &(&1.name == db_entry_name))
+
+      case guild_role do
+        nil ->
+          Logger.warning(
+            "No guild role with name #{db_entry_name} (guild has #{length(guild_roles)} roles)"
+          )
+
+        guild_role ->
+          Logger.debug("Adding role #{db_entry_name} to #{data[:member][:user][:username]}")
+
+          {:ok} =
+            Nostrum.Api.add_guild_member_role(
+              guild_id,
+              data[:member][:user][:id],
+              guild_role.id
+            )
+      end
+    end)
   end
 
-  # %{channel_id: 758513911833427971, emoji: %{id: nil, name: "👋"}, guild_id: 758513911833427968, message_id: 837806766200586301, user_id: 110245175636312064}
   def reaction_remove(data) do
     Logger.debug("reaction_remove: #{inspect(data)}")
-    # TODO
+
+    db_roles = Bot.Config.DB.get!()
+    guild_id = data[:guild_id]
+    guild_roles = Nostrum.Api.get_guild_roles!(guild_id)
+
+    # ...
   end
 end
