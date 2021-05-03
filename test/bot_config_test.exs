@@ -32,11 +32,11 @@ defmodule Bot.Config.File.Test do
     File.write!(file_name, @sample_config)
     c = Bot.Config.File.read_from_disk!()
 
-    assert c.containment_role_id === 1
-    assert c.valheim_role_id === 2
-    assert c.containment_response_gif === "a"
-    assert c.blessable_user_ids === [3]
-    assert length(c.scheduled) === 1
+    assert c.containment_role_id == 1
+    assert c.valheim_role_id == 2
+    assert c.containment_response_gif == "a"
+    assert c.blessable_user_ids == [3]
+    assert length(c.scheduled) == 1
 
     File.rm!(file_name)
   end
@@ -63,14 +63,14 @@ defmodule Bot.Config.DB.Test do
   test "empty db returns no data" do
     Bot.Config.DB.create_table!()
     rows = Bot.Config.DB.get!()
-    assert length(rows) === 0
+    assert length(rows) == 0
   end
 
   test "can store and retrieve data" do
     Bot.Config.DB.create_table!()
     Bot.Config.DB.insert!(1, 2, "a", "b")
     rows = Bot.Config.DB.get!()
-    assert length(rows) === 1
-    assert rows === [[1, 2, "a", "b"]]
+    assert length(rows) == 1
+    assert rows == [[1, 2, "a", "b"]]
   end
 end

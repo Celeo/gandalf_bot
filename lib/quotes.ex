@@ -1,4 +1,7 @@
 defmodule Bot.Quotes do
+  @doc """
+  Get a random quote.
+  """
   def get_random do
     Enum.take_random(get_all(), 1) |> Enum.at(0)
   end

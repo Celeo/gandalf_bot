@@ -14,7 +14,7 @@ defmodule Bot.MessageCheck.Test do
     assert not MessageCheck.is_incoherent!("<:Screampackman2:123456>")
     assert not MessageCheck.is_incoherent!("<@!123456>")
     assert not MessageCheck.is_incoherent!("<@123456>")
-    assert not MessageCheck.is_incoherent!("!foobar")
+    assert not MessageCheck.is_incoherent!("!asdfghjk")
 
     assert not MessageCheck.is_incoherent!("dictionary")
     assert not MessageCheck.is_incoherent!("*dictionary*")

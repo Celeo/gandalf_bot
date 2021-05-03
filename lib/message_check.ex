@@ -14,8 +14,16 @@ defmodule Bot.MessageCheck do
   ]
 
   defp strip_formatting(content), do: content |> String.replace(["*", "_", "~", "`"], "")
-  defp strip_punctuation(content), do: content |> String.replace(["?", "!", "\""], "")
 
+  defp strip_punctuation(content) do
+    content
+    |> String.replace(["?", "\""], "")
+    |> String.trim_trailing("!")
+  end
+
+  @doc """
+  Determine if the string is nonsense and could warrant the bot's reaction.
+  """
   def is_incoherent!(content, task \\ :whitespace) do
     case task do
       :whitespace ->

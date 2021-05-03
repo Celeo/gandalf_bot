@@ -14,6 +14,11 @@ defmodule Bot.Dice do
 
     default(Explode_10)
 
+    @doc """
+    Parse one of this Enum's values from the str.
+
+    Returns `RollType.Expode_10` if nothing can be matched.
+    """
     def from_input(str) do
       val =
         Enum.find(RollType.values(), RollType.Explode_10.value(), fn {search_for, _} ->
@@ -37,10 +42,10 @@ defmodule Bot.Dice do
       :modifier ->
         %{acc | mod: val}
 
-      :number when acc.mod === "+" ->
+      :number when acc.mod == "+" ->
         %{acc | total: acc.total + String.to_integer(val)}
 
-      :number when acc.mod === "-" ->
+      :number when acc.mod == "-" ->
         %{acc | total: acc.total - String.to_integer(val), mod: :add}
     end
   end
@@ -71,6 +76,11 @@ defmodule Bot.Dice do
     end
   end
 
+  @doc """
+  Take the user's input from the command arguments,
+  parse into dice rolling, roll the "dice", and
+  return a tuple of the results.
+  """
   def handle_roll(str, roll_fn \\ &roll_die/0) do
     type = RollType.from_input(str)
 
@@ -89,6 +99,9 @@ defmodule Bot.Dice do
     end
   end
 
+  @doc """
+  Turn roll result into a user-facing string.
+  """
   def roll_results_to_string({type, results}) do
     case results do
       [] ->

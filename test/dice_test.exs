@@ -60,7 +60,7 @@ defmodule Bot.Dice.Test do
           {Dice.RollType.Explode_10, [{8, false}, {8, false}, {8, false}, {8, false}, {8, false}]}
         )
 
-      assert result = "Successes: 5\n8 8 8 8 8\nExceptional success!"
+      assert result == "Successes: 5\n8 8 8 8 8\nExceptional success!"
     end
 
     test "handles failure results" do

@@ -1,6 +1,12 @@
 defmodule Bot.Commands do
   require Logger
 
+  @doc """
+  Command handler for user-submitted commands.
+
+  Is passed a message struct from a message created handler.
+  Returns `:notfound` if no commands matched, `nil` otherwise.
+  """
   def run!(msg) do
     [name, args] =
       case String.contains?(msg.content, " ") do
