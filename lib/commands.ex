@@ -108,12 +108,67 @@ defmodule Bot.Commands do
 
   defp cmd_roll!(args, msg) do
     Logger.debug("cmd_roll!(#{inspect(args)}) by #{msg.author.username}")
-    # TODO
+
+    results =
+      args
+      |> Enum.join(" ")
+      |> Bot.Dice.handle_roll()
+      |> Bot.Dice.roll_results_to_string()
+
+    Nostrum.Api.create_message!(
+      msg.channel_id,
+      content: results,
+      message_reference: %{message_id: msg.id}
+    )
   end
 
   defp cmd_merit!(args, msg) do
     Logger.debug("cmd_merit!(#{inspect(args)}) by #{msg.author.username}")
-    # TODO
+
+    if length(args) == 0 do
+      Nostrum.Api.create_message!(
+        msg.channel_id,
+        content: "Usage: `!merit [name]`",
+        message_reference: %{message_id: msg.id}
+      )
+    else
+      dir = Application.app_dir(:gandalf_discord_bot, "priv/merit_screenshots")
+
+      if File.exists?(dir) do
+        search_term = args |> Enum.join("_") |> String.replace(" ", "_")
+
+        files_sent =
+          File.ls!(dir)
+          |> Enum.sort()
+          |> Enum.map(fn file ->
+            if String.starts_with?(file, search_term) do
+              Nostrum.Api.create_message!(
+                msg.channel_id,
+                file: "#{dir}/#{file}"
+              )
+
+              true
+            else
+              false
+            end
+          end)
+          |> Enum.filter(&(&1 == true))
+
+        if length(files_sent) == 0 do
+          Nostrum.Api.create_message!(
+            msg.channel_id,
+            content: "No matching screenshots found",
+            message_reference: %{message_id: msg.id}
+          )
+        end
+      else
+        Nostrum.Api.create_message!(
+          msg.channel_id,
+          content: "No screenshots folder",
+          message_reference: %{message_id: msg.id}
+        )
+      end
+    end
   end
 
   defp cmd_reactionrole!(args, msg) do

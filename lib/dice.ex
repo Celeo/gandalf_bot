@@ -83,7 +83,10 @@ defmodule Bot.Dice do
 
     dice_setup = Enum.reduce(parts, %{mod: "+", total: 0}, &count_reduce_fn(&1, &2))
 
-    {type, roll_all_dice(dice_setup[:total], type, roll_fn)}
+    case type do
+      Bot.Dice.RollType.Chance -> {type, roll_all_dice(1, type, roll_fn)}
+      _ -> {type, roll_all_dice(dice_setup[:total], type, roll_fn)}
+    end
   end
 
   def roll_results_to_string({type, results}) do
@@ -93,6 +96,7 @@ defmodule Bot.Dice do
 
       results ->
         success_count = Enum.count(results, fn {value, _} -> value >= 8 end)
+        successes_str = "Successes: #{success_count}\n"
 
         dice_str =
           Enum.map(results, fn {value, bonus} ->
@@ -111,11 +115,12 @@ defmodule Bot.Dice do
             "Chance failed! (#{dice_str})"
 
           _ ->
-            case success_count do
-              0 -> "#{dice_str}\nFool of a Took!"
-              n when n >= 5 -> "#{dice_str}\nExceptional success!"
-              _ -> "#{dice_str}"
-            end
+            successes_str <>
+              case success_count do
+                0 -> "#{dice_str}\nFool of a Took!"
+                n when n >= 5 -> "#{dice_str}\nExceptional success!"
+                _ -> "#{dice_str}"
+              end
         end
     end
   end

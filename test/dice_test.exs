@@ -51,7 +51,7 @@ defmodule Bot.Dice.Test do
 
     test "handles normal roll" do
       result = Dice.roll_results_to_string({Dice.RollType.Explode_10, [{10, false}, {4, true}]})
-      assert result == "10 (4)"
+      assert result == "Successes: 1\n10 (4)"
     end
 
     test "handles exceptional results" do
@@ -60,12 +60,12 @@ defmodule Bot.Dice.Test do
           {Dice.RollType.Explode_10, [{8, false}, {8, false}, {8, false}, {8, false}, {8, false}]}
         )
 
-      assert result = "8 8 8 8 8\nExceptional success!"
+      assert result = "Successes: 5\n8 8 8 8 8\nExceptional success!"
     end
 
     test "handles failure results" do
       result = Dice.roll_results_to_string({Dice.RollType.Explode_10, [{1, false}]})
-      assert result == "1\nFool of a Took!"
+      assert result == "Successes: 0\n1\nFool of a Took!"
     end
 
     test "handles chance results" do
