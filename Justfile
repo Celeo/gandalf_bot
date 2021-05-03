@@ -14,7 +14,7 @@ build:
 
 image-save:
   rm -f {{IMAGE_FILE}}
-  podman image save --output {{IMAGE_FILE}} celeo/bobby_bot
+  podman image save --output {{IMAGE_FILE}} celeo/gandalf_bot
 
 deploy: build image-save
   scp {{IMAGE_FILE}} {{SSH_TARGET}}:/srv/gandalf_bot.image
