@@ -14,3 +14,4 @@ config.json
 config.test.json
 roles*.db
 /priv/words.txt
+image.bin
