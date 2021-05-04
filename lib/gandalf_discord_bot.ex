@@ -57,4 +57,6 @@ defmodule Bot.Consumer do
   end
 
   def handle_event(_event), do: :noop
+
+  # TODO scheduled messages
 end
