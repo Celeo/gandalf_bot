@@ -56,21 +56,21 @@ defmodule Bot.Config.DB.Test do
   end
 
   test "can create a table" do
-    Bot.Config.DB.create_table!()
+    Bot.Config.DB.create_tables!()
     assert File.exists?(Bot.Config.DB.file_name!())
   end
 
   test "empty db returns no data" do
-    Bot.Config.DB.create_table!()
+    Bot.Config.DB.create_tables!()
     rows = Bot.Config.DB.get!()
     assert length(rows) == 0
   end
 
   test "can store and retrieve data" do
-    Bot.Config.DB.create_table!()
-    Bot.Config.DB.insert!(1, 2, "a", "b")
+    Bot.Config.DB.create_tables!()
+    Bot.Config.DB.insert!(2, 3, "a", "b")
     rows = Bot.Config.DB.get!()
     assert length(rows) == 1
-    assert rows == [[1, 2, "a", "b"]]
+    assert rows == [[1, 2, 3, "a", "b"]]
   end
 end

@@ -28,8 +28,9 @@ defmodule Bot.Config.File do
 end
 
 defmodule Bot.Config.DB do
-  @sql_create_table """
+  @sql_create_tables """
     CREATE TABLE IF NOT EXISTS role_config (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       channel_id INTEGER,
       message_id INTEGER,
       emoji_name TEXT,
@@ -40,7 +41,9 @@ defmodule Bot.Config.DB do
     SELECT * FROM role_config
   """
   @sql_insert """
-    INSERT INTO role_config VALUES (?1, ?2, ?3, ?4)
+    INSERT INTO role_config
+    (channel_id, message_id, emoji_name, role_name)
+    VALUES (?1, ?2, ?3, ?4)
   """
 
   @doc """
@@ -60,9 +63,9 @@ defmodule Bot.Config.DB do
   @doc """
   Create tables in the DB if they don't exist.
   """
-  def create_table!() do
+  def create_tables!() do
     conn = connect!()
-    Exqlite.Sqlite3.execute(conn, @sql_create_table)
+    Exqlite.Sqlite3.execute(conn, @sql_create_tables)
     Exqlite.Sqlite3.close(conn)
   end
 

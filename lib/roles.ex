@@ -7,9 +7,9 @@ defmodule Bot.Roles do
 
     matches_from_db =
       Enum.filter(db_roles, fn row ->
-        Enum.at(row, 0) == channel_id &&
-          Enum.at(row, 1) == message_id &&
-          Enum.at(row, 2) == emoji_name
+        Enum.at(row, 1) == channel_id &&
+          Enum.at(row, 2) == message_id &&
+          Enum.at(row, 3) == emoji_name
       end)
 
     if length(matches_from_db) == 0 do
@@ -17,7 +17,7 @@ defmodule Bot.Roles do
     end
 
     Enum.each(matches_from_db, fn db_entry ->
-      db_entry_name = Enum.at(db_entry, 3)
+      db_entry_name = Enum.at(db_entry, 4)
       guild_role = Enum.find(guild_roles, &(&1.name == db_entry_name))
 
       case guild_role do
