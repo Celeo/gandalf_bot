@@ -24,4 +24,4 @@ run-image:
   podman run -ti --rm -v `pwd`/tmp:/opt/app/data celeo/gandalf_bot bash
 
 deploy: build image-save
-  scp {{IMAGE_FILE}} {{SSH_TARGET}}:/srv/gandalf_bot.image
+  rsync -avz --progress {{IMAGE_FILE}} {{SSH_TARGET}}:/srv/gandalf_bot.image
