@@ -179,11 +179,25 @@ defmodule Bot.Commands do
 
   defp cmd_reactionrole!(args, msg) do
     Logger.debug("cmd_reactionrole!(#{inspect(args)}) by #{msg.author.username}")
-    # TODO
+
+    # TODO implement command
+
+    Nostrum.Api.create_message!(
+      msg.channel_id,
+      content: "Command not implemented",
+      message_reference: %{message_id: msg.id}
+    )
   end
 
   defp cmd_reactionroles!(args, msg) do
     Logger.debug("cmd_reactionroles!(#{inspect(args)}) by #{msg.author.username}")
-    # TODO
+
+    # TODO implement command
+
+    Nostrum.Api.create_message!(
+      msg.channel_id,
+      content: "Command not implemented",
+      message_reference: %{message_id: msg.id}
+    )
   end
 end
