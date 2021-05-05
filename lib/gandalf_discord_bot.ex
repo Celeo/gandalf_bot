@@ -43,8 +43,22 @@ defmodule Bot.Consumer do
     end
   end
 
+  defp handle_quotes!(msg) do
+    bot_user_id = Nostrum.Cache.Me.get().id
+
+    bot_mention =
+      Enum.find(msg.mentions, fn mentioned_user ->
+        mentioned_user.id == bot_user_id
+      end)
+
+    if bot_mention != nil do
+      Nostrum.Api.create_message(msg.channel_id, Bot.Quotes.get_random())
+    end
+  end
+
   def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
     bless_you!(msg)
+    handle_quotes!(msg)
     Bot.Commands.run!(msg)
   end
 

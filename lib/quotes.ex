@@ -2,11 +2,11 @@ defmodule Bot.Quotes do
   @doc """
   Get a random quote.
   """
-  def get_random do
+  def get_random() do
     Enum.take_random(get_all(), 1) |> Enum.at(0)
   end
 
-  def get_all do
+  def get_all() do
     [
       "Courage will now be your best defense against the storm that is at hand -- that and such hope as I bring.",
       "Sauron will suspect a trap. He will not take the bait.",

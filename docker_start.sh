@@ -3,7 +3,7 @@
 if [ -d "./data" ]
 then
   echo "Copying files from ./data"
-  cp ./data/* .
+  cp ./data/{config.json,roles.db} .
 fi
 
 echo "Running application"
