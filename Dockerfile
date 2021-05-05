@@ -21,6 +21,8 @@ RUN mix release
 FROM docker.io/hexpm/elixir:1.11.4-erlang-23.3.2-ubuntu-xenial-20210114 AS run
 RUN mkdir /opt/app
 WORKDIR /opt/app
+
 COPY --from=build /opt/app/_build/prod/rel/gandalf_discord_bot .
 COPY docker_start.sh .
+
 CMD ["bash", "docker_start.sh"]
