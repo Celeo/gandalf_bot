@@ -36,6 +36,11 @@ defmodule Bot.Roles do
                 user_id,
                 guild_role.id
               )
+
+            Nostrum.Api.create_message!(
+              Nostrum.Api.create_dm!(user_id).id,
+              "Added the \"#{guild_role.name}\" role to you"
+            )
           else
             Logger.debug("Removing role #{db_entry_name} to #{username}")
 
@@ -45,6 +50,11 @@ defmodule Bot.Roles do
                 user_id,
                 guild_role.id
               )
+
+            Nostrum.Api.create_message!(
+              Nostrum.Api.create_dm!(user_id).id,
+              "Removed the \"#{guild_role.name}\" role from you"
+            )
           end
       end
     end)
