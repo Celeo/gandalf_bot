@@ -1,9 +1,5 @@
 .git
-.github
-.pytest_cache
-.coverage
-.vscode
-tests
-gandalf_bot.service
-LICENSE
-README.md
+.elixir_ls
+deps
+roles*.db
+_build

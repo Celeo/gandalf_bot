@@ -1,8 +1,7 @@
 {
-  "token": "",
   "containment_role_id": 0,
   "valheim_role_id": 0,
-  "containment_response_gif": null,
+  "containment_response_gif": "",
   "blessable_user_ids": [],
   "scheduled": []
 }
