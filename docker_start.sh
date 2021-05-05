@@ -2,8 +2,9 @@
 
 if [ -d "./data" ]
 then
-  echo "Copying files from ./data"
-  cp ./data/{config.json,roles.db} .
+  echo "Linking in config and role files from ./data"
+  ln -s ./data/config.json config.json
+  ln -s ./data/roles.db roles.db
 fi
 
 echo "Running application"
