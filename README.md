@@ -1,18 +1,21 @@
 # gandalf_bot
 
 [![CI](https://github.com/Celeo/gandalf_bot/workflows/CI/badge.svg?branch=master)](https://github.com/Celeo/gandalf_bot/actions?query=workflow%3ACI)
-[![codecov](https://codecov.io/gh/Celeo/gandalf_bot/branch/master/graph/badge.svg?token=2R9RY3P229)](https://codecov.io/gh/Celeo/gandalf_bot)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 A Discord bot.
 
 ## Installing
 
-TBD
+1. Install [Elixir](elixir-lang.org/)
+1. Clone the repo
+1. Install dependencies with `mix deps.get`
 
 ## Using
 
-TBD
+1. Copy the `config.example.json` file to `config.json`
+1. Create a `.env` and `.env.prod` files that expose a `DISCORD_TOKEN` environment variable via `source DISCORD_TOKEN=<your token>`
+1. Run with `mix run --no-halt`
 
 If you want to enable the functionality to post screenshots of merits, you'll need to create your own screenshots. Sorry, but copyright.
 
@@ -31,7 +34,6 @@ If you want to enable the functionality to post screenshots of merits, you'll ne
 git clone https://github.com/Celeo/gandalf_bot
 cd gandalf_bot
 mix deps.get
-mix compile
 ```
 
 ### Running tests
