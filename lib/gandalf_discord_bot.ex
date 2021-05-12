@@ -20,7 +20,13 @@ defmodule Bot.Supervisor do
 
   @impl true
   def init(_) do
-    Supervisor.init([Bot.Consumer, Bot.MessageCheck.Words], strategy: :one_for_one)
+    children = [
+      Bot.Consumer,
+      Bot.MessageCheck.Words,
+      {Bot.Scheduled, []}
+    ]
+
+    Supervisor.init(children, strategy: :one_for_one)
   end
 end
 
@@ -71,6 +77,4 @@ defmodule Bot.Consumer do
   end
 
   def handle_event(_event), do: :noop
-
-  # TODO scheduled messages
 end

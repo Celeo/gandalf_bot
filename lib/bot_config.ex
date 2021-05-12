@@ -1,5 +1,9 @@
 defmodule Bot.Config.File.Schedule do
-  defstruct [:channel_id, :message, :cron]
+  defstruct [
+    :channel_id,
+    :message,
+    :cron
+  ]
 end
 
 defmodule Bot.Config.File do
