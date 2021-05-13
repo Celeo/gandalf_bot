@@ -5,7 +5,7 @@ defmodule Bot.Dice.Test do
   describe "handle_roll()" do
     setup do
       on_exit(fn ->
-        Bot.Rng.clear_stored_numbers()
+        Bot.Util.Rng.clear_stored_numbers()
         :ok
       end)
 
@@ -18,13 +18,13 @@ defmodule Bot.Dice.Test do
     end
 
     test "gets results with a static gen fn" do
-      Bot.Rng.enqueue_static([8, 8, 8])
+      Bot.Util.Rng.enqueue_static([8, 8, 8])
       results = Dice.handle_roll("3")
       assert results == {Dice.RollType.Explode_10, [{8, false}, {8, false}, {8, false}]}
     end
 
     test "handles exploding correctly" do
-      Bot.Rng.enqueue_static([8, 4, 5, 9, 2])
+      Bot.Util.Rng.enqueue_static([8, 4, 5, 9, 2])
       results = Dice.handle_roll("3 8again")
 
       assert results ==
@@ -33,19 +33,19 @@ defmodule Bot.Dice.Test do
     end
 
     test "handles math - addition" do
-      Bot.Rng.enqueue_static([8, 8, 8, 8, 8, 8])
+      Bot.Util.Rng.enqueue_static([8, 8, 8, 8, 8, 8])
       {_, results} = Dice.handle_roll("3 + 3")
       assert length(results) == 6
     end
 
     test "handles math - no modifiers" do
-      Bot.Rng.enqueue_static([8, 8, 8, 8, 8, 8])
+      Bot.Util.Rng.enqueue_static([8, 8, 8, 8, 8, 8])
       {_, results} = Dice.handle_roll("3 3")
       assert length(results) == 6
     end
 
     test "handles math - negative" do
-      Bot.Rng.enqueue_static([8])
+      Bot.Util.Rng.enqueue_static([8])
       {_, results} = Dice.handle_roll("3 - 2")
       assert length(results) == 1
     end

@@ -59,7 +59,7 @@ defmodule Bot.Dice do
       # otherwise,
       _ ->
         # roll a single die
-        result = Bot.Rng.get_number()
+        result = Bot.Util.Rng.get_number()
         # check if it should explode
         {_, explode_threshold} = type.value()
         should_explode = result >= explode_threshold

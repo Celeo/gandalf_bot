@@ -22,9 +22,9 @@ defmodule Bot.Supervisor do
   def init(_) do
     children = [
       Bot.Consumer,
-      Bot.MessageCheck.Words,
+      Bot.Util.Words,
       {Bot.Scheduled, []},
-      Bot.Rng
+      Bot.Util.Rng
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
@@ -44,8 +44,8 @@ defmodule Bot.Consumer do
     config = Bot.Config.File.read_from_disk!()
 
     if Enum.member?(config.blessable_user_ids, msg.author.id) do
-      if Bot.MessageCheck.is_incoherent!(msg.content) do
-        Nostrum.Api.create_reaction!(msg.channel_id, msg.id, %Nostrum.Struct.Emoji{name: "🤧"})
+      if Bot.MessageCheck.Incoherent.is_match!(msg.content) do
+        Nostrum.Api.create_reaction!(msg.channel_id, msg.id, Bot.MessageCheck.Incoherent.emoji())
       end
     end
   end

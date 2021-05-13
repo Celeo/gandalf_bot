@@ -1,4 +1,4 @@
-defmodule Bot.Rng do
+defmodule Bot.Util.Rng do
   use GenServer
   require Logger
 
@@ -14,18 +14,16 @@ defmodule Bot.Rng do
   @impl true
   def handle_call(:get, _from, {numbers, rng_fn}) do
     [retval, numbers] =
-      cond do
-        length(numbers) > 0 ->
-          [head | tail] = numbers
+      if length(numbers) > 0 do
+        [head | tail] = numbers
 
-          Logger.debug(
-            "Returning static value #{head} from RNG; #{length(tail)} static number(s) remaining"
-          )
+        Logger.debug(
+          "Returning static value #{head} from RNG; #{length(tail)} static number(s) remaining"
+        )
 
-          [head, tail]
-
-        true ->
-          [rng_fn.(), []]
+        [head, tail]
+      else
+        [rng_fn.(), []]
       end
 
     {:reply, retval, {numbers, rng_fn}}
