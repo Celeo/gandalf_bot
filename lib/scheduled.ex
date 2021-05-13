@@ -14,6 +14,7 @@ defmodule Bot.Scheduled do
         {:ok, cr} = Crontab.CronExpression.Parser.parse(event.cron)
 
         if Crontab.DateChecker.matches_date?(cr, NaiveDateTime.utc_now()) do
+          Logger.info("Sending scheduled message to channel #{event.channel_id}")
           Nostrum.Api.create_message!(event.channel_id, event.message)
         end
       end)
@@ -21,8 +22,8 @@ defmodule Bot.Scheduled do
       File.Error -> Logger.warning("Could not load config")
     end
 
-    # 30 seconds
-    Process.sleep(30_000)
+    # 1 minute sleep
+    Process.sleep(60_000)
     run()
   end
 end
