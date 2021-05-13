@@ -50,9 +50,7 @@ defmodule Bot.Dice do
     end
   end
 
-  defp roll_die(), do: Enum.random(1..10)
-
-  defp roll_all_dice(count, type, roll_fn, is_bonus \\ false) do
+  defp roll_all_dice(count, type, is_bonus \\ false) do
     case count do
       # if no dice to roll, then return empty array for recursion termination
       0 ->
@@ -61,7 +59,7 @@ defmodule Bot.Dice do
       # otherwise,
       _ ->
         # roll a single die
-        result = roll_fn.()
+        result = Bot.Rng.get_number()
         # check if it should explode
         {_, explode_threshold} = type.value()
         should_explode = result >= explode_threshold
@@ -69,9 +67,9 @@ defmodule Bot.Dice do
         # check explosion and whether this roll is already a bonus
         case {should_explode, is_bonus} do
           # no explosion? keep rolling the rest, reset is_bonus to false
-          {false, b} -> [{result, b} | roll_all_dice(count - 1, type, roll_fn, false)]
+          {false, b} -> [{result, b} | roll_all_dice(count - 1, type, false)]
           # explosion? keep rolling, set is_bonus to true
-          {true, b} -> [{result, b} | roll_all_dice(count, type, roll_fn, true)]
+          {true, b} -> [{result, b} | roll_all_dice(count, type, true)]
         end
     end
   end
@@ -81,7 +79,7 @@ defmodule Bot.Dice do
   parse into dice rolling, roll the "dice", and
   return a tuple of the results.
   """
-  def handle_roll(str, roll_fn \\ &roll_die/0) do
+  def handle_roll(str) do
     type = RollType.from_input(str)
 
     parts =
@@ -94,8 +92,8 @@ defmodule Bot.Dice do
     dice_setup = Enum.reduce(parts, %{mod: "+", total: 0}, &count_reduce_fn(&1, &2))
 
     case type do
-      Bot.Dice.RollType.Chance -> {type, roll_all_dice(1, type, roll_fn)}
-      _ -> {type, roll_all_dice(dice_setup[:total], type, roll_fn)}
+      Bot.Dice.RollType.Chance -> {type, roll_all_dice(1, type)}
+      _ -> {type, roll_all_dice(dice_setup[:total], type)}
     end
   end
 
@@ -109,7 +107,7 @@ defmodule Bot.Dice do
 
       results ->
         success_count = Enum.count(results, fn {value, _} -> value >= 8 end)
-        successes_str = "Successes: #{success_count}\n"
+        successes_str = "Successes: **#{success_count}**\n"
 
         dice_str =
           Enum.map(results, fn {value, bonus} ->

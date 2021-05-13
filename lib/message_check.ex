@@ -85,7 +85,7 @@ defmodule Bot.MessageCheck.Words do
   end
 
   @impl GenServer
-  def handle_call({:check, key}, _, words) do
+  def handle_call({:check, key}, _from, words) do
     member = Enum.member?(words, key)
     {:reply, member, words}
   end

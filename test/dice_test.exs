@@ -3,18 +3,28 @@ defmodule Bot.Dice.Test do
   alias Bot.Dice
 
   describe "handle_roll()" do
+    setup do
+      on_exit(fn ->
+        Bot.Rng.clear_stored_numbers()
+        :ok
+      end)
+
+      :ok
+    end
+
     test "returns no values for no dice" do
       results = Dice.handle_roll("")
       assert results == {Dice.RollType.Explode_10, []}
     end
 
     test "gets results with a static gen fn" do
-      results = Dice.handle_roll("3", fn -> 8 end)
+      Bot.Rng.enqueue_static([8, 8, 8])
+      results = Dice.handle_roll("3")
       assert results == {Dice.RollType.Explode_10, [{8, false}, {8, false}, {8, false}]}
     end
 
     test "handles exploding correctly" do
-      :rand.seed(:exsss, {101, 102, 103})
+      Bot.Rng.enqueue_static([8, 4, 5, 9, 2])
       results = Dice.handle_roll("3 8again")
 
       assert results ==
@@ -23,22 +33,25 @@ defmodule Bot.Dice.Test do
     end
 
     test "handles math - addition" do
-      {_, results} = Dice.handle_roll("3 + 3", fn -> 8 end)
+      Bot.Rng.enqueue_static([8, 8, 8, 8, 8, 8])
+      {_, results} = Dice.handle_roll("3 + 3")
       assert length(results) == 6
     end
 
     test "handles math - no modifiers" do
-      {_, results} = Dice.handle_roll("3 3", fn -> 8 end)
+      Bot.Rng.enqueue_static([8, 8, 8, 8, 8, 8])
+      {_, results} = Dice.handle_roll("3 3")
       assert length(results) == 6
     end
 
     test "handles math - negative" do
-      {_, results} = Dice.handle_roll("3 - 2", fn -> 8 end)
+      Bot.Rng.enqueue_static([8])
+      {_, results} = Dice.handle_roll("3 - 2")
       assert length(results) == 1
     end
 
     test "handles math - down to zero" do
-      {_, results} = Dice.handle_roll("3 - 3", fn -> 8 end)
+      {_, results} = Dice.handle_roll("3 - 3")
       assert length(results) == 0
     end
   end
@@ -51,7 +64,7 @@ defmodule Bot.Dice.Test do
 
     test "handles normal roll" do
       result = Dice.roll_results_to_string({Dice.RollType.Explode_10, [{10, false}, {4, true}]})
-      assert result == "Successes: 1\n10 (4)"
+      assert result == "Successes: **1**\n10 (4)"
     end
 
     test "handles exceptional results" do
@@ -60,12 +73,12 @@ defmodule Bot.Dice.Test do
           {Dice.RollType.Explode_10, [{8, false}, {8, false}, {8, false}, {8, false}, {8, false}]}
         )
 
-      assert result == "Successes: 5\n8 8 8 8 8\nExceptional success!"
+      assert result == "Successes: **5**\n8 8 8 8 8\nExceptional success!"
     end
 
     test "handles failure results" do
       result = Dice.roll_results_to_string({Dice.RollType.Explode_10, [{1, false}]})
-      assert result == "Successes: 0\n1\nFool of a Took!"
+      assert result == "Successes: **0**\n1\nFool of a Took!"
     end
 
     test "handles chance results" do

@@ -23,7 +23,8 @@ defmodule Bot.Supervisor do
     children = [
       Bot.Consumer,
       Bot.MessageCheck.Words,
-      {Bot.Scheduled, []}
+      {Bot.Scheduled, []},
+      Bot.Rng
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
