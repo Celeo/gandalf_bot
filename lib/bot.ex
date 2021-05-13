@@ -50,6 +50,16 @@ defmodule Bot.Consumer do
     end
   end
 
+  defp hey_listen!(msg) do
+    config = Bot.Config.File.read_from_disk!()
+
+    if Enum.member?(config.listenable_user_ids, msg.author.id) do
+      if Bot.MessageCheck.HeyListen.is_match!(msg.content) do
+        Nostrum.Api.create_reaction!(msg.channel_id, msg.id, Bot.MessageCheck.HeyListen.emoji())
+      end
+    end
+  end
+
   defp handle_quotes!(msg) do
     bot_user_id = Nostrum.Cache.Me.get().id
 
@@ -65,6 +75,7 @@ defmodule Bot.Consumer do
 
   def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
     bless_you!(msg)
+    hey_listen!(msg)
     handle_quotes!(msg)
     Bot.Commands.run!(msg)
   end

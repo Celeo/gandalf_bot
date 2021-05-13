@@ -7,6 +7,7 @@ defmodule Bot.Config.File.Test do
     "valheim_role_id": 2,
     "containment_response_gif": "a",
     "blessable_user_ids": [3],
+    "listenable_user_ids": [5],
     "scheduled": [
       {
         "channel_id": 4,
@@ -36,6 +37,7 @@ defmodule Bot.Config.File.Test do
     assert c.valheim_role_id == 2
     assert c.containment_response_gif == "a"
     assert c.blessable_user_ids == [3]
+    assert c.listenable_user_ids == [5]
     assert length(c.scheduled) == 1
 
     File.rm!(file_name)

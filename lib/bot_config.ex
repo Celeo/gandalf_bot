@@ -12,6 +12,7 @@ defmodule Bot.Config.File do
     :valheim_role_id,
     :containment_response_gif,
     :blessable_user_ids,
+    :listenable_user_ids,
     :scheduled
   ]
 
