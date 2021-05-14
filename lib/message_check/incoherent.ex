@@ -13,14 +13,6 @@ defmodule Bot.MessageCheck.Incoherent do
     ~r/^!/
   ]
 
-  defp strip_formatting(content), do: content |> String.replace(["*", "_", "~", "`"], "")
-
-  defp strip_punctuation(content) do
-    content
-    |> String.replace(["?", "\""], "")
-    |> String.trim_trailing("!")
-  end
-
   @doc """
   Determine if the string is nonsense and could warrant the bot's reaction.
   """
@@ -30,7 +22,12 @@ defmodule Bot.MessageCheck.Incoherent do
         if String.contains?(content, " ") or String.contains?(content, "\n") do
           false
         else
-          content = content |> strip_formatting() |> strip_punctuation()
+          content =
+            content
+            |> String.trim()
+            |> Bot.Util.Message.strip_formatting()
+            |> Bot.Util.Message.strip_punctuation()
+
           is_match!(content, :length)
         end
 

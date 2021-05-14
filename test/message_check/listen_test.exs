@@ -9,6 +9,12 @@ defmodule Bot.MessageCheck.HeyListen.Test do
     assert HeyListen.is_match!("LISTEN   ")
     assert HeyListen.is_match!("LISTEN !")
 
+    assert HeyListen.is_match!("*LISTEN !")
+    assert HeyListen.is_match!("\"LISTEN !")
+    assert HeyListen.is_match!("~LISTEN !")
+    assert HeyListen.is_match!("_LISTEN !")
+    assert HeyListen.is_match!("`LISTEN !")
+
     assert not HeyListen.is_match!("asdf listen asdf")
   end
 end
