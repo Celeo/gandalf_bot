@@ -81,9 +81,14 @@ defmodule Bot.Dice.Test do
       assert result == "Successes: **0**\n1\nFool of a Took!"
     end
 
-    test "handles chance results" do
+    test "handles chance results failure" do
       result = Dice.roll_results_to_string({Dice.RollType.Chance, [{5, false}]})
       assert result == "Chance failed! (5)"
+    end
+
+    test "handles chance results success" do
+      result = Dice.roll_results_to_string({Dice.RollType.Chance, [{10, false}]})
+      assert result == "Chance **succeeded**! (10)"
     end
   end
 end

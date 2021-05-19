@@ -123,7 +123,13 @@ defmodule Bot.Dice do
 
         case type do
           Bot.Dice.RollType.Chance ->
-            "Chance failed! (#{dice_str})"
+            {first_result, _} = hd(results)
+
+            if first_result == 10 do
+              "Chance **succeeded**! (10)"
+            else
+              "Chance failed! (#{dice_str})"
+            end
 
           _ ->
             successes_str <>
