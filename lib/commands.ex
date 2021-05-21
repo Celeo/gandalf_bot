@@ -24,6 +24,7 @@ defmodule Bot.Commands do
       "!sitrep" -> cmd_sitrep!(args, msg)
       "!roll" -> cmd_roll!(args, msg)
       "!merit" -> cmd_merit!(args, msg)
+      "!condition" -> cmd_condition!(args, msg)
       "!reactionrole" -> cmd_reactionrole!(args, msg)
       "!reactionroles" -> cmd_reactionroles!(args, msg)
       _ -> :notfound
@@ -129,52 +130,11 @@ defmodule Bot.Commands do
   end
 
   defp cmd_merit!(args, msg) do
-    Logger.debug("cmd_merit!(#{inspect(args)}) by #{msg.author.username}")
+    Bot.Util.Screenshots.find_and_send(Bot.Util.Screenshots.ScreenshotType.Merit, args, msg)
+  end
 
-    if length(args) == 0 do
-      Nostrum.Api.create_message!(
-        msg.channel_id,
-        content: "Usage: `!merit [name]`",
-        message_reference: %{message_id: msg.id}
-      )
-    else
-      dir = Application.app_dir(:gandalf_discord_bot, "priv/merit_screenshots")
-
-      if File.exists?(dir) do
-        search_term = args |> Enum.join("_") |> String.replace(" ", "_")
-
-        files_sent =
-          File.ls!(dir)
-          |> Enum.sort()
-          |> Enum.map(fn file ->
-            if String.starts_with?(file, search_term) do
-              Nostrum.Api.create_message!(
-                msg.channel_id,
-                file: "#{dir}/#{file}"
-              )
-
-              true
-            else
-              false
-            end
-          end)
-          |> Enum.filter(&(&1 == true))
-
-        if length(files_sent) == 0 do
-          Nostrum.Api.create_message!(
-            msg.channel_id,
-            content: "No matching screenshots found",
-            message_reference: %{message_id: msg.id}
-          )
-        end
-      else
-        Nostrum.Api.create_message!(
-          msg.channel_id,
-          content: "No screenshots folder",
-          message_reference: %{message_id: msg.id}
-        )
-      end
-    end
+  defp cmd_condition!(args, msg) do
+    Bot.Util.Screenshots.find_and_send(Bot.Util.Screenshots.ScreenshotType.Condition, args, msg)
   end
 
   defp cmd_reactionrole!(args, msg) do
