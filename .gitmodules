@@ -1,3 +1,6 @@
 [submodule "priv/merit_screenshots"]
 	path = priv/merit_screenshots
 	url = github:celeo/cod_merit_screenshots
+[submodule "priv/condition_screenshots"]
+	path = priv/condition_screenshots
+	url = github:celeo/cod_condition_screenshots
