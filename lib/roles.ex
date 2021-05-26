@@ -13,7 +13,7 @@ defmodule Bot.Roles do
       end)
 
     if length(matches_from_db) == 0 do
-      Logger.debug("No matching roles in DB for added reaction")
+      Logger.debug("No matching roles in DB for added reaction: #{emoji_name}")
     end
 
     Enum.each(matches_from_db, fn db_entry ->
