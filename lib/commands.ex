@@ -23,6 +23,7 @@ defmodule Bot.Commands do
       "!unbreach" -> cmd_unbreach!(args, msg)
       "!sitrep" -> cmd_sitrep!(args, msg)
       "!roll" -> cmd_roll!(args, msg)
+      "!gmroll" -> cmd_gm_roll!(args, msg)
       "!merit" -> cmd_merit!(args, msg)
       "!condition" -> cmd_condition!(args, msg)
       "!reactionrole" -> cmd_reactionrole!(args, msg)
@@ -127,6 +128,58 @@ defmodule Bot.Commands do
       content: results,
       message_reference: %{message_id: msg.id}
     )
+  end
+
+  defp cmd_gm_roll!(args, msg) do
+    Logger.debug("cmd_gm_roll!(#{inspect(args)}) by #{msg.author.username}")
+
+    # find the GM role
+    config = Bot.Config.File.read_from_disk!()
+    guild = Nostrum.Api.get_guild!(msg.guild_id)
+
+    # find users with the GM role in the guild
+    gamemaster_members =
+      Enum.filter(
+        Nostrum.Api.list_guild_members!(msg.guild_id),
+        &Enum.member?(&1.roles, config.gamemaster_role_id)
+      )
+
+    case gamemaster_members do
+      # notify the user that no DMs were found
+      [] ->
+        Nostrum.Api.create_message!(
+          msg.channel_id,
+          content: "Could not find any game masters in this server.",
+          message_reference: %{message_id: msg.id}
+        )
+
+      gms ->
+        # roll like normal
+        results =
+          args
+          |> Enum.join(" ")
+          |> Bot.Dice.handle_roll()
+          |> Bot.Dice.roll_results_to_string()
+
+        # notify gamemaster(s)
+        Enum.each(gms, fn gamemaster ->
+          dm = Nostrum.Api.create_dm!(gamemaster.user.id)
+
+          full_content =
+            "\"#{msg.author.username}\" in \"#{guild.name}\" rolled this from the command \"#{
+              msg.content
+            }\"\n\n#{results}"
+
+          Nostrum.Api.create_message!(
+            dm.id,
+            content: full_content
+          )
+        end)
+
+        # Note: there's no straightfoward way to get people in a channel, so the
+        # expectation is that a guild will either only have 1 gamemaster, or
+        # they'll just deal with this.
+    end
   end
 
   defp cmd_merit!(args, msg) do

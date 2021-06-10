@@ -4,7 +4,7 @@ defmodule Bot.Config.File.Test do
   @sample_config """
   {
     "containment_role_id": 1,
-    "valheim_role_id": 2,
+    "gamemaster_role_id": 2,
     "containment_response_gif": "a",
     "blessable_user_ids": [3],
     "listenable_user_ids": [5],
@@ -34,7 +34,7 @@ defmodule Bot.Config.File.Test do
     c = Bot.Config.File.read_from_disk!()
 
     assert c.containment_role_id == 1
-    assert c.valheim_role_id == 2
+    assert c.gamemaster_role_id == 2
     assert c.containment_response_gif == "a"
     assert c.blessable_user_ids == [3]
     assert c.listenable_user_ids == [5]

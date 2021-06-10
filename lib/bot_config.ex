@@ -9,7 +9,7 @@ end
 defmodule Bot.Config.File do
   defstruct [
     :containment_role_id,
-    :valheim_role_id,
+    :gamemaster_role_id,
     :containment_response_gif,
     :blessable_user_ids,
     :listenable_user_ids,
