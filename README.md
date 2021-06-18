@@ -23,12 +23,12 @@ If you want to enable the functionality to post screenshots of merits, you'll ne
 
 ### Building
 
-### Requirements
+#### Requirements
 
 * Git
 * Elixir
 
-### Steps
+#### Steps
 
 ```sh
 git clone https://github.com/Celeo/gandalf_bot
@@ -36,7 +36,7 @@ cd gandalf_bot
 mix deps.get
 ```
 
-### Running tests
+#### Running tests
 
 ```sh
 mix test
