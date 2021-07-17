@@ -22,7 +22,7 @@ defmodule Bot.Util.Words do
 
   @impl GenServer
   def handle_call({:check, key}, _from, words) do
-    member = Enum.member?(words, key)
+    member = Enum.member?(words, String.downcase(key))
     {:reply, member, words}
   end
 
