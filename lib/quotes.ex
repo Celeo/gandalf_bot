@@ -84,7 +84,7 @@ defmodule Bot.Quotes do
       "Do you not understand that while we bicker amongst ourselves, Sauron's power grows?! None can escape it! You'll all be destroyed",
       "Hold them back, do not give in to fear. Stand to your posts. Fight!",
       "It is not despair, for despair is only for those who see the end beyond all doubt",
-      "by the skills of Lord Elrond you're beginning to mend",
+      "By the skills of Lord Elrond you're beginning to mend",
       "A little late for trimming the verge don't you think?",
       "Even the very wise cannot see all ends",
       "He that breaks a thing to find out what it is has left the path of wisdom",
