@@ -22,8 +22,9 @@ defmodule Bot.Commands do
       "!breach" -> cmd_breach!(args, msg)
       "!unbreach" -> cmd_unbreach!(args, msg)
       "!sitrep" -> cmd_sitrep!(args, msg)
-      "!roll" -> cmd_roll!(args, msg)
-      "!gmroll" -> cmd_gm_roll!(args, msg)
+      # disabled for usage of another bot
+      # "!roll" -> cmd_roll!(args, msg)
+      # "!gmroll" -> cmd_gm_roll!(args, msg)
       "!merit" -> cmd_merit!(args, msg)
       "!condition" -> cmd_condition!(args, msg)
       "!reactionrole" -> cmd_reactionrole!(args, msg)
@@ -166,9 +167,7 @@ defmodule Bot.Commands do
           dm = Nostrum.Api.create_dm!(gamemaster.user.id)
 
           full_content =
-            "\"#{msg.author.username}\" in \"#{guild.name}\" rolled this from the command \"#{
-              msg.content
-            }\"\n\n#{results}"
+            "\"#{msg.author.username}\" in \"#{guild.name}\" rolled this from the command \"#{msg.content}\"\n\n#{results}"
 
           Nostrum.Api.create_message!(
             dm.id,
