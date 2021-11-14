@@ -1,5 +1,6 @@
 SSH_TARGET := "do"
 IMAGE_FILE := "gandalf_bot.image.bin"
+set dotenv-load := true
 
 default:
 

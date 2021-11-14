@@ -29,6 +29,7 @@ defmodule Bot.Commands do
       "!condition" -> cmd_condition!(args, msg)
       "!reactionrole" -> cmd_reactionrole!(args, msg)
       "!reactionroles" -> cmd_reactionroles!(args, msg)
+      "!bones" -> cmd_bones!(args, msg)
       _ -> :notfound
     end
   end
@@ -203,6 +204,18 @@ defmodule Bot.Commands do
 
   defp cmd_reactionroles!(args, msg) do
     Logger.debug("cmd_reactionroles!(#{inspect(args)}) by #{msg.author.username}")
+
+    # TODO implement command
+
+    Nostrum.Api.create_message!(
+      msg.channel_id,
+      content: "Command not implemented",
+      message_reference: %{message_id: msg.id}
+    )
+  end
+
+  defp cmd_bones!(args, msg) do
+    Logger.debug("cmd_bones!(#{inspect(args)}) by #{msg.author.username}")
 
     # TODO implement command
 
