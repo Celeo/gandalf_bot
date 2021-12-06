@@ -29,7 +29,8 @@ defmodule Bot.Commands do
       "!condition" -> cmd_condition!(args, msg)
       "!reactionrole" -> cmd_reactionrole!(args, msg)
       "!reactionroles" -> cmd_reactionroles!(args, msg)
-      "!bones" -> cmd_bones!(args, msg)
+      "!pin" -> cmd_pin!(args, msg)
+      "!unpin" -> cmd_unpin!(args, msg)
       _ -> :notfound
     end
   end
@@ -54,7 +55,12 @@ defmodule Bot.Commands do
 
       applied_to =
         Enum.map(msg.mentions, fn mentioned_user ->
-          Nostrum.Api.add_guild_member_role(msg.guild_id, mentioned_user.id, containment_role.id)
+          Nostrum.Api.add_guild_member_role(
+            msg.guild_id,
+            mentioned_user.id,
+            containment_role.id
+          )
+
           mentioned_user.username
         end)
 
@@ -105,11 +111,16 @@ defmodule Bot.Commands do
     if member_is_admin!(msg.guild_id, msg.member) do
       containment_role = get_containment_role!(config, msg.guild_id)
       guild_members = Nostrum.Api.list_guild_members!(msg.guild_id, limit: 1000)
+
       contained_users = Enum.filter(guild_members, &Enum.member?(&1.roles, containment_role.id))
 
       if length(contained_users) > 0 do
         contained_users_str = Enum.join(contained_users, ", ")
-        Nostrum.Api.create_message!(msg.channel_id, "Contained users: #{contained_users_str}")
+
+        Nostrum.Api.create_message!(
+          msg.channel_id,
+          "Contained users: #{contained_users_str}"
+        )
       else
         Nostrum.Api.create_message!(msg.channel_id, "No one is contained")
       end
@@ -183,11 +194,19 @@ defmodule Bot.Commands do
   end
 
   defp cmd_merit!(args, msg) do
-    Bot.Util.Screenshots.find_and_send(Bot.Util.Screenshots.ScreenshotType.Merit, args, msg)
+    Bot.Util.Screenshots.find_and_send(
+      Bot.Util.Screenshots.ScreenshotType.Merit,
+      args,
+      msg
+    )
   end
 
   defp cmd_condition!(args, msg) do
-    Bot.Util.Screenshots.find_and_send(Bot.Util.Screenshots.ScreenshotType.Condition, args, msg)
+    Bot.Util.Screenshots.find_and_send(
+      Bot.Util.Screenshots.ScreenshotType.Condition,
+      args,
+      msg
+    )
   end
 
   defp cmd_reactionrole!(args, msg) do
@@ -214,15 +233,33 @@ defmodule Bot.Commands do
     )
   end
 
-  defp cmd_bones!(args, msg) do
-    Logger.debug("cmd_bones!(#{inspect(args)}) by #{msg.author.username}")
+  defp cmd_pin!(args, msg) do
+    Logger.debug("cmd_pin!(#{inspect(args)}) by #{msg.author.username}")
 
-    # TODO implement command
-
-    Nostrum.Api.create_message!(
+    Nostrum.Api.add_pinned_channel_message!(
       msg.channel_id,
-      content: "Command not implemented",
-      message_reference: %{message_id: msg.id}
+      args |> Enum.at(0) |> String.to_integer()
     )
+
+    Nostrum.Api.create_reaction!(msg.channel_id, msg.id, "👍")
+  end
+
+  defp cmd_unpin!(args, msg) do
+    Logger.debug("cmd_pin!(#{inspect(args)}) by #{msg.author.username}")
+    msg_id = args |> Enum.at(0) |> String.to_integer()
+
+    is_pinned =
+      msg.channel_id |> Nostrum.Api.get_pinned_messages!() |> Enum.find(&(&1.id == msg_id))
+
+    if is_pinned do
+      Nostrum.Api.delete_pinned_channel_message!(
+        msg.channel_id,
+        msg_id
+      )
+
+      Nostrum.Api.create_reaction!(msg.channel_id, msg.id, "👍")
+    else
+      Nostrum.Api.create_reaction!(msg.channel_id, msg.id, "🤷‍♂️")
+    end
   end
 end
