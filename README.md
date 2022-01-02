@@ -14,7 +14,7 @@ A Discord bot.
 ## Using
 
 1. Copy the `config.example.json` file to `config.json`
-1. Create a `.env` and `.env.prod` files that expose a `DISCORD_TOKEN` environment variable via `source DISCORD_TOKEN=<your token>`
+1. Create a `.env` and `.env.prod` files that expose a `DISCORD_TOKEN` environment variable via `export DISCORD_TOKEN=<your token>`
 1. Run with `mix run --no-halt`
 
 If you want to enable the functionality to post screenshots of merits, you'll need to create your own screenshots. Sorry, but copyright.
