@@ -7,38 +7,14 @@ A Discord bot.
 
 ## Installing
 
-1. Install Deno
+1. Install [Deno](https://deno.land)
+1. Install [just](https://github.com/casey/just)
 1. Clone the repo
 
 ## Using
 
-1. Copy the `config.example.json` file to `config.json`
-1. Create an `.env` file that exposes a `DISCORD_TOKEN` environment variable via `DISCORD_TOKEN=<your token>`
-1. TODO
-
-If you want to enable the functionality to post screenshots of merits, you'll need to create your own screenshots. Sorry, but copyright.
-
-## Developing
-
-### Building
-
-#### Requirements
-
-* Git
-* Deno
-
-#### Steps
-
-```sh
-git clone https://github.com/Celeo/gandalf_bot
-cd gandalf_bot
-```
-
-#### Running tests
-
-```sh
-deno test --allow-all
-```
+1. Copy the `config.example.json` file to `config.json` and populate
+1. Run with `just run`
 
 ## License
 
