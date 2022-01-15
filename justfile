@@ -2,7 +2,8 @@ set dotenv-load := false
 
 default: run
 
-files := ".env,.env.defaults,config.json,roles.db,roles.db-journal,words.txt"
+read_files := ".env,.env.defaults,config.json,roles.db,roles.db-journal,words.txt"
+write_files := "roles.db,roles.db-journal"
 
 setup:
     -rm data.db
@@ -10,14 +11,14 @@ setup:
 
 run:
     @deno run \
-        --allow-read={{files}} \
-        --allow-write={{files}} \
+        --allow-read={{read_files}} \
+        --allow-write={{write_files}} \
         --allow-net=discord.com,gateway.discord.gg main.ts
 
 compile:
     @deno compile \
-        --allow-read={{files}} \
-        --allow-write={{files}} \
+        --allow-read={{read_files}} \
+        --allow-write={{write_files}} \
         --allow-net=discord.com,gateway.discord.gg main.ts
 
 test:

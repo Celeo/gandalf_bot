@@ -1,4 +1,12 @@
-import { Bot, createBot, DiscordenoMessage, startBot } from "./deps.ts";
+import {
+  BotWithCache,
+  createBot,
+  DiscordenoMessage,
+  enableCachePlugin,
+  enableCacheSweepers,
+  enablePermissionsPlugin,
+  startBot,
+} from "./deps.ts";
 import { Config, loadConfig } from "./config.ts";
 import { handler as blessYouHandler } from "./blessYou.ts";
 import { handler as commandsHandler } from "./commands.ts";
@@ -6,11 +14,25 @@ import { handler as heyListenHandler } from "./heyListen.ts";
 import { handler as quotesHandler } from "./quotes.ts";
 import { reactionAdd, reactionRemove } from "./reactions.ts";
 
+const handlers: Array<[
+  (
+    bot: BotWithCache<BotWithCache>,
+    config: Config,
+    message: DiscordenoMessage,
+  ) => Promise<void>,
+  string,
+]> = [
+  [blessYouHandler, "blessYou"],
+  [commandsHandler, "commands"],
+  [heyListenHandler, "heyListen"],
+  [quotesHandler, "quotes"],
+];
+
 /**
  * Event handler for new messages.
  */
 async function messageHandler(
-  bot: Bot,
+  bot: BotWithCache,
   config: Config,
   message: DiscordenoMessage,
 ) {
@@ -18,10 +40,13 @@ async function messageHandler(
     // not handling any messages from bots
     return;
   }
-  await blessYouHandler(bot, config, message);
-  await commandsHandler(bot, config, message);
-  await heyListenHandler(bot, config, message);
-  await quotesHandler(bot, config, message);
+  for (const [handler, name] of handlers) {
+    try {
+      await handler(bot, config, message);
+    } catch (e) {
+      console.log(`Error when processing message handler "${name}: ${e}`);
+    }
+  }
 }
 
 /**
@@ -33,7 +58,7 @@ export async function main() {
     console.error("No token supplied");
     return;
   }
-  const bot = createBot({
+  const baseBot = createBot({
     token: config.token,
     intents: ["GuildMessages", "GuildMembers", "GuildMessageReactions"],
     botId: BigInt(atob(config.token.split(".")[0])),
@@ -42,7 +67,7 @@ export async function main() {
         console.log("Connected to gateway");
       },
       async messageCreate(bot, message) {
-        await messageHandler(bot, config, message);
+        await messageHandler(bot as BotWithCache, config, message);
       },
       async reactionAdd(bot, payload) {
         await reactionAdd(bot, config, payload);
@@ -52,5 +77,8 @@ export async function main() {
       },
     },
   });
+  const bot = enableCachePlugin(baseBot);
+  enableCacheSweepers(bot);
+  enablePermissionsPlugin(bot);
   await startBot(bot);
 }

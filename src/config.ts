@@ -3,10 +3,10 @@
  */
 export interface Config {
   token: string;
-  containmentRoleId: number;
+  containmentRoleId: bigint;
   containmentResponseGif: string;
-  blessableUserIds: Array<BigInt>;
-  listenableUserIds: Array<BigInt>;
+  blessableUserIds: Array<bigint>;
+  listenableUserIds: Array<bigint>;
 }
 
 /**
@@ -14,6 +14,7 @@ export interface Config {
  */
 export async function loadConfig(): Promise<Config> {
   const data = JSON.parse(await Deno.readTextFile("./config.json"));
+  data.containmentRoleId = BigInt(data.containmentRoleId);
   data.blessableUserIds = data.blessableUserIds.map((n: number) => BigInt(n));
   data.listenableUserIds = data.listenableUserIds.map((n: number) => BigInt(n));
   return data as Config;

@@ -1,4 +1,5 @@
-import { Bot, DiscordenoMessage, sendMessage } from "./deps.ts";
+import { Bot, DiscordenoMessage } from "./deps.ts";
+import { replyTo } from "./util.ts";
 import { Config } from "./config.ts";
 
 const QUOTES = [
@@ -262,12 +263,5 @@ export async function handler(
     return;
   }
   const randomQuote = QUOTES[Math.ceil(Math.random() * QUOTES.length) - 1];
-  await sendMessage(bot, message.channelId, {
-    content: randomQuote,
-    messageReference: {
-      messageId: message.id,
-      channelId: message.channelId,
-      failIfNotExists: false,
-    },
-  });
+  await replyTo(bot, message, randomQuote);
 }
