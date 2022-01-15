@@ -7,15 +7,14 @@ A Discord bot.
 
 ## Installing
 
-1. Install [Elixir](elixir-lang.org/)
+1. Install Deno
 1. Clone the repo
-1. Install dependencies with `mix deps.get`
 
 ## Using
 
 1. Copy the `config.example.json` file to `config.json`
-1. Create a `.env` and `.env.prod` files that expose a `DISCORD_TOKEN` environment variable via `export DISCORD_TOKEN=<your token>`
-1. Run with `mix run --no-halt`
+1. Create an `.env` file that exposes a `DISCORD_TOKEN` environment variable via `DISCORD_TOKEN=<your token>`
+1. TODO
 
 If you want to enable the functionality to post screenshots of merits, you'll need to create your own screenshots. Sorry, but copyright.
 
@@ -26,20 +25,19 @@ If you want to enable the functionality to post screenshots of merits, you'll ne
 #### Requirements
 
 * Git
-* Elixir
+* Deno
 
 #### Steps
 
 ```sh
 git clone https://github.com/Celeo/gandalf_bot
 cd gandalf_bot
-mix compile
 ```
 
 #### Running tests
 
 ```sh
-mix test
+deno test --allow-all
 ```
 
 ## License

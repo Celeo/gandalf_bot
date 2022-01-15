@@ -11,21 +11,3 @@ jobs:
       !(github.event_name == 'push' && contains(github.event.head_commit.message, '[skip ci]'))
     steps:
       - uses: actions/checkout@v2
-      - uses: erlef/setup-beam@v1
-        with:
-          otp-version: '23'
-          elixir-version: '1.11.3'
-      - uses: actions/cache@v2
-        with:
-          path: 'deps'
-          key: ${{ runner.os }}-deps-${{ hashFiles('**/mix.lock') }}
-      - uses: actions/cache@v2
-        with:
-          path: '_build'
-          key: ${{ runner.os }}-build-${{ hashFiles('**/mix.lock') }}
-      - run: mix deps.get
-      - run: mix deps.compile
-      - run: wget https://raw.githubusercontent.com/dwyl/english-words/master/words.txt -O priv/words.txt
-      - run: mix test
-        env:
-          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}

@@ -1,5 +1,0 @@
-.git
-.elixir_ls
-deps
-roles*.db
-_build
