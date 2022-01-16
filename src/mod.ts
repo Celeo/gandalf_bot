@@ -70,10 +70,10 @@ export async function main() {
         await messageHandler(bot as BotWithCache, config, message);
       },
       async reactionAdd(bot, payload) {
-        await reactionAdd(bot, config, payload);
+        await reactionAdd(bot as BotWithCache, config, payload);
       },
       async reactionRemove(bot, payload) {
-        await reactionRemove(bot, config, payload);
+        await reactionRemove(bot as BotWithCache, config, payload);
       },
     },
   });

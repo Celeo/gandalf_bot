@@ -151,7 +151,7 @@ async function commandBreach(
   message: DiscordenoMessage,
   _command: Command,
 ) {
-  if (!senderIsAdmin(bot, message)) {
+  if (message.guildId === undefined || !senderIsAdmin(bot, message)) {
     return;
   }
   if (message.mentionedUserIds.length === 0) {
@@ -160,7 +160,7 @@ async function commandBreach(
   for (const mentioned of message.mentionedUserIds) {
     await addRole(
       bot,
-      message.guildId as bigint,
+      message.guildId,
       mentioned,
       config.containmentRoleId,
     );
@@ -174,7 +174,7 @@ async function commandUnBreach(
   message: DiscordenoMessage,
   _command: Command,
 ) {
-  if (!senderIsAdmin(bot, message)) {
+  if (message.guildId === undefined || !senderIsAdmin(bot, message)) {
     return;
   }
   if (message.mentionedUserIds.length === 0) {
@@ -183,7 +183,7 @@ async function commandUnBreach(
   for (const mentioned of message.mentionedUserIds) {
     await removeRole(
       bot,
-      message.guildId as bigint,
+      message.guildId,
       mentioned,
       config.containmentRoleId,
     );
@@ -197,12 +197,13 @@ async function commandSitRep(
   message: DiscordenoMessage,
   _command: Command,
 ) {
-  if (!senderIsAdmin(bot, message)) {
+  if (message.guildId === undefined || !senderIsAdmin(bot, message)) {
     return;
   }
   const containmentRole = config.containmentRoleId;
   const containedMembers: Array<bigint> = [];
-  await fetchMembers(bot, message.guildId as bigint, 0);
+  // would be nice to actually get the shard id here
+  await fetchMembers(bot, message.guildId, 0);
   const members = bot.members;
   for (const member of members.values()) {
     if (member.roles.includes(containmentRole)) {
