@@ -1,3 +1,5 @@
+import { JsonBigInt } from "./deps.ts";
+
 /**
  * Bot configuration.
  */
@@ -13,9 +15,7 @@ export interface Config {
  * Load the bot configuration from the "./config.json" file.
  */
 export async function loadConfig(): Promise<Config> {
-  const data = JSON.parse(await Deno.readTextFile("./config.json"));
-  data.containmentRoleId = BigInt(data.containmentRoleId);
-  data.blessableUserIds = data.blessableUserIds.map((n: number) => BigInt(n));
-  data.listenableUserIds = data.listenableUserIds.map((n: number) => BigInt(n));
+  const raw = await Deno.readTextFile("./config.json");
+  const data = JsonBigInt({ useNativeBigInt: true }).parse(raw);
   return data as Config;
 }

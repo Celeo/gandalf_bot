@@ -1,22 +1,5 @@
 // ===== Bot library =====
-export {
-  addReaction,
-  BitwisePermissionFlags,
-  createBot,
-  getGuild,
-  getMember,
-  getUser,
-  pinMessage,
-  sendMessage,
-  startBot,
-  unpinMessage,
-} from "https://deno.land/x/discordeno@13.0.0-rc18/mod.ts";
-export type {
-  Bot,
-  DiscordenoEmoji,
-  DiscordenoMember,
-  DiscordenoMessage,
-} from "https://deno.land/x/discordeno@13.0.0-rc18/mod.ts";
+export * from "https://deno.land/x/discordeno@13.0.0-rc18/mod.ts";
 export {
   enableCachePlugin,
   enableCacheSweepers,
@@ -40,3 +23,6 @@ export type { ModelFields } from "https://deno.land/x/denodb@v1.0.40/lib/model.t
 
 // ===== memoize =====
 export { memoizy } from "https://deno.land/x/memoizy@1.0.0/mod.ts";
+
+// ===== BigInt JSON parser =====
+export { default as JsonBigInt } from "https://esm.sh/json-bigint";

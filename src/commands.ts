@@ -1,9 +1,13 @@
 import {
   addReaction,
+  addRole,
   BotWithCache,
   DiscordenoMessage,
+  fetchMembers,
+  getUser,
   hasGuildPermissions,
   pinMessage,
+  removeRole,
   unpinMessage,
 } from "./deps.ts";
 import { replyTo } from "./util.ts";
@@ -143,7 +147,7 @@ async function commandHelp(
 
 async function commandBreach(
   bot: BotWithCache,
-  _config: Config,
+  config: Config,
   message: DiscordenoMessage,
   _command: Command,
 ) {
@@ -153,12 +157,20 @@ async function commandBreach(
   if (message.mentionedUserIds.length === 0) {
     await replyTo(bot, message, "You must tag a user");
   }
-  // TODO
+  for (const mentioned of message.mentionedUserIds) {
+    await addRole(
+      bot,
+      message.guildId as bigint,
+      mentioned,
+      config.containmentRoleId,
+    );
+  }
+  await replyTo(bot, message, config.containmentResponseGif);
 }
 
 async function commandUnBreach(
   bot: BotWithCache,
-  _config: Config,
+  config: Config,
   message: DiscordenoMessage,
   _command: Command,
 ) {
@@ -168,7 +180,15 @@ async function commandUnBreach(
   if (message.mentionedUserIds.length === 0) {
     await replyTo(bot, message, "You must tag a user");
   }
-  // TODO
+  for (const mentioned of message.mentionedUserIds) {
+    await removeRole(
+      bot,
+      message.guildId as bigint,
+      mentioned,
+      config.containmentRoleId,
+    );
+  }
+  await addReaction(bot, message.channelId, message.id, "👍");
 }
 
 async function commandSitRep(
@@ -181,11 +201,13 @@ async function commandSitRep(
     return;
   }
   const containmentRole = config.containmentRoleId;
-  const containedMembers = [];
-  // FIXME this isn't working because `bot.members` isn't returning all members, and the members returned don't have nicks
-  for (const member of bot.members.values()) {
+  const containedMembers: Array<bigint> = [];
+  await fetchMembers(bot, message.guildId as bigint, 0);
+  const members = bot.members;
+  for (const member of members.values()) {
     if (member.roles.includes(containmentRole)) {
-      containedMembers.push(member.nick);
+      const user = await getUser(bot, member.id);
+      containedMembers.push(user.id);
     }
   }
   if (containedMembers.length === 0) {
@@ -194,7 +216,8 @@ async function commandSitRep(
     await replyTo(
       bot,
       message,
-      `Contained users: ${containedMembers.join(", ")}`,
+      "Contained users: " +
+        containedMembers.map((id) => `<@!${id}>`).join(", "),
     );
   }
 }
