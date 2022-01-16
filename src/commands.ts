@@ -257,7 +257,6 @@ async function commandUnpin(
   await addReaction(bot, message.channelId, message.id, "👍");
 }
 
-// deno-lint-ignore require-await
 async function commandAddReactionRole(
   bot: BotWithCache,
   _config: Config,
@@ -268,4 +267,5 @@ async function commandAddReactionRole(
     return;
   }
   // TODO
+  await replyTo(bot, message, "Not yet implemented");
 }
