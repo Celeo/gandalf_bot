@@ -50,11 +50,11 @@ export async function handler(
   if (content.length < 8) {
     return;
   }
-  const realWords = memoziedLoadWords();
-  if (realWords.includes(content.toLowerCase())) {
+  if (PATTERNS.find((pattern) => pattern.test(content))) {
     return;
   }
-  if (PATTERNS.find((pattern) => pattern.test(content))) {
+  const realWords = memoziedLoadWords();
+  if (realWords.includes(content.toLowerCase())) {
     return;
   }
   await addReaction(bot, message.channelId, message.id, "🤧");
