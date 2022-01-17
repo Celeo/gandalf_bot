@@ -46,7 +46,7 @@ export async function handler(
   if (content.includes(" ") || content.includes("\n")) {
     return;
   }
-  content = content.trim().replaceAll(/[\*_~`?\\,]/g, "");
+  content = content.trim().replaceAll(/[\*_~`!?\\,]/g, "");
   if (content.length < 8) {
     return;
   }
