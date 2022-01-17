@@ -13,13 +13,15 @@ run:
     @deno run \
         --allow-read={{read_files}} \
         --allow-write={{write_files}} \
-        --allow-net=discord.com,gateway.discord.gg main.ts
+        --allow-net=discord.com,gateway.discord.gg \
+        main.ts
 
 compile:
     @deno compile \
         --allow-read={{read_files}} \
         --allow-write={{write_files}} \
-        --allow-net=discord.com,gateway.discord.gg main.ts
+        --allow-net=discord.com,gateway.discord.gg \
+        main.ts
 
 test:
     @deno test --allow-all
