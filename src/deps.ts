@@ -25,4 +25,4 @@ export type { ModelFields } from "https://deno.land/x/denodb@v1.0.40/lib/model.t
 export { memoizy } from "https://deno.land/x/memoizy@1.0.0/mod.ts";
 
 // ===== BigInt JSON parser =====
-export { default as JsonBigInt } from "https://esm.sh/json-bigint";
+export { default as JsonBigInt } from "https://esm.sh/json-bigint@1.0.0";
