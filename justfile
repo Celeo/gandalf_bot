@@ -23,6 +23,10 @@ compile:
         --allow-net=discord.com,gateway.discord.gg \
         main.ts
 
+bundle:
+    @deno bundle \
+        main.ts bundle.js
+
 test:
     @deno test --allow-all
 

@@ -1,5 +1,24 @@
 // ===== Bot library =====
-export * from "https://deno.land/x/discordeno@13.0.0-rc18/mod.ts";
+export {
+  addReaction,
+  addRole,
+  createBot,
+  fetchMembers,
+  getDmChannel,
+  getMember,
+  getUser,
+  pinMessage,
+  removeRole,
+  sendMessage,
+  startBot,
+  unpinMessage,
+} from "https://deno.land/x/discordeno@13.0.0-rc18/mod.ts";
+export type {
+  Bot,
+  DiscordenoEmoji,
+  DiscordenoMember,
+  DiscordenoMessage,
+} from "https://deno.land/x/discordeno@13.0.0-rc18/mod.ts";
 export {
   enableCachePlugin,
   enableCacheSweepers,
