@@ -14,7 +14,10 @@ import { handler as heyListenHandler } from "./heyListen.ts";
 import { handler as quotesHandler } from "./quotes.ts";
 import { reactionAdd, reactionRemove } from "./reactions.ts";
 
-const handlers: Array<[
+/**
+ * Collection of message handlers and their "friendly" names.
+ */
+const HANDLERS: Array<[
   (
     bot: BotWithCache<BotWithCache>,
     config: Config,
@@ -40,7 +43,7 @@ async function messageHandler(
     // not handling any messages from bots
     return;
   }
-  for (const [handler, name] of handlers) {
+  for (const [handler, name] of HANDLERS) {
     try {
       await handler(bot, config, message);
     } catch (e) {

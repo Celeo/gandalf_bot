@@ -136,6 +136,10 @@ async function senderIsAdmin(
   return isAdmin;
 }
 
+// ===========================
+// Individual command handlers
+// ===========================
+
 async function commandHelp(
   bot: BotWithCache,
   _config: Config,

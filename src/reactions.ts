@@ -11,6 +11,9 @@ import {
 import { Config } from "./config.ts";
 import { getAllRoles } from "./db.ts";
 
+/**
+ * Event payload for a reaction being added.
+ */
 interface ReactionAddPayload {
   userId: bigint;
   channelId: bigint;
@@ -20,6 +23,9 @@ interface ReactionAddPayload {
   emoji: DiscordenoEmoji;
 }
 
+/**
+ * Event payload for a reaction being removed.
+ */
 interface ReactionRemovePayload {
   userId: bigint;
   channelId: bigint;

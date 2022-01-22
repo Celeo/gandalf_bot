@@ -16,7 +16,7 @@ export const db = new Database(
 /**
  * Role DB model.
  */
-export class Role extends Model {
+class Role extends Model {
   static table = "role_config";
   static timestamps = false;
 
