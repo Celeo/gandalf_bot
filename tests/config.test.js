@@ -10,7 +10,7 @@ Deno.test("config - loadConfig - works", async () => {
       "containmentResponseGif": "def",
       "blessableUserIds": [2, 3],
       "listenableUserIds": [9007199254740992]
-    }`
+    }`,
   );
   await Deno.writeFile(`./${filename}`, data);
   const loaded = await loadConfig("config.test.json");
