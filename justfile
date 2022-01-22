@@ -30,4 +30,7 @@ test:
     @deno test --allow-all
 
 download_words:
-  wget https://raw.githubusercontent.com/dwyl/english-words/master/words.txt -O words.txt
+    wget https://raw.githubusercontent.com/dwyl/english-words/master/words.txt -O words.txt
+
+package:
+    @tar -cpzf gandalf_bot.dist.tar.gz main.ts src words.txt
