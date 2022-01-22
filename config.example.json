@@ -2,6 +2,6 @@
   "token": "",
   "containmentRoleId": 0,
   "containmentResponseGif": "",
-  "blessableUserIds": [0],
-  "listenableUserIds": [0]
+  "blessableUserIds": [],
+  "listenableUserIds": []
 }
