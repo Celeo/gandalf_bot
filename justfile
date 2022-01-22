@@ -24,8 +24,7 @@ compile:
         main.ts
 
 bundle:
-    @deno bundle \
-        main.ts bundle.js
+    @deno bundle main.ts bundle.js
 
 test:
     @deno test --allow-all
