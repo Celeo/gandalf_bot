@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/Celeo/gandalf_bot/workflows/CI/badge.svg?branch=master)](https://github.com/Celeo/gandalf_bot/actions?query=workflow%3ACI)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![Runtime](https://img.shields.io/badge/runtime-Deno-orange)](https://deno.land/)
 
 A Discord bot.
 
@@ -18,7 +19,9 @@ A Discord bot.
 
 ## License
 
-Licensed under MIT ([LICENSE](LICENSE)).
+- Bot under MIT ([LICENSE](LICENSE)).
+- List of English words under the [unlicense](https://github.com/dwyl/english-words).
+- Libraries in use under their respective licenses.
 
 ## Contributing
 
