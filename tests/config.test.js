@@ -6,19 +6,19 @@ Deno.test("config - loadConfig - works", async () => {
   const data = new TextEncoder().encode(
     `{
       "token": "abc",
-      "containmentRoleId": 1,
+      "containmentRoleId": "1",
       "containmentResponseGif": "def",
-      "blessableUserIds": [2, 3],
-      "listenableUserIds": [9007199254740992]
-    }`,
+      "blessableUserIds": ["2", "3"],
+      "listenableUserIds": ["9007199254740992"]
+    }`
   );
   await Deno.writeFile(`./${filename}`, data);
   const loaded = await loadConfig("config.test.json");
   assertEquals(loaded, {
     token: "abc",
-    containmentRoleId: 1,
+    containmentRoleId: 1n,
     containmentResponseGif: "def",
-    blessableUserIds: [2, 3],
+    blessableUserIds: [2n, 3n],
     listenableUserIds: [9007199254740992n],
   });
   await Deno.remove(`./${filename}`);
