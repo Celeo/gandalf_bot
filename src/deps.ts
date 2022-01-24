@@ -31,14 +31,8 @@ export {
   hasGuildPermissions,
 } from "https://deno.land/x/discordeno_permissions_plugin@0.0.15/mod.ts";
 
-// ===== ORM =====
-export {
-  Database,
-  DataTypes,
-  Model,
-  SQLite3Connector,
-} from "https://deno.land/x/denodb@v1.0.40/mod.ts";
-export type { ModelFields } from "https://deno.land/x/denodb@v1.0.40/lib/model.ts";
+// ===== DB =====
+export { DB } from "https://deno.land/x/sqlite@v3.2.0/mod.ts";
 
 // ===== memoize =====
 export { memoizy } from "https://deno.land/x/memoizy@1.0.0/mod.ts";

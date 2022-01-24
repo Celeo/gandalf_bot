@@ -52,7 +52,7 @@ async function handleReaction(
   emojiName: string,
   add: boolean,
 ) {
-  const dbRoleEntries = await getAllRoles();
+  const dbRoleEntries = getAllRoles();
   for (const entry of dbRoleEntries) {
     if (
       entry.channel_id !== channelId ||

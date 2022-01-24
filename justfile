@@ -7,7 +7,7 @@ write_files := "roles.db,roles.db-journal"
 
 setup:
     -rm data.db
-    @echo "import { databaseSetup } from './src/db.ts'; await databaseSetup(); 'Done'" | deno
+    @echo "import { databaseSetup } from './src/db.ts'; databaseSetup(); 'Done'" | deno
 
 run:
     @deno run \

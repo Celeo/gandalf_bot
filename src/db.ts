@@ -1,54 +1,19 @@
-import {
-  Database,
-  DataTypes,
-  Model,
-  ModelFields,
-  SQLite3Connector,
-} from "./deps.ts";
+import { DB } from "./deps.ts";
 
-/**
- * Database ORM object.
- */
-export const db = new Database(
-  new SQLite3Connector({ filepath: "./roles.db" }),
-);
-
-/**
- * Role DB model.
- */
-class Role extends Model {
-  static table = "role_config";
-  static timestamps = false;
-
-  static fields: ModelFields = {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    channel_id: {
-      type: DataTypes.BIG_INTEGER,
-      allowNull: false,
-    },
-    message_id: {
-      type: DataTypes.BIG_INTEGER,
-      allowNull: false,
-    },
-    emoji_name: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    role_name: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-  };
-}
+const SQL_CREATE_TABLE = `
+CREATE TABLE IF NOT EXISTS role_config (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  channel_id INTEGER NOT NULL,
+  message_id INTEGER NOT NULL,
+  emoji_name TEXT NOT NULL,
+  role_name TEXT NOT NULL
+)`;
+const SQL_RETRIEVE_ITEMS = `SELECT * FROM role_config`;
 
 /**
  * Just the types for the `Role` DB model.
  */
-export interface RoleModel {
+export interface Role {
   id: number;
   channel_id: bigint;
   message_id: bigint;
@@ -56,21 +21,34 @@ export interface RoleModel {
   role_name: string;
 }
 
-// connect the model to the DB instance.
-db.link([Role]);
+function getDB(): DB {
+  return new DB("./roles.db");
+}
 
 /**
  * Drop the database and create new tables.
  */
-export async function databaseSetup() {
-  await db.sync({ drop: true });
+export function databaseSetup() {
+  const db = getDB();
+  db.query(SQL_CREATE_TABLE);
+  db.close();
 }
 
 /**
  * Get all entries from the database.
  */
-export async function getAllRoles(): Promise<Array<RoleModel>> {
-  return (await Role.all()) as Array<unknown> as Array<
-    RoleModel
-  >;
+export function getAllRoles(): Array<Role> {
+  const db = getDB();
+  const roles: Array<Role> = [];
+  for (const row of db.query(SQL_RETRIEVE_ITEMS)) {
+    roles.push({
+      id: row[0] as number,
+      channel_id: row[1] as bigint,
+      message_id: row[2] as bigint,
+      emoji_name: row[3] as string,
+      role_name: row[4] as string,
+    });
+  }
+  db.close();
+  return roles;
 }
