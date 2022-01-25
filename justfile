@@ -4,6 +4,7 @@ default: run
 
 read_files := ".env,.env.defaults,config.json,roles.db,roles.db-journal,words.txt"
 write_files := "roles.db,roles.db-journal"
+packaged_output := "/tmp/gandalf_bot.dist.tar.gz"
 
 setup:
     -rm data.db
@@ -30,7 +31,9 @@ test:
     @deno test --allow-all
 
 download_words:
-    wget https://raw.githubusercontent.com/dwyl/english-words/master/words.txt -O words.txt
+    @wget https://raw.githubusercontent.com/dwyl/english-words/master/words.txt -O words.txt
 
-package:
-    @tar -cpzf gandalf_bot.dist.tar.gz main.ts src words.txt
+deploy:
+    @tar -cpzf {{packaged_output}} main.ts src words.txt
+    @scp {{packaged_output}} "$SSH_HOST_NAME:/srv/"
+    @rm -f {{packaged_output}}
