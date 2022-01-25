@@ -1,4 +1,4 @@
-import { assertEquals } from "./test_deps.js";
+import { assertEquals } from "./test_deps.ts";
 import { loadConfig } from "../src/config.ts";
 
 Deno.test("config - loadConfig - works", async () => {

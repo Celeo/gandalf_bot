@@ -1,4 +1,4 @@
-import { assertEquals } from "./test_deps.js";
+import { assertEquals } from "./test_deps.ts";
 import { parse } from "../src/commands.ts";
 
 Deno.test("commands - parse - empty message", () => {
