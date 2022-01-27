@@ -9,7 +9,6 @@ import {
   sendMessage,
 } from "./deps.ts";
 import { Config } from "./config.ts";
-import { getAllRoles } from "./db.ts";
 
 /**
  * Event payload for a reaction being added.
@@ -44,6 +43,7 @@ interface ReactionRemovePayload {
  */
 async function handleReaction(
   bot: BotWithCache,
+  config: Config,
   guildId: bigint,
   memberId: bigint,
   userId: bigint,
@@ -52,13 +52,16 @@ async function handleReaction(
   emojiName: string,
   add: boolean,
 ) {
-  const dbRoleEntries = getAllRoles();
-  for (const entry of dbRoleEntries) {
+  let anyPartialMatch = false;
+  for (const entry of config.reactionRoles) {
     if (
-      entry.channel_id !== channelId ||
-      entry.message_id !== messageId ||
-      entry.emoji_name !== emojiName
+      entry.channelId !== channelId ||
+      entry.messageId !== messageId
     ) {
+      continue;
+    }
+    anyPartialMatch = true;
+    if (entry.emoji !== emojiName) {
       continue;
     }
     const allGuilds = bot.guilds;
@@ -67,7 +70,7 @@ async function handleReaction(
       return;
     }
     const role = matchingGuild.roles.find((role) =>
-      role.name === entry.role_name
+      role.name === entry.roleName
     );
     if (!role) {
       return;
@@ -83,6 +86,7 @@ async function handleReaction(
       await sendMessage(bot, dmChannel.id, {
         content: `Added the "${role.name}" role to you`,
       });
+      return;
     } else {
       await removeRole(
         bot,
@@ -93,7 +97,14 @@ async function handleReaction(
       await sendMessage(bot, dmChannel.id, {
         content: `Removed the "${role.name}" role from you`,
       });
+      return;
     }
+  }
+  if (anyPartialMatch) {
+    console.log(
+      "Matching channel & message, but no matching reaction emoji for:",
+      emojiName,
+    );
   }
 }
 
@@ -102,7 +113,7 @@ async function handleReaction(
  */
 export async function reactionAdd(
   bot: BotWithCache,
-  _config: Config,
+  config: Config,
   payload: ReactionAddPayload,
 ) {
   if (payload.guildId === undefined || payload.member === undefined) {
@@ -110,6 +121,7 @@ export async function reactionAdd(
   }
   await handleReaction(
     bot,
+    config,
     payload.guildId,
     payload.member.id,
     payload.userId,
@@ -125,7 +137,7 @@ export async function reactionAdd(
  */
 export async function reactionRemove(
   bot: BotWithCache,
-  _config: Config,
+  config: Config,
   payload: ReactionRemovePayload,
 ) {
   if (payload.guildId === undefined) {
@@ -134,6 +146,7 @@ export async function reactionRemove(
   const member = await getMember(bot, payload.guildId, payload.userId);
   await handleReaction(
     bot,
+    config,
     payload.guildId,
     member.id,
     payload.userId,

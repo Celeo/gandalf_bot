@@ -3,5 +3,6 @@
   "containmentRoleId": "0",
   "containmentResponseGif": "",
   "blessableUserIds": [],
-  "listenableUserIds": []
+  "listenableUserIds": [],
+  "reactionRoles": []
 }

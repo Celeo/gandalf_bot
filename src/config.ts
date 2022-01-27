@@ -1,4 +1,14 @@
 /**
+ * An entry in the "reactionRoles" list.
+ */
+export interface ReactionRole {
+  channelId: bigint;
+  messageId: bigint;
+  emoji: string;
+  roleName: string;
+}
+
+/**
  * Bot configuration.
  */
 export interface Config {
@@ -7,6 +17,7 @@ export interface Config {
   containmentResponseGif: string;
   blessableUserIds: Array<bigint>;
   listenableUserIds: Array<bigint>;
+  reactionRoles: Array<ReactionRole>;
 }
 
 /**
@@ -19,5 +30,14 @@ export async function loadConfig(filename = "config.json"): Promise<Config> {
   data.containmentRoleId = BigInt(data.containmentRoleId);
   data.blessableUserIds = data.blessableUserIds.map((s: string) => BigInt(s));
   data.listenableUserIds = data.listenableUserIds.map((s: string) => BigInt(s));
+  data.reactionRoles = data.reactionRoles.map(
+    (entry: Record<string, string>) => {
+      return {
+        ...entry,
+        channelId: BigInt(entry.channelId),
+        messageId: BigInt(entry.messageId),
+      };
+    },
+  );
   return data as Config;
 }

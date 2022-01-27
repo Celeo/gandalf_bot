@@ -31,8 +31,5 @@ export {
   hasGuildPermissions,
 } from "https://deno.land/x/discordeno_permissions_plugin@0.0.15/mod.ts";
 
-// ===== DB =====
-export { DB } from "https://deno.land/x/sqlite@v3.2.0/mod.ts";
-
 // ===== memoize =====
 export { memoizy } from "https://deno.land/x/memoizy@1.0.0/mod.ts";

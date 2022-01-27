@@ -23,7 +23,6 @@ unbreach          Bring someone back
 sitrep            Show who's been banished
 pin               Pin a message
 unpin             Unpin a message
-addreactionrole   Add reaction roles
 \`\`\``;
 
 /**
@@ -102,10 +101,6 @@ export async function handler(
     }
     case "unpin": {
       await commandUnpin(bot, config, message, command);
-      break;
-    }
-    case "addreactionrole": {
-      await commandAddReactionRole(bot, config, message, command);
       break;
     }
   }
@@ -259,17 +254,4 @@ async function commandUnpin(
   }
   await unpinMessage(bot, message.channelId, BigInt(command.args[0]));
   await addReaction(bot, message.channelId, message.id, "👍");
-}
-
-async function commandAddReactionRole(
-  bot: BotWithCache,
-  _config: Config,
-  message: DiscordenoMessage,
-  _command: Command,
-) {
-  if (!senderIsAdmin(bot, message)) {
-    return;
-  }
-  // TODO
-  await replyTo(bot, message, "Not yet implemented");
 }

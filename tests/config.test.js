@@ -9,7 +9,8 @@ Deno.test("config - loadConfig - works", async () => {
       "containmentRoleId": "1",
       "containmentResponseGif": "def",
       "blessableUserIds": ["2", "3"],
-      "listenableUserIds": ["9007199254740992"]
+      "listenableUserIds": ["9007199254740992"],
+      "reactionRoles": []
     }`,
   );
   await Deno.writeFile(`./${filename}`, data);
@@ -20,6 +21,7 @@ Deno.test("config - loadConfig - works", async () => {
     containmentResponseGif: "def",
     blessableUserIds: [2n, 3n],
     listenableUserIds: [9007199254740992n],
+    reactionRoles: [],
   });
   await Deno.remove(`./${filename}`);
 });
