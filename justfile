@@ -2,7 +2,7 @@ set dotenv-load := false
 
 default: run
 
-read_files := ".env,.env.defaults,config.json,roles.db,roles.db-journal,words.txt"
+read_files := ".env,.env.defaults,config.json,roles.db,roles.db-journal,words.txt,src/configWorker.ts"
 write_files := "roles.db,roles.db-journal"
 packaged_output := "/tmp/gandalf_bot.dist.tar.gz"
 
@@ -15,6 +15,7 @@ run:
         --allow-read={{read_files}} \
         --allow-write={{write_files}} \
         --allow-net=discord.com,gateway.discord.gg \
+        --unstable \
         main.ts
 
 compile:
@@ -22,6 +23,7 @@ compile:
         --allow-read={{read_files}} \
         --allow-write={{write_files}} \
         --allow-net=discord.com,gateway.discord.gg \
+        --unstable \
         main.ts
 
 bundle:

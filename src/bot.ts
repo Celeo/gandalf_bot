@@ -40,7 +40,6 @@ async function messageHandler(
   message: DiscordenoMessage,
 ) {
   if (message.isBot) {
-    // not handling any messages from bots
     return;
   }
   for (const [handler, name] of HANDLERS) {
@@ -56,11 +55,26 @@ async function messageHandler(
  * Entry point.
  */
 export async function main() {
-  const config = await loadConfig();
+  /* config first load and re-loads */
+
+  let config = await loadConfig();
   if (config.token.length === 0) {
     console.error("No token supplied");
     return;
   }
+  const worker = new Worker(
+    new URL("./configWorker.ts", import.meta.url).href,
+    {
+      type: "module",
+      deno: true,
+    },
+  );
+  worker.onmessage = (e: MessageEvent<Config>) => {
+    config = e.data;
+  };
+
+  /* bot creation and plugin enablement */
+
   const baseBot = createBot({
     token: config.token,
     intents: ["GuildMessages", "GuildMembers", "GuildMessageReactions"],
@@ -83,5 +97,7 @@ export async function main() {
   const bot = enableCachePlugin(baseBot);
   enableCacheSweepers(bot);
   enablePermissionsPlugin(bot);
+
+  // start and block
   await startBot(bot);
 }
