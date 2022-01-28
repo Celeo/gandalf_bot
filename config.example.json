@@ -4,5 +4,7 @@
   "containmentResponseGif": "",
   "blessableUserIds": [],
   "listenableUserIds": [],
-  "reactionRoles": []
+  "reactionRoles": [],
+  "birthdayChannel": "",
+  "birthdays": []
 }

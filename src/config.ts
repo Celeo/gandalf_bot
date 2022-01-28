@@ -9,6 +9,14 @@ export interface ReactionRole {
 }
 
 /**
+ * An entry in the "birthdays" list.
+ */
+export interface Birthday {
+  who: string;
+  when: string;
+}
+
+/**
  * Bot configuration.
  */
 export interface Config {
@@ -18,6 +26,8 @@ export interface Config {
   blessableUserIds: Array<bigint>;
   listenableUserIds: Array<bigint>;
   reactionRoles: Array<ReactionRole>;
+  birthdayChannel: bigint;
+  birthdays: Array<Birthday>;
 }
 
 /**
@@ -39,5 +49,6 @@ export async function loadConfig(filename = "config.json"): Promise<Config> {
       };
     },
   );
+  data.birthdayChannel = BigInt(data.birthdayChannel);
   return data as Config;
 }

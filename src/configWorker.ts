@@ -7,6 +7,7 @@ const watcher = Deno.watchFs("./config.json");
 
 for await (const event of watcher) {
   if (event.kind === "modify") {
+    console.log("Found config file edit; reloading");
     (self as unknown as Worker).postMessage(await loadConfig());
   }
 }

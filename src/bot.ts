@@ -5,6 +5,7 @@ import {
   enableCachePlugin,
   enableCacheSweepers,
   enablePermissionsPlugin,
+  sendMessage,
   startBot,
 } from "./deps.ts";
 import { Config, loadConfig } from "./config.ts";
@@ -38,7 +39,7 @@ async function messageHandler(
   bot: BotWithCache,
   config: Config,
   message: DiscordenoMessage,
-) {
+): Promise<void> {
   if (message.isBot) {
     return;
   }
@@ -54,23 +55,30 @@ async function messageHandler(
 /**
  * Entry point.
  */
-export async function main() {
-  /* config first load and re-loads */
+export async function main(): Promise<void> {
+  /* config first load */
 
   let config = await loadConfig();
   if (config.token.length === 0) {
     console.error("No token supplied");
     return;
   }
-  const worker = new Worker(
+
+  /* workers */
+
+  const configWorker = new Worker(
     new URL("./configWorker.ts", import.meta.url).href,
-    {
-      type: "module",
-      deno: true,
-    },
+    { type: "module", deno: true },
   );
-  worker.onmessage = (e: MessageEvent<Config>) => {
+  const birthdayWorker = new Worker(
+    new URL("./birthdaysWorker.ts", import.meta.url).href,
+    { type: "module" },
+  );
+  birthdayWorker.postMessage(config);
+  configWorker.onmessage = (e: MessageEvent<Config>) => {
+    console.log("Received message from configWorker in main thread");
     config = e.data;
+    birthdayWorker.postMessage(config);
   };
 
   /* bot creation and plugin enablement */
@@ -83,20 +91,31 @@ export async function main() {
       ready() {
         console.log("Connected to gateway");
       },
-      async messageCreate(bot, message) {
-        await messageHandler(bot as BotWithCache, config, message);
+      messageCreate(bot, message) {
+        messageHandler(bot as BotWithCache, config, message);
       },
-      async reactionAdd(bot, payload) {
-        await reactionAdd(bot as BotWithCache, config, payload);
+      reactionAdd(bot, payload) {
+        reactionAdd(bot as BotWithCache, config, payload);
       },
-      async reactionRemove(bot, payload) {
-        await reactionRemove(bot as BotWithCache, config, payload);
+      reactionRemove(bot, payload) {
+        reactionRemove(bot as BotWithCache, config, payload);
       },
     },
   });
   const bot = enableCachePlugin(baseBot);
   enableCacheSweepers(bot);
   enablePermissionsPlugin(bot);
+
+  // hook up received birthdaysWorker messages
+  birthdayWorker.onmessage = async (e: MessageEvent<string>) => {
+    console.log(
+      "Received message from birthdays worker in main thread:",
+      e.data,
+    );
+    await sendMessage(bot, config.birthdayChannel, {
+      content: `Happy birthday to <@!${e.data}>!`,
+    });
+  };
 
   // start and block
   await startBot(bot);
