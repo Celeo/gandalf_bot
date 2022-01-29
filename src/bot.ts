@@ -1,12 +1,11 @@
 import {
-  BotWithCache,
+  BotWrapper,
   createBot,
+  createEventHandlers,
   DiscordenoMessage,
   enableCachePlugin,
   enableCacheSweepers,
   enablePermissionsPlugin,
-  sendMessage,
-  startBot,
 } from "./deps.ts";
 import { Config, loadConfig } from "./config.ts";
 import { handler as blessYouHandler } from "./blessYou.ts";
@@ -20,7 +19,7 @@ import { reactionAdd, reactionRemove } from "./reactions.ts";
  */
 const HANDLERS: Array<[
   (
-    bot: BotWithCache<BotWithCache>,
+    wrapper: BotWrapper,
     config: Config,
     message: DiscordenoMessage,
   ) => Promise<void>,
@@ -36,7 +35,7 @@ const HANDLERS: Array<[
  * Event handler for new messages.
  */
 async function messageHandler(
-  bot: BotWithCache,
+  wrapper: BotWrapper,
   config: Config,
   message: DiscordenoMessage,
 ): Promise<void> {
@@ -45,7 +44,7 @@ async function messageHandler(
   }
   for (const [handler, name] of HANDLERS) {
     try {
-      await handler(bot, config, message);
+      await handler(wrapper, config, message);
     } catch (e) {
       console.log(`Error when processing message handler "${name}: ${e}`);
     }
@@ -87,24 +86,26 @@ export async function main(): Promise<void> {
     token: config.token,
     intents: ["GuildMessages", "GuildMembers", "GuildMessageReactions"],
     botId: BigInt(atob(config.token.split(".")[0])),
-    events: {
-      ready() {
-        console.log("Connected to gateway");
-      },
-      messageCreate(bot, message) {
-        messageHandler(bot as BotWithCache, config, message);
-      },
-      reactionAdd(bot, payload) {
-        reactionAdd(bot as BotWithCache, config, payload);
-      },
-      reactionRemove(bot, payload) {
-        reactionRemove(bot as BotWithCache, config, payload);
-      },
-    },
+    events: {},
   });
   const bot = enableCachePlugin(baseBot);
   enableCacheSweepers(bot);
   enablePermissionsPlugin(bot);
+  const wrapper = new BotWrapper(bot);
+  wrapper.bot.events = createEventHandlers({
+    ready() {
+      console.log("Connected to gateway");
+    },
+    messageCreate(_bot, message) {
+      messageHandler(wrapper, config, message);
+    },
+    reactionAdd(_bot, payload) {
+      reactionAdd(wrapper, config, payload);
+    },
+    reactionRemove(_bot, payload) {
+      reactionRemove(wrapper, config, payload);
+    },
+  });
 
   // hook up received birthdaysWorker messages
   birthdayWorker.onmessage = async (e: MessageEvent<string>) => {
@@ -112,11 +113,11 @@ export async function main(): Promise<void> {
       "Received message from birthdays worker in main thread:",
       e.data,
     );
-    await sendMessage(bot, config.birthdayChannel, {
+    await wrapper.sendMessage(config.birthdayChannel, {
       content: `Happy birthday to <@!${e.data}>!`,
     });
   };
 
   // start and block
-  await startBot(bot);
+  await wrapper.startBot();
 }

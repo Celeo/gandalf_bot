@@ -30,7 +30,7 @@ bundle:
     @deno bundle main.ts bundle.js
 
 test:
-    @deno test --allow-all
+    @deno test --allow-all --unstable
 
 download_words:
     @wget https://raw.githubusercontent.com/dwyl/english-words/master/words.txt -O words.txt

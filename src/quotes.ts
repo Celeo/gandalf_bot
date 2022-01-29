@@ -1,5 +1,4 @@
-import { Bot, DiscordenoMessage } from "./deps.ts";
-import { replyTo } from "./util.ts";
+import { BotWrapper, DiscordenoMessage } from "./deps.ts";
 import { Config } from "./config.ts";
 
 const QUOTES = [
@@ -255,13 +254,13 @@ const QUOTES = [
  * Send a random quote when mentioned.
  */
 export async function handler(
-  bot: Bot,
+  wrapper: BotWrapper,
   _config: Config,
   message: DiscordenoMessage,
 ): Promise<void> {
-  if (!message.mentionedUserIds.includes(bot.id)) {
+  if (!message.mentionedUserIds.includes(wrapper.bot.id)) {
     return;
   }
   const randomQuote = QUOTES[Math.ceil(Math.random() * QUOTES.length) - 1];
-  await replyTo(bot, message, randomQuote);
+  await wrapper.replyTo(message, randomQuote);
 }

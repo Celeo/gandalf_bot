@@ -1,12 +1,8 @@
 import {
-  addRole,
   BotWithCache,
+  BotWrapper,
   DiscordenoEmoji,
   DiscordenoMember,
-  getDmChannel,
-  getMember,
-  removeRole,
-  sendMessage,
 } from "./deps.ts";
 import { Config } from "./config.ts";
 
@@ -42,7 +38,7 @@ interface ReactionRemovePayload {
  * those reactions.
  */
 async function handleReaction(
-  bot: BotWithCache,
+  wrapper: BotWrapper,
   config: Config,
   guildId: bigint,
   memberId: bigint,
@@ -64,7 +60,7 @@ async function handleReaction(
     if (entry.emoji !== emojiName) {
       continue;
     }
-    const allGuilds = bot.guilds;
+    const allGuilds = (wrapper.bot as BotWithCache).guilds;
     const matchingGuild = allGuilds.find((guild) => guild.id === guildId);
     if (!matchingGuild) {
       return;
@@ -75,26 +71,24 @@ async function handleReaction(
     if (!role) {
       return;
     }
-    const dmChannel = await getDmChannel(bot, userId);
+    const dmChannel = await wrapper.getDmChannel(userId);
     if (add) {
-      await addRole(
-        bot,
+      await wrapper.addRole(
         guildId,
         memberId,
         role.id,
       );
-      await sendMessage(bot, dmChannel.id, {
+      await wrapper.sendMessage(dmChannel.id, {
         content: `Added the "${role.name}" role to you`,
       });
       return;
     } else {
-      await removeRole(
-        bot,
+      await wrapper.removeRole(
         guildId,
         memberId,
         role.id,
       );
-      await sendMessage(bot, dmChannel.id, {
+      await wrapper.sendMessage(dmChannel.id, {
         content: `Removed the "${role.name}" role from you`,
       });
       return;
@@ -112,7 +106,7 @@ async function handleReaction(
  * Handler for reactions being added to messages.
  */
 export async function reactionAdd(
-  bot: BotWithCache,
+  wrapper: BotWrapper,
   config: Config,
   payload: ReactionAddPayload,
 ) {
@@ -120,7 +114,7 @@ export async function reactionAdd(
     return;
   }
   await handleReaction(
-    bot,
+    wrapper,
     config,
     payload.guildId,
     payload.member.id,
@@ -136,16 +130,16 @@ export async function reactionAdd(
  * Handler for reactions being removed from messages.
  */
 export async function reactionRemove(
-  bot: BotWithCache,
+  wrapper: BotWrapper,
   config: Config,
   payload: ReactionRemovePayload,
 ) {
   if (payload.guildId === undefined) {
     return;
   }
-  const member = await getMember(bot, payload.guildId, payload.userId);
+  const member = await wrapper.getMember(payload.guildId, payload.userId);
   await handleReaction(
-    bot,
+    wrapper,
     config,
     payload.guildId,
     member.id,

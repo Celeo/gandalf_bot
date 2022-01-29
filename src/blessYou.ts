@@ -1,4 +1,4 @@
-import { addReaction, Bot, DiscordenoMessage, memoizy } from "./deps.ts";
+import { BotWrapper, DiscordenoMessage, memoizy } from "./deps.ts";
 import { Config } from "./config.ts";
 
 /**
@@ -35,7 +35,7 @@ const memoziedLoadWords = memoizy(loadWords);
  * Add a sneeze emoji to misspelled words from specific users.
  */
 export async function handler(
-  bot: Bot,
+  wrapper: BotWrapper,
   config: Config,
   message: DiscordenoMessage,
 ): Promise<void> {
@@ -57,5 +57,5 @@ export async function handler(
   if (realWords.includes(content.toLowerCase())) {
     return;
   }
-  await addReaction(bot, message.channelId, message.id, "🤧");
+  await wrapper.addReaction(message.channelId, message.id, "🤧");
 }

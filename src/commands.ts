@@ -1,16 +1,4 @@
-import {
-  addReaction,
-  addRole,
-  BotWithCache,
-  DiscordenoMessage,
-  fetchMembers,
-  getUser,
-  hasGuildPermissions,
-  pinMessage,
-  removeRole,
-  unpinMessage,
-} from "./deps.ts";
-import { replyTo } from "./util.ts";
+import { BotWithCache, BotWrapper, DiscordenoMessage } from "./deps.ts";
 import { Config } from "./config.ts";
 
 const HELP_RESPONSE = `\`\`\`~~~ Gandalf bot commands ~~~
@@ -70,7 +58,7 @@ export function parse(message: string): Command | null {
  * Handler for people sending commands to the bot.
  */
 export async function handler(
-  bot: BotWithCache,
+  wrapper: BotWrapper,
   config: Config,
   message: DiscordenoMessage,
 ): Promise<void> {
@@ -80,27 +68,27 @@ export async function handler(
   }
   switch (command.name) {
     case "help": {
-      await commandHelp(bot, config, message, command);
+      await commandHelp(wrapper, config, message, command);
       break;
     }
     case "breach": {
-      await commandBreach(bot, config, message, command);
+      await commandBreach(wrapper, config, message, command);
       break;
     }
     case "unbreach": {
-      await commandUnBreach(bot, config, message, command);
+      await commandUnBreach(wrapper, config, message, command);
       break;
     }
     case "sitrep": {
-      await commandSitRep(bot, config, message, command);
+      await commandSitRep(wrapper, config, message, command);
       break;
     }
     case "pin": {
-      await commandPin(bot, config, message, command);
+      await commandPin(wrapper, config, message, command);
       break;
     }
     case "unpin": {
-      await commandUnpin(bot, config, message, command);
+      await commandUnpin(wrapper, config, message, command);
       break;
     }
   }
@@ -112,18 +100,21 @@ export async function handler(
  * If not, a response gif is sent in response to the message.
  */
 async function senderIsAdmin(
-  bot: BotWithCache,
+  wrapper: BotWrapper,
   message: DiscordenoMessage,
 ): Promise<boolean> {
   if (message.member === undefined || message.guildId === undefined) {
     return false;
   }
-  const isAdmin = hasGuildPermissions(bot, message.guildId, message.member, [
-    "ADMINISTRATOR",
-  ]);
+  const isAdmin = wrapper.hasGuildPermissions(
+    message.guildId,
+    message.member,
+    [
+      "ADMINISTRATOR",
+    ],
+  );
   if (!isAdmin) {
-    await replyTo(
-      bot,
+    await wrapper.replyTo(
       message,
       "https://tenor.com/view/no-nooo-nope-eat-fingerwag-gif-14832139",
     );
@@ -136,85 +127,84 @@ async function senderIsAdmin(
 // ===========================
 
 async function commandHelp(
-  bot: BotWithCache,
+  wrapper: BotWrapper,
   _config: Config,
   message: DiscordenoMessage,
   _command: Command,
 ) {
-  await replyTo(bot, message, HELP_RESPONSE);
+  await wrapper.replyTo(message, HELP_RESPONSE);
 }
 
 async function commandBreach(
-  bot: BotWithCache,
+  wrapper: BotWrapper,
   config: Config,
   message: DiscordenoMessage,
   _command: Command,
 ) {
-  if (message.guildId === undefined || !senderIsAdmin(bot, message)) {
+  if (message.guildId === undefined || !await senderIsAdmin(wrapper, message)) {
     return;
   }
   if (message.mentionedUserIds.length === 0) {
-    await replyTo(bot, message, "You must tag a user");
+    await wrapper.replyTo(message, "You must tag a user");
+    return;
   }
   for (const mentioned of message.mentionedUserIds) {
-    await addRole(
-      bot,
+    await wrapper.addRole(
       message.guildId,
       mentioned,
       config.containmentRoleId,
     );
   }
-  await replyTo(bot, message, config.containmentResponseGif);
+  await wrapper.replyTo(message, config.containmentResponseGif);
 }
 
 async function commandUnBreach(
-  bot: BotWithCache,
+  wrapper: BotWrapper,
   config: Config,
   message: DiscordenoMessage,
   _command: Command,
 ) {
-  if (message.guildId === undefined || !senderIsAdmin(bot, message)) {
+  if (message.guildId === undefined || !await senderIsAdmin(wrapper, message)) {
     return;
   }
   if (message.mentionedUserIds.length === 0) {
-    await replyTo(bot, message, "You must tag a user");
+    await wrapper.replyTo(message, "You must tag a user");
+    return;
   }
   for (const mentioned of message.mentionedUserIds) {
-    await removeRole(
-      bot,
+    await wrapper.removeRole(
       message.guildId,
       mentioned,
       config.containmentRoleId,
     );
   }
-  await addReaction(bot, message.channelId, message.id, "👍");
+  await wrapper.addReaction(message.channelId, message.id, "👍");
 }
 
 async function commandSitRep(
-  bot: BotWithCache,
+  wrapper: BotWrapper,
   config: Config,
   message: DiscordenoMessage,
   _command: Command,
 ) {
-  if (message.guildId === undefined || !senderIsAdmin(bot, message)) {
+  if (message.guildId === undefined || !await senderIsAdmin(wrapper, message)) {
     return;
   }
   const containmentRole = config.containmentRoleId;
   const containedMembers: Array<bigint> = [];
   // would be nice to actually get the shard id here
-  await fetchMembers(bot, message.guildId, 0);
-  const members = bot.members;
+  await wrapper.fetchMembers(message.guildId, 0);
+  const members = (wrapper.bot as BotWithCache).members;
   for (const member of members.values()) {
     if (member.roles.includes(containmentRole)) {
-      const user = await getUser(bot, member.id);
+      const user = await wrapper.getUser(member.id);
       containedMembers.push(user.id);
     }
   }
   if (containedMembers.length === 0) {
-    await replyTo(bot, message, "No one is contained");
+    await wrapper.replyTo(message, "No one is contained");
   } else {
-    await replyTo(
-      bot,
+    await wrapper.replyTo(
       message,
       "Contained users: " +
         containedMembers.map((id) => `<@!${id}>`).join(", "),
@@ -223,35 +213,35 @@ async function commandSitRep(
 }
 
 async function commandPin(
-  bot: BotWithCache,
+  wrapper: BotWrapper,
   _config: Config,
   message: DiscordenoMessage,
   command: Command,
 ) {
   if (command.args.length !== 1) {
-    await replyTo(
-      bot,
+    await wrapper.replyTo(
       message,
       "This command requires a single argument: the ID of a message to pin",
     );
+    return;
   }
-  await pinMessage(bot, message.channelId, BigInt(command.args[0]));
-  await addReaction(bot, message.channelId, message.id, "👍");
+  await wrapper.pinMessage(message.channelId, BigInt(command.args[0]));
+  await wrapper.addReaction(message.channelId, message.id, "👍");
 }
 
 async function commandUnpin(
-  bot: BotWithCache,
+  wrapper: BotWrapper,
   _config: Config,
   message: DiscordenoMessage,
   command: Command,
 ) {
   if (command.args.length !== 1) {
-    await replyTo(
-      bot,
+    await wrapper.replyTo(
       message,
       "This command requires a single argument: the ID of a message to unpin",
     );
+    return;
   }
-  await unpinMessage(bot, message.channelId, BigInt(command.args[0]));
-  await addReaction(bot, message.channelId, message.id, "👍");
+  await wrapper.unpinMessage(message.channelId, BigInt(command.args[0]));
+  await wrapper.addReaction(message.channelId, message.id, "👍");
 }
