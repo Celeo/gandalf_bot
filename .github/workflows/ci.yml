@@ -17,5 +17,7 @@ jobs:
           deno-version: "~1.17"
       - name: Lint Deno Module
         run: deno fmt --check --ignore='README.md'
+      - name: Create sample words.txt
+        run: echo "deno" >> words.txt
       - name: Test Deno Module
         run: deno test --allow-all --unstable
