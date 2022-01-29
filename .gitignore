@@ -2,4 +2,4 @@ config.json
 config.test.json
 words.txt
 gandalf_bot
-bundle.js
+coverage

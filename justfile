@@ -26,11 +26,12 @@ compile:
         --unstable \
         main.ts
 
-bundle:
-    @deno bundle main.ts bundle.js
-
 test:
     @deno test --allow-all --unstable
+
+test-cov:
+    @deno test --allow-all --unstable --coverage=coverage
+    @deno coverage coverage
 
 download_words:
     @wget https://raw.githubusercontent.com/dwyl/english-words/master/words.txt -O words.txt
