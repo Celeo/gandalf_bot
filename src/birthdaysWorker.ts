@@ -51,6 +51,6 @@ while (true) {
         }
       }
     }
-    await sleep(60 * 60 * 3); // 3 hours
   }
+  await sleep(60 * 60 * 3); // 3 hours
 }
