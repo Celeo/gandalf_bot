@@ -10,8 +10,9 @@ Deno.test("config - loadConfig - works", async () => {
       "containmentResponseGif": "def",
       "blessableUserIds": ["2", "3"],
       "listenableUserIds": ["4"],
+      "grossUserIds": ["5"],
       "reactionRoles": [],
-      "birthdayChannel": "5",
+      "birthdayChannel": "6",
       "birthdays": []
     }`,
   );
@@ -23,8 +24,9 @@ Deno.test("config - loadConfig - works", async () => {
     containmentResponseGif: "def",
     blessableUserIds: [2n, 3n],
     listenableUserIds: [4n],
+    grossUserIds: [5n],
     reactionRoles: [],
-    birthdayChannel: 5n,
+    birthdayChannel: 6n,
     birthdays: [],
   });
   await Deno.remove(`./${filename}`);

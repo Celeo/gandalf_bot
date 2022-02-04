@@ -25,6 +25,7 @@ export interface Config {
   containmentResponseGif: string;
   blessableUserIds: Array<bigint>;
   listenableUserIds: Array<bigint>;
+  grossUserIds: Array<bigint>;
   reactionRoles: Array<ReactionRole>;
   birthdayChannel: bigint;
   birthdays: Array<Birthday>;
@@ -40,6 +41,7 @@ export async function loadConfig(filename = "config.json"): Promise<Config> {
   data.containmentRoleId = BigInt(data.containmentRoleId);
   data.blessableUserIds = data.blessableUserIds.map((s: string) => BigInt(s));
   data.listenableUserIds = data.listenableUserIds.map((s: string) => BigInt(s));
+  data.grossUserIds = data.grossUserIds.map((s: string) => BigInt(s));
   data.reactionRoles = data.reactionRoles.map(
     (entry: Record<string, string>) => {
       return {

@@ -12,6 +12,7 @@ import { handler as blessYouHandler } from "./blessYou.ts";
 import { handler as commandsHandler } from "./commands.ts";
 import { handler as heyListenHandler } from "./heyListen.ts";
 import { handler as quotesHandler } from "./quotes.ts";
+import { handler as grossHandler } from "./gross.ts";
 import { reactionAdd, reactionRemove } from "./reactions.ts";
 
 /**
@@ -29,6 +30,7 @@ const HANDLERS: Array<[
   [commandsHandler, "commands"],
   [heyListenHandler, "heyListen"],
   [quotesHandler, "quotes"],
+  [grossHandler, "gross"],
 ];
 
 /**
