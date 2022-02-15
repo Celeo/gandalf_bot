@@ -32,7 +32,7 @@ while (true) {
   }
   console.log("Checking for birthdays");
   if (config.birthdays.length > 0) {
-    const date = new Date();
+    const date = new Date(new Date().getTime() - (8 * 1000 * 60 * 60)); // PST offset
     const dateMatch = `${date.getMonth() + 1}/${date.getDate()}`;
     for (const birthday of config.birthdays) {
       if (birthday.when === dateMatch) {
