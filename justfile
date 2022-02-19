@@ -2,7 +2,7 @@ set dotenv-load := false
 
 default: run
 
-read_files := ".env,.env.defaults,config.json,roles.db,roles.db-journal,words.txt,src/configWorker.ts,src/birthdaysWorker.ts"
+read_files := "config.json,roles.db,roles.db-journal,words.txt,src/configWorker.ts,src/birthdaysWorker.ts"
 write_files := "roles.db,roles.db-journal"
 packaged_output := "/tmp/gandalf_bot.dist.tar.gz"
 
