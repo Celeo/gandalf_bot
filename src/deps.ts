@@ -1,12 +1,17 @@
 // ===== Bot library =====
 
 export {
+  ApplicationCommandOptionTypes,
+  ApplicationCommandTypes,
+  createApplicationCommand,
   createBot,
   createEventHandlers,
+  InteractionResponseTypes,
 } from "https://deno.land/x/discordeno@13.0.0-rc18/mod.ts";
 export type {
   Bot,
   DiscordenoEmoji,
+  DiscordenoInteraction,
   DiscordenoMember,
   DiscordenoMessage,
 } from "https://deno.land/x/discordeno@13.0.0-rc18/mod.ts";
@@ -27,9 +32,11 @@ import {
   fetchMembers,
   getDmChannel,
   getMember,
+  getPins,
   getUser,
   pinMessage,
   removeRole,
+  sendInteractionResponse,
   sendMessage,
   startBot,
   unpinMessage,
@@ -38,6 +45,7 @@ import type {
   Bot,
   CreateMessage,
   DiscordenoGuild,
+  DiscordenoInteractionResponse,
   DiscordenoMember,
   DiscordenoMessage,
   PermissionStrings,
@@ -118,6 +126,18 @@ export class BotWrapper {
 
   async unpinMessage(channelId: bigint, messageId: bigint) {
     return await unpinMessage(this.bot, channelId, messageId);
+  }
+
+  async sendInteractionResponse(
+    id: bigint,
+    token: string,
+    data: DiscordenoInteractionResponse,
+  ) {
+    return await sendInteractionResponse(this.bot, id, token, data);
+  }
+
+  async getPins(channelId: bigint) {
+    return await getPins(this.bot, channelId);
   }
 
   hasGuildPermissions(

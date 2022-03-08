@@ -9,11 +9,11 @@ import {
 } from "./deps.ts";
 import { Config, loadConfig } from "./config.ts";
 import { handler as blessYouHandler } from "./blessYou.ts";
-import { handler as commandsHandler } from "./commands.ts";
 import { handler as heyListenHandler } from "./heyListen.ts";
 import { handler as quotesHandler } from "./quotes.ts";
 import { handler as grossHandler } from "./gross.ts";
 import { reactionAdd, reactionRemove } from "./reactions.ts";
+import { interactionCreate, registerCommands } from "./slashCommands.ts";
 
 /**
  * Collection of message handlers and their "friendly" names.
@@ -27,7 +27,6 @@ const HANDLERS: Array<[
   string,
 ]> = [
   [blessYouHandler, "blessYou"],
-  [commandsHandler, "commands"],
   [heyListenHandler, "heyListen"],
   [quotesHandler, "quotes"],
   [grossHandler, "gross"],
@@ -107,6 +106,9 @@ export async function main(): Promise<void> {
     reactionRemove(_bot, payload) {
       reactionRemove(wrapper, config, payload);
     },
+    interactionCreate(_bot, payload) {
+      interactionCreate(wrapper, config, payload);
+    },
   });
 
   // hook up received birthdaysWorker messages
@@ -119,6 +121,9 @@ export async function main(): Promise<void> {
       content: `Happy birthday to <@!${e.data}>!`,
     });
   };
+
+  // slash commands
+  await registerCommands(bot);
 
   // start and block
   await wrapper.startBot();
