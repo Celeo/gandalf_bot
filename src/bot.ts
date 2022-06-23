@@ -13,6 +13,7 @@ import { handler as commandsHandler } from "./commands.ts";
 import { handler as heyListenHandler } from "./heyListen.ts";
 import { handler as quotesHandler } from "./quotes.ts";
 import { handler as grossHandler } from "./gross.ts";
+import { handler as framedHandler } from "./framed.ts";
 import { reactionAdd, reactionRemove } from "./reactions.ts";
 
 /**
@@ -31,6 +32,7 @@ const HANDLERS: Array<[
   [heyListenHandler, "heyListen"],
   [quotesHandler, "quotes"],
   [grossHandler, "gross"],
+  [framedHandler, "framed"],
 ];
 
 /**
@@ -69,7 +71,7 @@ export async function main(): Promise<void> {
 
   const configWorker = new Worker(
     new URL("./configWorker.ts", import.meta.url).href,
-    { type: "module", deno: true },
+    { type: "module" },
   );
   const birthdayWorker = new Worker(
     new URL("./birthdaysWorker.ts", import.meta.url).href,
