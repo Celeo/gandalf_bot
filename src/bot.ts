@@ -88,7 +88,12 @@ export async function main(): Promise<void> {
 
   const baseBot = createBot({
     token: config.token,
-    intents: ["GuildMessages", "GuildMembers", "GuildMessageReactions"],
+    intents: [
+      "GuildMessages",
+      "GuildMembers",
+      "GuildMessageReactions",
+      "DirectMessages",
+    ],
     botId: BigInt(atob(config.token.split(".")[0])),
     events: {},
   });
