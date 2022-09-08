@@ -15,7 +15,6 @@ run:
         --allow-read={{read_files}} \
         --allow-write={{write_files}} \
         --allow-net=discord.com,gateway.discord.gg \
-        --unstable \
         main.ts
 
 compile:
@@ -23,14 +22,13 @@ compile:
         --allow-read={{read_files}} \
         --allow-write={{write_files}} \
         --allow-net=discord.com,gateway.discord.gg \
-        --unstable \
         main.ts
 
 test:
-    @deno test --allow-all --unstable
+    @deno test --allow-all
 
 test-cov:
-    @deno test --allow-all --unstable --coverage=coverage
+    @deno test --allow-all --coverage=coverage
     @deno coverage coverage
 
 download_words:

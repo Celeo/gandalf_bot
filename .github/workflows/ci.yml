@@ -20,4 +20,4 @@ jobs:
       - name: Create sample words.txt
         run: echo "dictionary" >> words.txt
       - name: Test Deno Module
-        run: deno test --allow-all --unstable
+        run: deno test --allow-all
