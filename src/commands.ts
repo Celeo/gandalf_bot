@@ -1,94 +1,97 @@
-import { BotWithCache, BotWrapper, DiscordenoMessage } from "./deps.ts";
-import { Config } from "./config.ts";
-
-const HELP_RESPONSE = `\`\`\`~~~ Gandalf bot commands ~~~
-
-Command           Actions
---------------------------------------------------
-help              Show this message
-breach            Send someone to the shadow realm
-unbreach          Bring someone back
-sitrep            Show who's been banished
-pin               Pin a message
-unpin             Unpin a message
-\`\`\``;
+import type { Config } from "./config.ts";
+import {
+  ApplicationCommandOptionTypes,
+  InteractionResponseTypes,
+  InteractionTypes,
+} from "./deps.ts";
+import type { BotWrapper, DiscordenoInteraction } from "./deps.ts";
 
 /**
- * Commands parts.
+ * Register the bot's slash commands.
  */
-export interface Command {
-  /**
-   * The actual name of the command.
-   */
-  name: string;
-  /**
-   * Any arguments supplied to the command.
-   */
-  args: Array<string>;
+export function registerCommands(wrapper: BotWrapper): void {
+  wrapper.bot.helpers.createApplicationCommand({
+    name: "pin",
+    description: "Pin a message to a channel",
+    options: [
+      {
+        type: ApplicationCommandOptionTypes.String,
+        name: "messageid",
+        description: "ID of the message to pin",
+        required: true,
+      },
+    ],
+  });
+
+  wrapper.bot.helpers.createApplicationCommand({
+    name: "unpin",
+    description: "Unpin a message from a channel",
+    options: [
+      {
+        type: ApplicationCommandOptionTypes.String,
+        name: "messageid",
+        description: "ID of the message to unpin",
+        required: true,
+      },
+    ],
+  });
+
+  wrapper.bot.helpers.createApplicationCommand({
+    name: "breach",
+    description: "Throw someone to the shadow realm",
+    options: [
+      {
+        type: ApplicationCommandOptionTypes.User,
+        name: "user",
+        description: "User to target",
+        required: true,
+      },
+    ],
+  });
+
+  wrapper.bot.helpers.createApplicationCommand({
+    name: "unbreach",
+    description: "Save someone from the shadow realm",
+    options: [
+      {
+        type: ApplicationCommandOptionTypes.User,
+        name: "user",
+        description: "User to target",
+        required: true,
+      },
+    ],
+  });
 }
 
 /**
- * Parse a message content into a command or `null`
- * if the message does not represent a command.
+ * Handle incoming interactions.
  */
-export function parse(message: string): Command | null {
-  if (message.length < 2) {
-    return null;
-  }
-  if (!message.startsWith("!")) {
-    return null;
-  }
-  let name;
-  if (message.includes(" ")) {
-    name = message.substring(1, message.indexOf(" "));
-  } else {
-    name = message.substring(1, message.length);
-  }
-  const args = message
-    .substring(name.length + 1, message.length)
-    .split(" ")
-    .filter((part) => part.length > 0);
-  return {
-    name: name.toLowerCase(),
-    args,
-  };
-}
-
-/**
- * Handler for people sending commands to the bot.
- */
-export async function handler(
+export async function interactionCreate(
   wrapper: BotWrapper,
   config: Config,
-  message: DiscordenoMessage,
+  payload: DiscordenoInteraction,
 ): Promise<void> {
-  const command = parse(message.content);
-  if (command === null) {
+  if (
+    payload.data === undefined ||
+    payload.type !== InteractionTypes.ApplicationCommand
+  ) {
     return;
   }
-  switch (command.name) {
-    case "help": {
-      await commandHelp(wrapper, config, message, command);
-      break;
-    }
-    case "breach": {
-      await commandBreach(wrapper, config, message, command);
-      break;
-    }
-    case "unbreach": {
-      await commandUnBreach(wrapper, config, message, command);
-      break;
-    }
-    case "sitrep": {
-      await commandSitRep(wrapper, config, message, command);
-      break;
-    }
+  switch (payload.data.name) {
     case "pin": {
-      await commandPin(wrapper, config, message, command);
+      await commandPin(wrapper, config, payload);
       break;
     }
     case "unpin": {
-      await commandUnpin(wrapper, config, message, command);
+      await commandUnpin(wrapper, config, payload);
+      break;
+    }
+    case "breach": {
+      await commandBreach(wrapper, config, payload);
+      break;
+    }
+    case "unbreach": {
+      await commandUnBreach(wrapper, config, payload);
       break;
     }
   }
@@ -97,151 +100,162 @@ export async function handler(
 /**
  * Check if a command sender is an admin on the server.
  *
- * If not, a response gif is sent in response to the message.
+ * If not, a response gif is sent in response to the payload.
  */
 async function senderIsAdmin(
   wrapper: BotWrapper,
-  message: DiscordenoMessage,
+  payload: DiscordenoInteraction,
 ): Promise<boolean> {
-  if (message.member === undefined || message.guildId === undefined) {
+  if (payload.member === undefined || payload.guildId === undefined) {
     return false;
   }
   const isAdmin = wrapper.hasGuildPermissions(
-    message.guildId,
-    message.member,
-    [
-      "ADMINISTRATOR",
-    ],
+    payload.guildId,
+    payload.member,
+    ["ADMINISTRATOR"],
   );
   if (!isAdmin) {
-    await wrapper.replyTo(
-      message,
-      "https://tenor.com/view/no-nooo-nope-eat-fingerwag-gif-14832139",
+    await wrapper.bot.helpers.sendInteractionResponse(
+      payload.id,
+      payload.token,
+      {
+        type: InteractionResponseTypes.ChannelMessageWithSource,
+        data: {
+          content:
+            "https://tenor.com/view/no-nooo-nope-eat-fingerwag-gif-14832139",
+        },
+      },
     );
   }
   return isAdmin;
 }
 
-// ===========================
-// Individual command handlers
-// ===========================
-
-async function commandHelp(
-  wrapper: BotWrapper,
-  _config: Config,
-  message: DiscordenoMessage,
-  _command: Command,
-) {
-  await wrapper.replyTo(message, HELP_RESPONSE);
-}
-
-async function commandBreach(
+export async function commandBreach(
   wrapper: BotWrapper,
   config: Config,
-  message: DiscordenoMessage,
-  _command: Command,
-) {
-  if (message.guildId === undefined || !await senderIsAdmin(wrapper, message)) {
+  payload: DiscordenoInteraction,
+): Promise<void> {
+  if (
+    payload.guildId === undefined ||
+    payload.data === undefined ||
+    payload.data.options === undefined ||
+    payload.data.options.length === 0 ||
+    !await senderIsAdmin(wrapper, payload)
+  ) {
     return;
   }
-  if (message.mentionedUserIds.length === 0) {
-    await wrapper.replyTo(message, "You must tag a user");
-    return;
-  }
-  for (const mentioned of message.mentionedUserIds) {
-    await wrapper.addRole(
-      message.guildId,
-      mentioned,
-      config.containmentRoleId,
-    );
-  }
-  await wrapper.replyTo(message, config.containmentResponseGif);
+  await wrapper.addRole(
+    payload.guildId,
+    BigInt(payload.data.options[0].value as string),
+    config.containmentRoleId,
+  );
+  await wrapper.bot.helpers.sendInteractionResponse(
+    payload.id,
+    payload.token,
+    {
+      type: InteractionResponseTypes.ChannelMessageWithSource,
+      data: { content: config.containmentResponseGif },
+    },
+  );
 }
 
-async function commandUnBreach(
+export async function commandUnBreach(
   wrapper: BotWrapper,
   config: Config,
-  message: DiscordenoMessage,
-  _command: Command,
-) {
-  if (message.guildId === undefined || !await senderIsAdmin(wrapper, message)) {
+  payload: DiscordenoInteraction,
+): Promise<void> {
+  if (
+    payload.guildId === undefined ||
+    payload.data === undefined ||
+    payload.data.options === undefined ||
+    payload.data.options.length === 0 ||
+    !await senderIsAdmin(wrapper, payload)
+  ) {
     return;
   }
-  if (message.mentionedUserIds.length === 0) {
-    await wrapper.replyTo(message, "You must tag a user");
-    return;
-  }
-  for (const mentioned of message.mentionedUserIds) {
-    await wrapper.removeRole(
-      message.guildId,
-      mentioned,
-      config.containmentRoleId,
-    );
-  }
-  await wrapper.addReaction(message.channelId, message.id, "👍");
+  await wrapper.removeRole(
+    payload.guildId,
+    BigInt(payload.data.options[0].value as string),
+    config.containmentRoleId,
+  );
+  await wrapper.bot.helpers.sendInteractionResponse(
+    payload.id,
+    payload.token,
+    {
+      type: InteractionResponseTypes.ChannelMessageWithSource,
+      data: { content: "👍" },
+    },
+  );
 }
 
-async function commandSitRep(
-  wrapper: BotWrapper,
-  config: Config,
-  message: DiscordenoMessage,
-  _command: Command,
-) {
-  if (message.guildId === undefined || !await senderIsAdmin(wrapper, message)) {
-    return;
-  }
-  const containmentRole = config.containmentRoleId;
-  const containedMembers: Array<bigint> = [];
-  // would be nice to actually get the shard id here
-  await wrapper.fetchMembers(message.guildId, 0);
-  const members = (wrapper.bot as BotWithCache).members;
-  for (const member of members.values()) {
-    if (member.roles.includes(containmentRole)) {
-      const user = await wrapper.getUser(member.id);
-      containedMembers.push(user.id);
-    }
-  }
-  if (containedMembers.length === 0) {
-    await wrapper.replyTo(message, "No one is contained");
-  } else {
-    await wrapper.replyTo(
-      message,
-      "Contained users: " +
-        containedMembers.map((id) => `<@!${id}>`).join(", "),
-    );
-  }
-}
-
-async function commandPin(
+export async function commandPin(
   wrapper: BotWrapper,
   _config: Config,
-  message: DiscordenoMessage,
-  command: Command,
-) {
-  if (command.args.length !== 1) {
-    await wrapper.replyTo(
-      message,
-      "This command requires a single argument: the ID of a message to pin",
-    );
+  payload: DiscordenoInteraction,
+): Promise<void> {
+  if (
+    payload.channelId === undefined || payload.data === undefined ||
+    payload.data.options === undefined || payload.data.options.length === 0
+  ) {
     return;
   }
-  await wrapper.pinMessage(message.channelId, BigInt(command.args[0]));
-  await wrapper.addReaction(message.channelId, message.id, "👍");
+  try {
+    await wrapper.pinMessage(
+      payload.channelId,
+      BigInt(payload.data.options[0].value as string),
+    );
+    await wrapper.bot.helpers.sendInteractionResponse(
+      payload.id,
+      payload.token,
+      {
+        type: InteractionResponseTypes.ChannelMessageWithSource,
+        data: { content: "👍" },
+      },
+    );
+  } catch {
+    await wrapper.bot.helpers.sendInteractionResponse(
+      payload.id,
+      payload.token,
+      {
+        type: InteractionResponseTypes.ChannelMessageWithSource,
+        data: { content: "Pin failed. Was that actually a message ID?" },
+      },
+    );
+  }
 }
 
-async function commandUnpin(
+export async function commandUnpin(
   wrapper: BotWrapper,
   _config: Config,
-  message: DiscordenoMessage,
-  command: Command,
-) {
-  if (command.args.length !== 1) {
-    await wrapper.replyTo(
-      message,
-      "This command requires a single argument: the ID of a message to unpin",
-    );
+  payload: DiscordenoInteraction,
+): Promise<void> {
+  if (
+    payload.channelId === undefined || payload.data === undefined ||
+    payload.data.options === undefined || payload.data.options.length === 0
+  ) {
     return;
   }
-  await wrapper.unpinMessage(message.channelId, BigInt(command.args[0]));
-  await wrapper.addReaction(message.channelId, message.id, "👍");
+  try {
+    await wrapper.unpinMessage(
+      payload.channelId,
+      BigInt(payload.data.options[0].value as string),
+    );
+    await wrapper.bot.helpers.sendInteractionResponse(
+      payload.id,
+      payload.token,
+      {
+        type: InteractionResponseTypes.ChannelMessageWithSource,
+        data: { content: "👍" },
+      },
+    );
+  } catch {
+    await wrapper.bot.helpers.sendInteractionResponse(
+      payload.id,
+      payload.token,
+      {
+        type: InteractionResponseTypes.ChannelMessageWithSource,
+        data: { content: "Unpin failed. Was that actually a message ID?" },
+      },
+    );
+  }
 }

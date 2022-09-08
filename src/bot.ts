@@ -8,8 +8,8 @@ import {
   enablePermissionsPlugin,
 } from "./deps.ts";
 import { Config, loadConfig } from "./config.ts";
+import { interactionCreate, registerCommands } from "./commands.ts";
 import { handler as blessYouHandler } from "./blessYou.ts";
-import { handler as commandsHandler } from "./commands.ts";
 import { handler as heyListenHandler } from "./heyListen.ts";
 import { handler as quotesHandler } from "./quotes.ts";
 import { handler as grossHandler } from "./gross.ts";
@@ -28,7 +28,6 @@ const HANDLERS: Array<[
   string,
 ]> = [
   [blessYouHandler, "blessYou"],
-  [commandsHandler, "commands"],
   [heyListenHandler, "heyListen"],
   [quotesHandler, "quotes"],
   [grossHandler, "gross"],
@@ -100,7 +99,9 @@ export async function main(): Promise<void> {
   const bot = enableCachePlugin(baseBot);
   enableCacheSweepers(bot);
   enablePermissionsPlugin(bot);
+
   const wrapper = new BotWrapper(bot);
+  registerCommands(wrapper);
   wrapper.bot.events = createEventHandlers({
     ready() {
       console.log("Connected to gateway");
@@ -113,6 +114,9 @@ export async function main(): Promise<void> {
     },
     reactionRemove(_bot, payload) {
       reactionRemove(wrapper, config, payload);
+    },
+    interactionCreate(_bot, payload) {
+      interactionCreate(wrapper, config, payload);
     },
   });
 

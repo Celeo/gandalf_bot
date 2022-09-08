@@ -1,12 +1,16 @@
 // ===== Bot library =====
 
 export {
+  ApplicationCommandOptionTypes,
   createBot,
   createEventHandlers,
+  InteractionResponseTypes,
+  InteractionTypes,
 } from "https://deno.land/x/discordeno@13.0.0-rc18/mod.ts";
 export type {
   Bot,
   DiscordenoEmoji,
+  DiscordenoInteraction,
   DiscordenoMember,
   DiscordenoMessage,
 } from "https://deno.land/x/discordeno@13.0.0-rc18/mod.ts";
