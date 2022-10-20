@@ -5,7 +5,7 @@ Deno.test("blessYou - does not trigger for un-configured users", async () => {
   const addReaction = sinon.stub();
   const wrapper = { addReaction };
   const config = { blessableUserIds: [] };
-  const message = {};
+  const message = { content: "" };
 
   await handler(wrapper, config, message);
 
