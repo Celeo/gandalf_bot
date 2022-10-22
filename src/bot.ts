@@ -13,7 +13,7 @@ import { handler as blessYouHandler } from "./blessYou.ts";
 import { handler as heyListenHandler } from "./heyListen.ts";
 import { handler as quotesHandler } from "./quotes.ts";
 import { handler as grossHandler } from "./gross.ts";
-import { handler as framedHandler } from "./framed.ts";
+import { handler as guessingGamesHandler } from "./guessingGames.ts";
 import { reactionAdd, reactionRemove } from "./reactions.ts";
 
 /**
@@ -31,7 +31,7 @@ const HANDLERS: Array<[
   [heyListenHandler, "heyListen"],
   [quotesHandler, "quotes"],
   [grossHandler, "gross"],
-  [framedHandler, "framed"],
+  [guessingGamesHandler, "guessingGames"],
 ];
 
 /**
