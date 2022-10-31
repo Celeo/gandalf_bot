@@ -12,7 +12,7 @@ Deno.test("guessingGames - ignores empty", async () => {
   assertEquals(addReaction.getCalls().length, 0);
 });
 
-Deno.test("guessinGames - framed - matches correctly", async () => {
+Deno.test("guessingGames - framed - matches correctly", async () => {
   const addReaction = sinon.stub();
   const wrapper = { addReaction };
   const config = {};
@@ -28,7 +28,7 @@ https://framed.wtf/`,
   assertEquals(addReaction.getCalls().length, 1);
 });
 
-Deno.test("guessinGames - framed - ignores correctly", async () => {
+Deno.test("guessingGames - framed - ignores correctly", async () => {
   const addReaction = sinon.stub();
   const wrapper = { addReaction };
   const config = {};
@@ -66,6 +66,38 @@ Deno.test("guessingGames - tradle - ignores correctly", async () => {
   const message = {
     content: `#Tradle #226 3/6
 🟩🟩🟩🟩🟨
+🟩🟩🟩🟩🟨
+🟩🟩🟩🟩🟩
+https://oec.world/en/tradle`,
+  };
+
+  await handler(wrapper, config, message);
+
+  assertEquals(addReaction.getCalls().length, 0);
+});
+
+Deno.test("guessingGames - worldle - matches correctly", async () => {
+  const addReaction = sinon.stub();
+  const wrapper = { addReaction };
+  const config = {};
+  const message = {
+    content: `#Worldle #282 1/6 (100%)
+🟩🟩🟩🟩🟩🎉
+https://worldle.teuteuf.fr/`,
+  };
+
+  await handler(wrapper, config, message);
+
+  assertEquals(addReaction.getCalls().length, 1);
+});
+
+Deno.test("guessingGames - worldle - ignores correctly", async () => {
+  const addReaction = sinon.stub();
+  const wrapper = { addReaction };
+  const config = {};
+  const message = {
+    content: `#Tradle #237 3/6
+🟩🟩🟨⬜⬜
 🟩🟩🟩🟩🟨
 🟩🟩🟩🟩🟩
 https://oec.world/en/tradle`,
