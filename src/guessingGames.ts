@@ -16,6 +16,7 @@ export async function handler(
   for (const pattern of PATTERNS) {
     if (message.content.match(pattern) !== null) {
       await wrapper.addReaction(message.channelId, message.id, "💯");
+      break;
     }
   }
 }
