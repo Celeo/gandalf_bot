@@ -1,4 +1,4 @@
-import { BotWrapper, DiscordenoMessage } from "./deps.ts";
+import { BotWrapper, Message } from "./deps.ts";
 import { Config } from "./config.ts";
 
 const PATTERNS = [
@@ -11,7 +11,7 @@ const PATTERNS = [
 export async function handler(
   wrapper: BotWrapper,
   _config: Config,
-  message: DiscordenoMessage,
+  message: Message,
 ): Promise<void> {
   for (const pattern of PATTERNS) {
     if (message.content.match(pattern) !== null) {

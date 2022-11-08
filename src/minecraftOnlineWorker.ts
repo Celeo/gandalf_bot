@@ -47,16 +47,12 @@ await sleep(30);
 
 while (true) {
   if (config === undefined) {
-    console.log(
-      "Minecraft Online Worker does not have a config; waiting 5 seconds ...",
-    );
     await sleep(5);
     continue;
   }
-  console.log("Checking for Minecraft server player count");
   if (config.minecraftServer) {
     const count = await getOnlineCount(config);
     (self as unknown as Worker).postMessage(count);
   }
-  await sleep(60 * 5); // 5 minutes
+  await sleep(60 * 10); // 10 minutes
 }

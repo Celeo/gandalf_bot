@@ -2,10 +2,11 @@ import {
   BotWrapper,
   createBot,
   createEventHandlers,
-  DiscordenoMessage,
   enableCachePlugin,
   enableCacheSweepers,
   enablePermissionsPlugin,
+  GatewayIntents,
+  Message,
 } from "./deps.ts";
 import { Config, loadConfig } from "./config.ts";
 import { interactionCreate, registerCommands } from "./commands.ts";
@@ -23,7 +24,7 @@ const HANDLERS: Array<[
   (
     wrapper: BotWrapper,
     config: Config,
-    message: DiscordenoMessage,
+    message: Message,
   ) => Promise<void>,
   string,
 ]> = [
@@ -40,9 +41,9 @@ const HANDLERS: Array<[
 async function messageHandler(
   wrapper: BotWrapper,
   config: Config,
-  message: DiscordenoMessage,
+  message: Message,
 ): Promise<void> {
-  if (message.isBot) {
+  if (message.isFromBot) {
     return;
   }
   for (const [handler, name] of HANDLERS) {
@@ -93,12 +94,11 @@ export async function main(): Promise<void> {
 
   const baseBot = createBot({
     token: config.token,
-    intents: [
-      "GuildMessages",
-      "GuildMembers",
-      "GuildMessageReactions",
-      "DirectMessages",
-    ],
+    intents: GatewayIntents.GuildMessages |
+      GatewayIntents.MessageContent |
+      GatewayIntents.GuildMembers |
+      GatewayIntents.GuildMessageReactions |
+      GatewayIntents.DirectMessages,
     botId: BigInt(atob(config.token.split(".")[0])),
     events: {},
   });
@@ -129,10 +129,6 @@ export async function main(): Promise<void> {
   // hook up received birthdaysWorker messages
   birthdayWorker.onmessage = async (e: MessageEvent<string>) => {
     try {
-      console.log(
-        "Received message from birthdays worker in main thread:",
-        e.data,
-      );
       await wrapper.sendMessage(config.birthdayChannel, {
         content: `Happy birthday to <@!${e.data}>!`,
       });
@@ -142,10 +138,6 @@ export async function main(): Promise<void> {
   };
   minecraftWorker.onmessage = async (e: MessageEvent<number>) => {
     try {
-      console.log(
-        "Received player count from Minecraft worker in main thread:",
-        e.data,
-      );
       await wrapper.editChannel(config.minecraftChannel, {
         topic: `Online players: ${e.data}`,
       });

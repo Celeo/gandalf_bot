@@ -1,9 +1,4 @@
-import {
-  BotWithCache,
-  BotWrapper,
-  DiscordenoEmoji,
-  DiscordenoMember,
-} from "./deps.ts";
+import { BotWithCache, BotWrapper, Emoji, Member, User } from "./deps.ts";
 import { Config } from "./config.ts";
 
 /**
@@ -14,8 +9,9 @@ interface ReactionAddPayload {
   channelId: bigint;
   messageId: bigint;
   guildId?: bigint;
-  member?: DiscordenoMember;
-  emoji: DiscordenoEmoji;
+  member?: Member;
+  user?: User;
+  emoji: Emoji;
 }
 
 /**
@@ -26,7 +22,7 @@ interface ReactionRemovePayload {
   channelId: bigint;
   messageId: bigint;
   guildId?: bigint;
-  emoji: DiscordenoEmoji;
+  emoji: Emoji;
 }
 
 /**
@@ -117,7 +113,7 @@ export async function reactionAdd(
     wrapper,
     config,
     payload.guildId,
-    payload.member.id,
+    payload.userId,
     payload.userId,
     payload.channelId,
     payload.messageId,

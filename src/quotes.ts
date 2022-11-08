@@ -1,4 +1,4 @@
-import { BotWrapper, DiscordenoMessage } from "./deps.ts";
+import { BotWrapper, Message } from "./deps.ts";
 import { Config } from "./config.ts";
 
 const QUOTES = [
@@ -256,7 +256,7 @@ const QUOTES = [
 export async function handler(
   wrapper: BotWrapper,
   _config: Config,
-  message: DiscordenoMessage,
+  message: Message,
 ): Promise<void> {
   if (!message.mentionedUserIds.includes(wrapper.bot.id)) {
     return;

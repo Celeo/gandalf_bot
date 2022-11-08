@@ -1,4 +1,4 @@
-import { BotWrapper, DiscordenoMessage } from "./deps.ts";
+import { BotWrapper, Message } from "./deps.ts";
 import { Config } from "./config.ts";
 
 const PATTERN = /^listen[! ]*$/i;
@@ -9,7 +9,7 @@ const PATTERN = /^listen[! ]*$/i;
 export async function handler(
   wrapper: BotWrapper,
   config: Config,
-  message: DiscordenoMessage,
+  message: Message,
 ): Promise<void> {
   if (!config.listenableUserIds.includes(message.authorId)) {
     return;

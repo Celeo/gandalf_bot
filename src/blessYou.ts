@@ -1,4 +1,4 @@
-import { BotWrapper, DiscordenoMessage, memoizy } from "./deps.ts";
+import { BotWrapper, memoizy, Message } from "./deps.ts";
 import { Config } from "./config.ts";
 
 /**
@@ -37,7 +37,7 @@ const memoziedLoadWords = memoizy(loadWords);
 export async function handler(
   wrapper: BotWrapper,
   config: Config,
-  message: DiscordenoMessage,
+  message: Message,
 ): Promise<void> {
   if (!config.blessableUserIds.includes(message.authorId)) {
     return;

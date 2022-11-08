@@ -4,32 +4,30 @@ export {
   ApplicationCommandOptionTypes,
   createBot,
   createEventHandlers,
+  GatewayIntents,
   InteractionResponseTypes,
   InteractionTypes,
-} from "https://deno.land/x/discordeno@13.0.0-rc18/mod.ts";
-export type {
-  Bot,
-  DiscordenoEmoji,
-  DiscordenoInteraction,
-  DiscordenoMember,
-  DiscordenoMessage,
-} from "https://deno.land/x/discordeno@13.0.0-rc18/mod.ts";
+} from "https://deno.land/x/discordeno@17.0.1/mod.ts";
 export {
   enableCachePlugin,
   enableCacheSweepers,
-} from "https://deno.land/x/discordeno_cache_plugin@0.0.21/mod.ts";
+  enablePermissionsPlugin,
+} from "https://deno.land/x/discordeno@17.0.1/plugins/mod.ts";
+export type {
+  Emoji,
+  Interaction,
+  Member,
+  Message,
+  User,
+} from "https://deno.land/x/discordeno@17.0.1/mod.ts";
 export type {
   BotWithCache,
-} from "https://deno.land/x/discordeno_cache_plugin@0.0.21/mod.ts";
-export {
-  enablePermissionsPlugin,
-} from "https://deno.land/x/discordeno_permissions_plugin@0.0.15/mod.ts";
+} from "https://deno.land/x/discordeno@17.0.1/plugins/mod.ts";
 
 import {
   addReaction,
   addRole,
   editChannel,
-  fetchMembers,
   getDmChannel,
   getMember,
   getUser,
@@ -38,22 +36,20 @@ import {
   sendMessage,
   startBot,
   unpinMessage,
-} from "https://deno.land/x/discordeno@13.0.0-rc18/mod.ts";
+} from "https://deno.land/x/discordeno@17.0.1/mod.ts";
+import {
+  BotWithCache,
+  hasGuildPermissions,
+} from "https://deno.land/x/discordeno@17.0.1/plugins/mod.ts";
 import type {
   Bot,
   CreateMessage,
-  DiscordenoGuild,
-  DiscordenoMember,
-  DiscordenoMessage,
+  Guild,
+  Member,
+  Message,
   ModifyChannel,
   PermissionStrings,
-} from "https://deno.land/x/discordeno@13.0.0-rc18/mod.ts";
-import type {
-  BotWithCache,
-} from "https://deno.land/x/discordeno_cache_plugin@0.0.21/mod.ts";
-import {
-  hasGuildPermissions,
-} from "https://deno.land/x/discordeno_permissions_plugin@0.0.15/mod.ts";
+} from "https://deno.land/x/discordeno@17.0.1/mod.ts";
 
 /**
  * Wrapper for Discordeno's `Bot` object.
@@ -76,12 +72,8 @@ export class BotWrapper {
     return await addReaction(this.bot, channelId, messageId, emoji);
   }
 
-  async addRole(guildId: bigint, memberId: bigint, roleId: bigint) {
+  async addRole(guildId: bigint | string, memberId: bigint, roleId: bigint) {
     return await addRole(this.bot, guildId, memberId, roleId);
-  }
-
-  async fetchMembers(guildId: bigint, shardId: number) {
-    return await fetchMembers(this.bot, guildId, shardId);
   }
 
   async getDmChannel(userId: bigint) {
@@ -96,11 +88,11 @@ export class BotWrapper {
     return await getUser(this.bot, userId);
   }
 
-  async pinMessage(channelId: bigint, messageId: bigint) {
+  async pinMessage(channelId: bigint | string, messageId: bigint) {
     return await pinMessage(this.bot, channelId, messageId);
   }
 
-  async removeRole(guildId: bigint, memberId: bigint, roleId: bigint) {
+  async removeRole(guildId: bigint | string, memberId: bigint, roleId: bigint) {
     return await removeRole(this.bot, guildId, memberId, roleId);
   }
 
@@ -109,7 +101,7 @@ export class BotWrapper {
   }
 
   async replyTo(
-    message: DiscordenoMessage,
+    message: Message,
     content: string,
   ) {
     return await this.sendMessage(message.channelId, {
@@ -122,13 +114,13 @@ export class BotWrapper {
     });
   }
 
-  async unpinMessage(channelId: bigint, messageId: bigint) {
+  async unpinMessage(channelId: bigint | string, messageId: bigint) {
     return await unpinMessage(this.bot, channelId, messageId);
   }
 
   hasGuildPermissions(
-    guild: bigint | DiscordenoGuild,
-    member: bigint | DiscordenoMember,
+    guild: bigint | Guild,
+    member: bigint | Member,
     permissions: PermissionStrings[],
   ) {
     return hasGuildPermissions(

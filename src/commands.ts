@@ -4,13 +4,13 @@ import {
   InteractionResponseTypes,
   InteractionTypes,
 } from "./deps.ts";
-import type { BotWrapper, DiscordenoInteraction } from "./deps.ts";
+import type { BotWrapper, Interaction } from "./deps.ts";
 
 /**
  * Register the bot's slash commands.
  */
 export function registerCommands(wrapper: BotWrapper): void {
-  wrapper.bot.helpers.createApplicationCommand({
+  wrapper.bot.helpers.createGlobalApplicationCommand({
     name: "pin",
     description: "Pin a message to a channel",
     options: [
@@ -23,7 +23,7 @@ export function registerCommands(wrapper: BotWrapper): void {
     ],
   });
 
-  wrapper.bot.helpers.createApplicationCommand({
+  wrapper.bot.helpers.createGlobalApplicationCommand({
     name: "unpin",
     description: "Unpin a message from a channel",
     options: [
@@ -36,7 +36,7 @@ export function registerCommands(wrapper: BotWrapper): void {
     ],
   });
 
-  wrapper.bot.helpers.createApplicationCommand({
+  wrapper.bot.helpers.createGlobalApplicationCommand({
     name: "breach",
     description: "Throw someone to the shadow realm",
     options: [
@@ -49,7 +49,7 @@ export function registerCommands(wrapper: BotWrapper): void {
     ],
   });
 
-  wrapper.bot.helpers.createApplicationCommand({
+  wrapper.bot.helpers.createGlobalApplicationCommand({
     name: "unbreach",
     description: "Save someone from the shadow realm",
     options: [
@@ -69,7 +69,7 @@ export function registerCommands(wrapper: BotWrapper): void {
 export async function interactionCreate(
   wrapper: BotWrapper,
   config: Config,
-  payload: DiscordenoInteraction,
+  payload: Interaction,
 ): Promise<void> {
   if (
     payload.data === undefined ||
@@ -104,7 +104,7 @@ export async function interactionCreate(
  */
 async function senderIsAdmin(
   wrapper: BotWrapper,
-  payload: DiscordenoInteraction,
+  payload: Interaction,
 ): Promise<boolean> {
   if (payload.member === undefined || payload.guildId === undefined) {
     return false;
@@ -133,7 +133,7 @@ async function senderIsAdmin(
 export async function commandBreach(
   wrapper: BotWrapper,
   config: Config,
-  payload: DiscordenoInteraction,
+  payload: Interaction,
 ): Promise<void> {
   if (
     payload.guildId === undefined ||
@@ -162,7 +162,7 @@ export async function commandBreach(
 export async function commandUnBreach(
   wrapper: BotWrapper,
   config: Config,
-  payload: DiscordenoInteraction,
+  payload: Interaction,
 ): Promise<void> {
   if (
     payload.guildId === undefined ||
@@ -191,7 +191,7 @@ export async function commandUnBreach(
 export async function commandPin(
   wrapper: BotWrapper,
   _config: Config,
-  payload: DiscordenoInteraction,
+  payload: Interaction,
 ): Promise<void> {
   if (
     payload.channelId === undefined || payload.data === undefined ||
@@ -227,7 +227,7 @@ export async function commandPin(
 export async function commandUnpin(
   wrapper: BotWrapper,
   _config: Config,
-  payload: DiscordenoInteraction,
+  payload: Interaction,
 ): Promise<void> {
   if (
     payload.channelId === undefined || payload.data === undefined ||

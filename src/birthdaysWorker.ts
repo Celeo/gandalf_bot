@@ -24,9 +24,6 @@ await sleep(30);
 
 while (true) {
   if (config === undefined) {
-    console.log(
-      "Birthdays Worker does not have a config; waiting 5 seconds ...",
-    );
     await sleep(5);
     continue;
   }
