@@ -28,6 +28,7 @@ export {
 import {
   addReaction,
   addRole,
+  editChannel,
   fetchMembers,
   getDmChannel,
   getMember,
@@ -44,6 +45,7 @@ import type {
   DiscordenoGuild,
   DiscordenoMember,
   DiscordenoMessage,
+  ModifyChannel,
   PermissionStrings,
 } from "https://deno.land/x/discordeno@13.0.0-rc18/mod.ts";
 import type {
@@ -135,6 +137,10 @@ export class BotWrapper {
       member,
       permissions,
     );
+  }
+
+  async editChannel(channelId: bigint, options: ModifyChannel) {
+    return await editChannel(this.bot, channelId, options);
   }
 }
 

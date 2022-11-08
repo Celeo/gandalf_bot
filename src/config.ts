@@ -29,6 +29,8 @@ export interface Config {
   reactionRoles: Array<ReactionRole>;
   birthdayChannel: bigint;
   birthdays: Array<Birthday>;
+  minecraftChannel: bigint;
+  minecraftServer: string;
 }
 
 /**
@@ -52,5 +54,6 @@ export async function loadConfig(filename = "config.json"): Promise<Config> {
     },
   );
   data.birthdayChannel = BigInt(data.birthdayChannel);
+  data.minecraftChannel = BigInt(data.minecraftChannel);
   return data as Config;
 }

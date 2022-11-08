@@ -7,5 +7,7 @@
   "grossUserIds": [],
   "reactionRoles": [],
   "birthdayChannel": "",
-  "birthdays": []
+  "birthdays": [],
+  "minecraftChannel": "0",
+  "minecraftServer": ""
 }

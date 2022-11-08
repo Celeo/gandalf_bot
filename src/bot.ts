@@ -77,10 +77,16 @@ export async function main(): Promise<void> {
     { type: "module" },
   );
   birthdayWorker.postMessage(config);
+  const minecraftWorker = new Worker(
+    new URL("./minecraftOnlineWorker.ts", import.meta.url).href,
+    { type: "module" },
+  );
+  minecraftWorker.postMessage(config);
   configWorker.onmessage = (e: MessageEvent<Config>) => {
     console.log("Received message from configWorker in main thread");
     config = e.data;
     birthdayWorker.postMessage(config);
+    minecraftWorker.postMessage(config);
   };
 
   /* bot creation and plugin enablement */
@@ -122,13 +128,30 @@ export async function main(): Promise<void> {
 
   // hook up received birthdaysWorker messages
   birthdayWorker.onmessage = async (e: MessageEvent<string>) => {
-    console.log(
-      "Received message from birthdays worker in main thread:",
-      e.data,
-    );
-    await wrapper.sendMessage(config.birthdayChannel, {
-      content: `Happy birthday to <@!${e.data}>!`,
-    });
+    try {
+      console.log(
+        "Received message from birthdays worker in main thread:",
+        e.data,
+      );
+      await wrapper.sendMessage(config.birthdayChannel, {
+        content: `Happy birthday to <@!${e.data}>!`,
+      });
+    } catch (err) {
+      console.error("Could not send birthday announcement:", err);
+    }
+  };
+  minecraftWorker.onmessage = async (e: MessageEvent<number>) => {
+    try {
+      console.log(
+        "Received player count from Minecraft worker in main thread:",
+        e.data,
+      );
+      await wrapper.editChannel(config.minecraftChannel, {
+        topic: `Online players: ${e.data}`,
+      });
+    } catch (err) {
+      console.error("Could not update Minecraft channel topic:", err);
+    }
   };
 
   // start and block
