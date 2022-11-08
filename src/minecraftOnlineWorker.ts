@@ -54,5 +54,5 @@ while (true) {
     const count = await getOnlineCount(config);
     (self as unknown as Worker).postMessage(count);
   }
-  await sleep(60 * 10); // 10 minutes
+  await sleep(60 * 15); // 15 minutes
 }
