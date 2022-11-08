@@ -14,7 +14,7 @@ jobs:
       - name: Use Deno Version ${{ matrix.deno-version }}
         uses: denolib/setup-deno@v2
         with:
-          deno-version: "~1.17"
+          deno-version: "~1.27"
       - name: Lint Deno Module
         run: deno fmt --check --ignore='README.md'
       - name: Create sample words.txt
