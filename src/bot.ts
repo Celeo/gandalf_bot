@@ -140,7 +140,7 @@ export async function main(): Promise<void> {
   };
   minecraftWorker.onmessage = async (e: MessageEvent<number>) => {
     try {
-      logger.debug("Updating channel topic with player count");
+      logger.debug(`Updating channel topic with player count ${e.data}`);
       await wrapper.editChannel(config.minecraftChannel, {
         topic: `Online players: ${e.data}`,
       });
