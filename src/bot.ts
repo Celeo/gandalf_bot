@@ -130,6 +130,7 @@ export async function main(): Promise<void> {
   // hook up received birthdaysWorker messages
   birthdayWorker.onmessage = async (e: MessageEvent<string>) => {
     try {
+      logger.debug("Sending happy birthday message");
       await wrapper.sendMessage(config.birthdayChannel, {
         content: `Happy birthday to <@!${e.data}>!`,
       });
@@ -139,6 +140,7 @@ export async function main(): Promise<void> {
   };
   minecraftWorker.onmessage = async (e: MessageEvent<number>) => {
     try {
+      logger.debug("Updating channel topic with player count");
       await wrapper.editChannel(config.minecraftChannel, {
         topic: `Online players: ${e.data}`,
       });
