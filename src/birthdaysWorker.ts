@@ -16,7 +16,7 @@ let config: Config | undefined;
 const mentioned: Record<string, Array<number>> = {};
 
 (self as unknown as Worker).onmessage = (e: MessageEvent<Config>) => {
-  logger.info("Received new config in birthdaysWorker");
+  logger.debug("Received new config in birthdaysWorker");
   config = e.data;
 };
 
