@@ -136,6 +136,33 @@ export class BotWrapper {
   }
 }
 
-// ===== memoize =====
+// ===== other =====
 
 export { memoizy } from "https://deno.land/x/memoizy@1.0.0/mod.ts";
+import * as log from "https://deno.land/std@0.163.0/log/mod.ts";
+
+log.setup({
+  handlers: {
+    console: new log.handlers.ConsoleHandler("DEBUG", {
+      formatter: (record: log.LogRecord): string => {
+        const ds = record.datetime.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        });
+        return `${ds} [${record.levelName}] ${record.msg}`;
+      },
+    }),
+  },
+  loggers: {
+    default: {
+      level: "DEBUG",
+      handlers: ["console"],
+    },
+  },
+});
+export const logger = log.getLogger();

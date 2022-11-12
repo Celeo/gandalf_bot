@@ -1,4 +1,4 @@
-import { BotWrapper, memoizy, Message } from "./deps.ts";
+import { BotWrapper, logger, memoizy, Message } from "./deps.ts";
 import { Config } from "./config.ts";
 
 /**
@@ -19,7 +19,7 @@ const PATTERNS: Array<RegExp> = [
  * Load the words.txt file into memory.
  */
 function loadWords(): Array<string> {
-  console.log("Loading words.txt into memory");
+  logger.info("Loading words.txt into memory");
   const decoder = new TextDecoder("utf-8");
   const raw = Deno.readFileSync("./words.txt");
   const text = decoder.decode(raw);

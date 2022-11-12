@@ -6,6 +6,7 @@ import {
   enableCacheSweepers,
   enablePermissionsPlugin,
   GatewayIntents,
+  logger,
   Message,
 } from "./deps.ts";
 import { Config, loadConfig } from "./config.ts";
@@ -50,7 +51,7 @@ async function messageHandler(
     try {
       await handler(wrapper, config, message);
     } catch (e) {
-      console.log(`Error when processing message handler "${name}: ${e}`);
+      logger.error(`Error when processing message handler "${name}: ${e}`);
     }
   }
 }
@@ -63,7 +64,7 @@ export async function main(): Promise<void> {
 
   let config = await loadConfig();
   if (config.token.length === 0) {
-    console.error("No token supplied");
+    logger.error("No token supplied");
     return;
   }
 
@@ -84,7 +85,7 @@ export async function main(): Promise<void> {
   );
   minecraftWorker.postMessage(config);
   configWorker.onmessage = (e: MessageEvent<Config>) => {
-    console.log("Received message from configWorker in main thread");
+    logger.debug("Received message from configWorker in main thread");
     config = e.data;
     birthdayWorker.postMessage(config);
     minecraftWorker.postMessage(config);
@@ -110,7 +111,7 @@ export async function main(): Promise<void> {
   registerCommands(wrapper);
   wrapper.bot.events = createEventHandlers({
     ready() {
-      console.log("Connected to gateway");
+      logger.info("Connected to gateway");
     },
     messageCreate(_bot, message) {
       messageHandler(wrapper, config, message);
@@ -133,7 +134,7 @@ export async function main(): Promise<void> {
         content: `Happy birthday to <@!${e.data}>!`,
       });
     } catch (err) {
-      console.error("Could not send birthday announcement:", err);
+      logger.error("Could not send birthday announcement:", err);
     }
   };
   minecraftWorker.onmessage = async (e: MessageEvent<number>) => {
@@ -142,7 +143,7 @@ export async function main(): Promise<void> {
         topic: `Online players: ${e.data}`,
       });
     } catch (err) {
-      console.error("Could not update Minecraft channel topic:", err);
+      logger.error("Could not update Minecraft channel topic:", err);
     }
   };
 

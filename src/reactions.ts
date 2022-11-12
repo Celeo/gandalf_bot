@@ -1,4 +1,11 @@
-import { BotWithCache, BotWrapper, Emoji, Member, User } from "./deps.ts";
+import {
+  BotWithCache,
+  BotWrapper,
+  Emoji,
+  logger,
+  Member,
+  User,
+} from "./deps.ts";
 import { Config } from "./config.ts";
 
 /**
@@ -91,7 +98,7 @@ async function handleReaction(
     }
   }
   if (anyPartialMatch) {
-    console.log(
+    logger.debug(
       "Matching channel & message, but no matching reaction emoji for:",
       emojiName,
     );

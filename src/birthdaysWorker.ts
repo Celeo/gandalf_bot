@@ -3,6 +3,7 @@
 // so a message can be posted to Discord.
 
 import { Config } from "./config.ts";
+import { logger } from "./deps.ts";
 
 /**
  * Sleep for a number of seconds.
@@ -15,7 +16,7 @@ let config: Config | undefined;
 const mentioned: Record<string, Array<number>> = {};
 
 (self as unknown as Worker).onmessage = (e: MessageEvent<Config>) => {
-  console.log("Received new config in birthdaysWorker");
+  logger.info("Received new config in birthdaysWorker");
   config = e.data;
 };
 
@@ -27,7 +28,7 @@ while (true) {
     await sleep(5);
     continue;
   }
-  console.log("Checking for birthdays");
+  logger.info("Checking for birthdays");
   if (config.birthdays.length > 0) {
     const date = new Date(new Date().getTime() - (8 * 1000 * 60 * 60)); // PST offset
     const dateMatch = `${date.getMonth() + 1}/${date.getDate()}`;

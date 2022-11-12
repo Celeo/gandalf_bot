@@ -1,4 +1,5 @@
 import { Config } from "./config.ts";
+import { logger } from "./deps.ts";
 
 /**
  * Response format from external website.
@@ -38,7 +39,7 @@ function sleep(seconds: number): Promise<(() => Promise<void>)> {
 let config: Config | undefined;
 
 (self as unknown as Worker).onmessage = (e: MessageEvent<Config>) => {
-  console.log("Received new config in minecraftOnlineWorker");
+  logger.debug("Received new config in minecraftOnlineWorker");
   config = e.data;
 };
 
@@ -54,5 +55,5 @@ while (true) {
     const count = await getOnlineCount(config);
     (self as unknown as Worker).postMessage(count);
   }
-  await sleep(60 * 15); // 15 minutes
+  await sleep(60 * 10); // 10 minutes
 }
