@@ -15,6 +15,7 @@ Deno.test("config - loadConfig - works", async () => {
       "birthdayChannel": "6",
       "birthdays": [],
       "minecraftChannel": "7",
+      "minecraftMessage": null,
       "minecraftServer": "ghi"
     }`,
   );
@@ -31,6 +32,7 @@ Deno.test("config - loadConfig - works", async () => {
     birthdayChannel: 6n,
     birthdays: [],
     minecraftChannel: 7n,
+    minecraftMessage: null,
     minecraftServer: "ghi",
   });
   await Deno.remove(`./${filename}`);
