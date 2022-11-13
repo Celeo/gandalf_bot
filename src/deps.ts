@@ -27,7 +27,7 @@ export type {
 import {
   addReaction,
   addRole,
-  editChannel,
+  editMessage,
   getDmChannel,
   getMember,
   getUser,
@@ -44,10 +44,10 @@ import {
 import type {
   Bot,
   CreateMessage,
+  EditMessage,
   Guild,
   Member,
   Message,
-  ModifyChannel,
   PermissionStrings,
 } from "https://deno.land/x/discordeno@17.0.1/mod.ts";
 
@@ -131,8 +131,12 @@ export class BotWrapper {
     );
   }
 
-  async editChannel(channelId: bigint, options: ModifyChannel) {
-    return await editChannel(this.bot, channelId, options);
+  async editMessage(
+    channelId: bigint,
+    messageId: bigint,
+    options: EditMessage,
+  ) {
+    return await editMessage(this.bot, channelId, messageId, options);
   }
 }
 
@@ -140,20 +144,13 @@ export class BotWrapper {
 
 export { memoizy } from "https://deno.land/x/memoizy@1.0.0/mod.ts";
 import * as log from "https://deno.land/std@0.163.0/log/mod.ts";
+import { dateAsString } from "./dateUtil.ts";
 
 log.setup({
   handlers: {
     console: new log.handlers.ConsoleHandler("DEBUG", {
       formatter: (record: log.LogRecord): string => {
-        const ds = record.datetime.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: false,
-        });
+        const ds = dateAsString(record.datetime);
         return `${ds} [${record.levelName}] ${record.msg}`;
       },
     }),

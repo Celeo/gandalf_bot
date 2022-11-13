@@ -9,7 +9,7 @@ import {
   logger,
   Message,
 } from "./deps.ts";
-import { Config, loadConfig } from "./config.ts";
+import { Config, loadConfig, saveConfig } from "./config.ts";
 import { interactionCreate, registerCommands } from "./commands.ts";
 import { handler as blessYouHandler } from "./blessYou.ts";
 import { handler as heyListenHandler } from "./heyListen.ts";
@@ -17,6 +17,7 @@ import { handler as quotesHandler } from "./quotes.ts";
 import { handler as grossHandler } from "./gross.ts";
 import { handler as guessingGamesHandler } from "./guessingGames.ts";
 import { reactionAdd, reactionRemove } from "./reactions.ts";
+import { dateAsString } from "./dateUtil.ts";
 
 /**
  * Collection of message handlers and their "friendly" names.
@@ -68,7 +69,7 @@ export async function main(): Promise<void> {
     return;
   }
 
-  /* workers */
+  /* worker setup */
 
   const configWorker = new Worker(
     new URL("./configWorker.ts", import.meta.url).href,
@@ -78,18 +79,13 @@ export async function main(): Promise<void> {
     new URL("./birthdaysWorker.ts", import.meta.url).href,
     { type: "module" },
   );
-  birthdayWorker.postMessage(config);
   const minecraftWorker = new Worker(
-    new URL("./minecraftOnlineWorker.ts", import.meta.url).href,
+    new URL("./minecraftWorker.ts", import.meta.url).href,
     { type: "module" },
   );
+
+  birthdayWorker.postMessage(config);
   minecraftWorker.postMessage(config);
-  configWorker.onmessage = (e: MessageEvent<Config>) => {
-    logger.debug("Received message from configWorker in main thread");
-    config = e.data;
-    birthdayWorker.postMessage(config);
-    minecraftWorker.postMessage(config);
-  };
 
   /* bot creation and plugin enablement */
 
@@ -127,7 +123,15 @@ export async function main(): Promise<void> {
     },
   });
 
-  // hook up received birthdaysWorker messages
+  /* handle worker messages */
+
+  configWorker.onmessage = (e: MessageEvent<Config>) => {
+    logger.debug("Received message from configWorker in main thread");
+    config = e.data;
+    birthdayWorker.postMessage(config);
+    minecraftWorker.postMessage(config);
+  };
+
   birthdayWorker.onmessage = async (e: MessageEvent<string>) => {
     try {
       logger.debug("Sending happy birthday message");
@@ -135,17 +139,41 @@ export async function main(): Promise<void> {
         content: `Happy birthday to <@!${e.data}>!`,
       });
     } catch (err) {
-      logger.error("Could not send birthday announcement:", err);
+      logger.error(`Could not send birthday announcement: ${err}`);
     }
   };
+
   minecraftWorker.onmessage = async (e: MessageEvent<number>) => {
-    try {
-      logger.debug(`Updating channel topic with player count ${e.data}`);
-      await wrapper.editChannel(config.minecraftChannel, {
-        topic: `Online players: ${e.data}`,
-      });
-    } catch (err) {
-      logger.error("Could not update Minecraft channel topic:", err);
+    const content = `Players currently online: ${e.data}
+
+This is updated every 5 minutes.
+
+Last updated: ${dateAsString(new Date())}`;
+    if (config.minecraftMessage === null) {
+      try {
+        // make new post into the channel, and pin it
+        const message = await wrapper.sendMessage(config.minecraftChannel, {
+          content,
+        });
+        logger.info(`New Minecraft channel message ID: ${message.id}`);
+        await wrapper.pinMessage(config.minecraftChannel, message.id);
+        config.minecraftMessage = message.id;
+        await saveConfig(config);
+      } catch (err) {
+        logger.error(
+          `Could not create new post with Minecraft player information: ${err}`,
+        );
+      }
+    } else {
+      // update existing message in the channel
+      await wrapper.editMessage(
+        config.minecraftChannel,
+        config.minecraftMessage,
+        { content },
+      );
+      logger.debug(
+        `Pinned Minecraft message updated to show ${e.data} players`,
+      );
     }
   };
 

@@ -9,5 +9,6 @@
   "birthdayChannel": "",
   "birthdays": [],
   "minecraftChannel": "0",
+  "minecraftMessage": null,
   "minecraftServer": ""
 }

@@ -39,7 +39,7 @@ function sleep(seconds: number): Promise<(() => Promise<void>)> {
 let config: Config | undefined;
 
 (self as unknown as Worker).onmessage = (e: MessageEvent<Config>) => {
-  logger.debug("Received new config in minecraftOnlineWorker");
+  logger.debug("Received new config in minecraftWorker");
   config = e.data;
 };
 
@@ -55,5 +55,5 @@ while (true) {
     const count = await getOnlineCount(config);
     (self as unknown as Worker).postMessage(count);
   }
-  await sleep(60 * 10); // 10 minutes
+  await sleep(60 * 5); // 5 minutes
 }

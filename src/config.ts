@@ -30,14 +30,17 @@ export interface Config {
   birthdayChannel: bigint;
   birthdays: Array<Birthday>;
   minecraftChannel: bigint;
+  minecraftMessage: bigint | null;
   minecraftServer: string;
 }
+
+const CONFIG_FILE_NAME = "config.json";
 
 /**
  * Load the bot configuration from the configuration file,
  * which is "config.json" unless otherwise specified.
  */
-export async function loadConfig(filename = "config.json"): Promise<Config> {
+export async function loadConfig(filename = CONFIG_FILE_NAME): Promise<Config> {
   const raw = await Deno.readTextFile(`./${filename}`);
   const data = JSON.parse(raw);
   data.containmentRoleId = BigInt(data.containmentRoleId);
@@ -55,5 +58,28 @@ export async function loadConfig(filename = "config.json"): Promise<Config> {
   );
   data.birthdayChannel = BigInt(data.birthdayChannel);
   data.minecraftChannel = BigInt(data.minecraftChannel);
+  if (data.minecraftMessage !== null) {
+    data.minecraftMessage = BigInt(data.minecraftMessage);
+  }
   return data as Config;
+}
+
+/**
+ * Save the config file in memory to disk.
+ *
+ * A backup is saved at "config.json.bak".
+ */
+export async function saveConfig(
+  config: Config,
+  filename = CONFIG_FILE_NAME,
+): Promise<void> {
+  await Deno.copyFile(filename, `${filename}.bak`);
+  await Deno.writeTextFile(
+    filename,
+    JSON.stringify(
+      config,
+      (_, v) => typeof v === "bigint" ? v.toString() : v,
+      2,
+    ),
+  );
 }
