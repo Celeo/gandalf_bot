@@ -6,6 +6,7 @@ const PATTERNS = [
   /#Tradle #\d+ \d+\/\d+\n🟩🟩🟩🟩🟩\nhttps:\/\/oec.world\/en\/tradle/,
   /#Heardle #\d+\n\n🔊🟩⬜⬜⬜⬜⬜\n\nhttps:\/\/spotify\.com\/heardle/,
   /#Worldle #\d+ 1\/6 \(100%\)\n🟩🟩🟩🟩🟩🎉\nhttps:\/\/worldle.teuteuf.fr\//,
+  /#Tradle \(🇺🇸 Edition\) #\d+ 1\/6\n🟩🟩🟩🟩🟩\nhttps:\/\/oec.world\/en\/tradle/,
 ];
 
 export async function handler(
