@@ -6,6 +6,23 @@ import {
 } from "./deps.ts";
 import type { BotWrapper, Interaction } from "./deps.ts";
 
+const HELP_CONTEXT = `**Available commands**:
+
+- /pin - Pin a message to a channel
+- /unpin - Unpin a pinned message from a channel
+- /breach - Throw someone to the shadow realm
+- /unbreach - Save someone from the shadow realm
+
+When using (un)pin, you need the ID of the message. Enable developer \
+mode in Settings -> Advanced, and then right click a message -> Copy ID \
+to get the ID. Paste that into the command argument.
+
+Anyone can pin and unpin messages via those commands. These are available \
+as commands instead of default Discord permissions since Discord permissions \
+are bad.
+
+Breaching is only available to server admins (so, Charley).`;
+
 /**
  * Register the bot's slash commands.
  */
@@ -48,7 +65,6 @@ export function registerCommands(wrapper: BotWrapper): void {
       },
     ],
   });
-
   wrapper.bot.helpers.createGlobalApplicationCommand({
     name: "unbreach",
     description: "Save someone from the shadow realm",
@@ -60,6 +76,11 @@ export function registerCommands(wrapper: BotWrapper): void {
         required: true,
       },
     ],
+  });
+
+  wrapper.bot.helpers.createGlobalApplicationCommand({
+    name: "help",
+    description: "Show available commands",
   });
 }
 
@@ -92,6 +113,10 @@ export async function interactionCreate(
     }
     case "unbreach": {
       await commandUnBreach(wrapper, config, payload);
+      break;
+    }
+    case "help": {
+      await commandHelp(wrapper, config, payload);
       break;
     }
   }
@@ -258,4 +283,19 @@ export async function commandUnpin(
       },
     );
   }
+}
+
+export async function commandHelp(
+  wrapper: BotWrapper,
+  _config: Config,
+  payload: Interaction,
+): Promise<void> {
+  await wrapper.bot.helpers.sendInteractionResponse(
+    payload.id,
+    payload.token,
+    {
+      type: InteractionResponseTypes.ChannelMessageWithSource,
+      data: { content: HELP_CONTEXT },
+    },
+  );
 }
