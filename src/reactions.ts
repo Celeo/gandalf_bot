@@ -48,7 +48,7 @@ async function handleReaction(
   userId: bigint,
   channelId: bigint,
   messageId: bigint,
-  emojiName: string,
+  emoji: Emoji,
   add: boolean,
 ) {
   let anyPartialMatch = false;
@@ -60,7 +60,7 @@ async function handleReaction(
       continue;
     }
     anyPartialMatch = true;
-    if (entry.emoji !== emojiName) {
+    if (entry.emoji !== (emoji.name as string)) {
       continue;
     }
     const allGuilds = (wrapper.bot as BotWithCache).guilds;
@@ -99,8 +99,8 @@ async function handleReaction(
   }
   if (anyPartialMatch) {
     logger.debug(
-      "Matching channel & message, but no matching reaction emoji for:",
-      emojiName,
+      "Matching channel & message, but no matching reaction emoji for:" +
+        JSON.stringify(emoji),
     );
   }
 }
@@ -124,7 +124,7 @@ export async function reactionAdd(
     payload.userId,
     payload.channelId,
     payload.messageId,
-    payload.emoji.name as string,
+    payload.emoji,
     true,
   );
 }
@@ -149,7 +149,7 @@ export async function reactionRemove(
     payload.userId,
     payload.channelId,
     payload.messageId,
-    payload.emoji.name as string,
+    payload.emoji,
     false,
   );
 }
