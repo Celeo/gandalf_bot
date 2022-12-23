@@ -146,7 +146,7 @@ export async function main(): Promise<void> {
   minecraftWorker.onmessage = async (e: MessageEvent<number>) => {
     const content = `Players currently online: ${e.data}
 
-This is updated every 5 minutes.
+This is updated every 15 minutes.
 
 Last updated: ${dateAsString(new Date())}`;
     if (config.minecraftMessage === null) {
