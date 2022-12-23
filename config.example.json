@@ -10,5 +10,9 @@
   "birthdays": [],
   "minecraftChannel": "0",
   "minecraftMessage": null,
-  "minecraftServer": ""
+  "minecraftServer": "",
+  "valheim": {
+    "server": "",
+    "password": ""
+  }
 }

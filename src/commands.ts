@@ -5,6 +5,7 @@ import {
   InteractionTypes,
 } from "./deps.ts";
 import type { BotWrapper, Interaction } from "./deps.ts";
+import { getServerStatus } from "./valheim.ts";
 
 const HELP_CONTEXT = `**Available commands**:
 
@@ -12,6 +13,7 @@ const HELP_CONTEXT = `**Available commands**:
 - /unpin - Unpin a pinned message from a channel
 - /breach - Throw someone to the shadow realm
 - /unbreach - Save someone from the shadow realm
+- /valheim - Interact with the Valheim server
 
 When using (un)pin, you need the ID of the message. Enable developer \
 mode in Settings -> Advanced, and then right click a message -> Copy ID \
@@ -79,6 +81,11 @@ export function registerCommands(wrapper: BotWrapper): void {
   });
 
   wrapper.bot.helpers.createGlobalApplicationCommand({
+    name: "valheim",
+    description: "Interact with the Valheim server",
+  });
+
+  wrapper.bot.helpers.createGlobalApplicationCommand({
     name: "help",
     description: "Show available commands",
   });
@@ -113,6 +120,10 @@ export async function interactionCreate(
     }
     case "unbreach": {
       await commandUnBreach(wrapper, config, payload);
+      break;
+    }
+    case "valheim": {
+      await commandValheim(wrapper, config, payload);
       break;
     }
     case "help": {
@@ -280,6 +291,40 @@ export async function commandUnpin(
       {
         type: InteractionResponseTypes.ChannelMessageWithSource,
         data: { content: "Unpin failed. Was that actually a message ID?" },
+      },
+    );
+  }
+}
+
+export async function commandValheim(
+  wrapper: BotWrapper,
+  config: Config,
+  payload: Interaction,
+): Promise<void> {
+  try {
+    const data = await getServerStatus(config);
+    const online = data["world/active"] as boolean;
+    const url = data["instance/cloud-dns"] as string;
+    await wrapper.bot.helpers.sendInteractionResponse(
+      payload.id,
+      payload.token,
+      {
+        type: InteractionResponseTypes.ChannelMessageWithSource,
+        data: {
+          content: `**Server online**: ${
+            online ? "Yes ✅" : "No ❌"
+          }\n**Url**: \`${url}\` (password \`${config.valheim.password}\`)`,
+        },
+      },
+    );
+  } catch (err) {
+    console.error(`Error getting Valheim server details: ${err}`);
+    await wrapper.bot.helpers.sendInteractionResponse(
+      payload.id,
+      payload.token,
+      {
+        type: InteractionResponseTypes.ChannelMessageWithSource,
+        data: { content: "Something went wrong" },
       },
     );
   }
