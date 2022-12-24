@@ -313,7 +313,7 @@ export async function commandValheim(
       content = `Server is booting ⌚ - it should be on in a few minutes`;
     } else {
       content =
-        `Server is offline ❌\nUse <https://gameho.io/servers/${config.valheim.server}> to boot it`;
+        `Server is offline ❌\nUse <https://gameho.io/servers/${config.valheim.server}> with password \`${config.valheim.password}\` to boot it`;
     }
     await wrapper.bot.helpers.sendInteractionResponse(
       payload.id,
