@@ -303,7 +303,8 @@ export async function commandValheim(
 ): Promise<void> {
   try {
     const data = await getServerStatus(config);
-    const online = data["world/active"] as boolean;
+    // FIXME this field isn't whether or not the server is running
+    // const online = data["world/active"] as boolean;
     const url = data["instance/cloud-dns"] as string;
     await wrapper.bot.helpers.sendInteractionResponse(
       payload.id,
@@ -311,9 +312,8 @@ export async function commandValheim(
       {
         type: InteractionResponseTypes.ChannelMessageWithSource,
         data: {
-          content: `**Server online**: ${
-            online ? "Yes ✅" : "No ❌"
-          }\n**Url**: \`${url}\` (password \`${config.valheim.password}\`)`,
+          content: // `**Server online**: ${online ? "Yes ✅" : "No ❌"}` +
+            `\n**Url**: \`${url}\` (password \`${config.valheim.password}\`)`,
         },
       },
     );
