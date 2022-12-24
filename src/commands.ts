@@ -303,17 +303,25 @@ export async function commandValheim(
 ): Promise<void> {
   try {
     const data = await getServerStatus(config);
-    // FIXME this field isn't whether or not the server is running
-    // const online = data["world/active"] as boolean;
+    const state = data["instance/state"] as number;
     const url = data["instance/cloud-dns"] as string;
+    let content;
+    if (state === 10 || state === 13) {
+      content =
+        `Server is online ✅\n**Url**: \`${url}\`\n**Password**: \`${config.valheim.password}\``;
+    } else if (state === 0 || state === 5) {
+      content = `Server is booting ⌚ - it should be on in a few minutes`;
+    } else {
+      content =
+        `Server is offline ❌\nUse <https://gameho.io/servers/${config.valheim.server}> to boot it`;
+    }
     await wrapper.bot.helpers.sendInteractionResponse(
       payload.id,
       payload.token,
       {
         type: InteractionResponseTypes.ChannelMessageWithSource,
         data: {
-          content: // `**Server online**: ${online ? "Yes ✅" : "No ❌"}` +
-            `\n**Url**: \`${url}\` (password \`${config.valheim.password}\`)`,
+          content,
         },
       },
     );
