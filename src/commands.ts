@@ -166,6 +166,21 @@ async function senderIsAdmin(
   return isAdmin;
 }
 
+async function interactionResponse(
+  wrapper: BotWrapper,
+  payload: Interaction,
+  content: string,
+): Promise<void> {
+  return wrapper.bot.helpers.sendInteractionResponse(
+    payload.id,
+    payload.token,
+    {
+      type: InteractionResponseTypes.ChannelMessageWithSource,
+      data: { content },
+    },
+  );
+}
+
 export async function commandBreach(
   wrapper: BotWrapper,
   config: Config,
@@ -185,14 +200,7 @@ export async function commandBreach(
     BigInt(payload.data.options[0].value as string),
     config.containmentRoleId,
   );
-  await wrapper.bot.helpers.sendInteractionResponse(
-    payload.id,
-    payload.token,
-    {
-      type: InteractionResponseTypes.ChannelMessageWithSource,
-      data: { content: config.containmentResponseGif },
-    },
-  );
+  await interactionResponse(wrapper, payload, config.containmentResponseGif);
 }
 
 export async function commandUnBreach(
@@ -214,14 +222,7 @@ export async function commandUnBreach(
     BigInt(payload.data.options[0].value as string),
     config.containmentRoleId,
   );
-  await wrapper.bot.helpers.sendInteractionResponse(
-    payload.id,
-    payload.token,
-    {
-      type: InteractionResponseTypes.ChannelMessageWithSource,
-      data: { content: "👍" },
-    },
-  );
+  await interactionResponse(wrapper, payload, "👍");
 }
 
 export async function commandPin(
@@ -240,22 +241,12 @@ export async function commandPin(
       payload.channelId,
       BigInt(payload.data.options[0].value as string),
     );
-    await wrapper.bot.helpers.sendInteractionResponse(
-      payload.id,
-      payload.token,
-      {
-        type: InteractionResponseTypes.ChannelMessageWithSource,
-        data: { content: "👍" },
-      },
-    );
+    await interactionResponse(wrapper, payload, "👍");
   } catch {
-    await wrapper.bot.helpers.sendInteractionResponse(
-      payload.id,
-      payload.token,
-      {
-        type: InteractionResponseTypes.ChannelMessageWithSource,
-        data: { content: "Pin failed. Was that actually a message ID?" },
-      },
+    await interactionResponse(
+      wrapper,
+      payload,
+      "Pin failed. Was that actually a message ID?",
     );
   }
 }
@@ -276,22 +267,12 @@ export async function commandUnpin(
       payload.channelId,
       BigInt(payload.data.options[0].value as string),
     );
-    await wrapper.bot.helpers.sendInteractionResponse(
-      payload.id,
-      payload.token,
-      {
-        type: InteractionResponseTypes.ChannelMessageWithSource,
-        data: { content: "👍" },
-      },
-    );
+    await interactionResponse(wrapper, payload, "👍");
   } catch {
-    await wrapper.bot.helpers.sendInteractionResponse(
-      payload.id,
-      payload.token,
-      {
-        type: InteractionResponseTypes.ChannelMessageWithSource,
-        data: { content: "Unpin failed. Was that actually a message ID?" },
-      },
+    await interactionResponse(
+      wrapper,
+      payload,
+      "Unpin failed. Was that actually a message ID?",
     );
   }
 }
@@ -315,26 +296,10 @@ export async function commandValheim(
       content =
         `Server is offline ❌\nUse <https://gameho.io/servers/${config.valheim.server}> with password \`${config.valheim.password}\` to boot it`;
     }
-    await wrapper.bot.helpers.sendInteractionResponse(
-      payload.id,
-      payload.token,
-      {
-        type: InteractionResponseTypes.ChannelMessageWithSource,
-        data: {
-          content,
-        },
-      },
-    );
+    await interactionResponse(wrapper, payload, content);
   } catch (err) {
     console.error(`Error getting Valheim server details: ${err}`);
-    await wrapper.bot.helpers.sendInteractionResponse(
-      payload.id,
-      payload.token,
-      {
-        type: InteractionResponseTypes.ChannelMessageWithSource,
-        data: { content: "Something went wrong" },
-      },
-    );
+    await interactionResponse(wrapper, payload, "Something went wrong");
   }
 }
 
@@ -343,12 +308,5 @@ export async function commandHelp(
   _config: Config,
   payload: Interaction,
 ): Promise<void> {
-  await wrapper.bot.helpers.sendInteractionResponse(
-    payload.id,
-    payload.token,
-    {
-      type: InteractionResponseTypes.ChannelMessageWithSource,
-      data: { content: HELP_CONTEXT },
-    },
-  );
+  await interactionResponse(wrapper, payload, HELP_CONTEXT);
 }
