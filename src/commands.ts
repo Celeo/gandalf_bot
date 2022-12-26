@@ -14,7 +14,7 @@ import {
   examineServerStatus,
   getServerStatus,
   ServerStatus,
-startServer,
+  startServer,
 } from "./valheim.ts";
 
 const HELP_CONTEXT = `**Available commands**:
@@ -367,10 +367,18 @@ export async function buttonValheimStart(
   } else {
     try {
       await startServer(config);
-      await interactionResponse(wrapper, payload, "Got it, starting the server");
+      await interactionResponse(
+        wrapper,
+        payload,
+        "Got it, starting the server",
+      );
     } catch (err) {
-      console.error(`Error in starting Valheim server: ${err}`)
-      await interactionResponse(wrapper, payload, "Something went wrong when trying to start the server");
+      console.error(`Error in starting Valheim server: ${err}`);
+      await interactionResponse(
+        wrapper,
+        payload,
+        "Something went wrong when trying to start the server",
+      );
     }
   }
 }
