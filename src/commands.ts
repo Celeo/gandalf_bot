@@ -166,7 +166,7 @@ async function senderIsAdmin(
   return isAdmin;
 }
 
-async function interactionResponse(
+function interactionResponse(
   wrapper: BotWrapper,
   payload: Interaction,
   content: string,
