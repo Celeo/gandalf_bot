@@ -4,8 +4,18 @@ import {
   InteractionResponseTypes,
   InteractionTypes,
 } from "./deps.ts";
-import type { BotWrapper, Interaction } from "./deps.ts";
-import { getServerStatus } from "./valheim.ts";
+import {
+  BotWrapper,
+  ButtonStyles,
+  Interaction,
+  MessageComponentTypes,
+} from "./deps.ts";
+import {
+  examineServerStatus,
+  getServerStatus,
+  ServerStatus,
+startServer,
+} from "./valheim.ts";
 
 const HELP_CONTEXT = `**Available commands**:
 
@@ -99,36 +109,42 @@ export async function interactionCreate(
   config: Config,
   payload: Interaction,
 ): Promise<void> {
-  if (
-    payload.data === undefined ||
-    payload.type !== InteractionTypes.ApplicationCommand
-  ) {
+  if (payload.data === undefined) {
     return;
   }
-  switch (payload.data.name) {
-    case "pin": {
-      await commandPin(wrapper, config, payload);
-      break;
+  if (payload.type === InteractionTypes.ApplicationCommand) {
+    switch (payload.data.name) {
+      case "pin": {
+        await commandPin(wrapper, config, payload);
+        break;
+      }
+      case "unpin": {
+        await commandUnpin(wrapper, config, payload);
+        break;
+      }
+      case "breach": {
+        await commandBreach(wrapper, config, payload);
+        break;
+      }
+      case "unbreach": {
+        await commandUnBreach(wrapper, config, payload);
+        break;
+      }
+      case "valheim": {
+        await commandValheim(wrapper, config, payload);
+        break;
+      }
+      case "help": {
+        await commandHelp(wrapper, config, payload);
+        break;
+      }
     }
-    case "unpin": {
-      await commandUnpin(wrapper, config, payload);
-      break;
-    }
-    case "breach": {
-      await commandBreach(wrapper, config, payload);
-      break;
-    }
-    case "unbreach": {
-      await commandUnBreach(wrapper, config, payload);
-      break;
-    }
-    case "valheim": {
-      await commandValheim(wrapper, config, payload);
-      break;
-    }
-    case "help": {
-      await commandHelp(wrapper, config, payload);
-      break;
+  } else if (payload.type === InteractionTypes.MessageComponent) {
+    switch (payload.data.customId) {
+      case "valheim-start": {
+        await buttonValheimStart(wrapper, config, payload);
+        break;
+      }
     }
   }
 }
@@ -284,19 +300,45 @@ export async function commandValheim(
 ): Promise<void> {
   try {
     const data = await getServerStatus(config);
-    const state = data["instance/state"] as number;
+    const state = examineServerStatus(data["instance/state"] as number);
     const url = data["instance/cloud-dns"] as string;
-    let content;
-    if (state === 10 || state === 13) {
-      content =
-        `Server is online ✅\n**Url**: \`${url}\`\n**Password**: \`${config.valheim.password}\``;
-    } else if (state === 0 || state === 5) {
-      content = `Server is booting ⌚ - it should be on in a few minutes`;
+    if (state === ServerStatus.Online) {
+      await interactionResponse(
+        wrapper,
+        payload,
+        `Server is online ✅\n**Url**: \`${url}\`\n**Password**: \`${config.valheim.password}\``,
+      );
+    } else if (state === ServerStatus.Starting) {
+      await interactionResponse(
+        wrapper,
+        payload,
+        `Server is booting ⌚ - it should be on in a few minutes`,
+      );
     } else {
-      content =
-        `Server is offline ❌\nUse <https://gameho.io/servers/${config.valheim.server}> with password \`${config.valheim.password}\` to boot it`;
+      await wrapper.bot.helpers.sendInteractionResponse(
+        payload.id,
+        payload.token,
+        {
+          type: InteractionResponseTypes.ChannelMessageWithSource,
+          data: {
+            content: "Server is offline ❌",
+            components: [
+              {
+                type: MessageComponentTypes.ActionRow,
+                components: [
+                  {
+                    type: MessageComponentTypes.Button,
+                    label: "Start it up",
+                    customId: "valheim-start",
+                    style: ButtonStyles.Primary,
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      );
     }
-    await interactionResponse(wrapper, payload, content);
   } catch (err) {
     console.error(`Error getting Valheim server details: ${err}`);
     await interactionResponse(wrapper, payload, "Something went wrong");
@@ -309,4 +351,26 @@ export async function commandHelp(
   payload: Interaction,
 ): Promise<void> {
   await interactionResponse(wrapper, payload, HELP_CONTEXT);
+}
+
+export async function buttonValheimStart(
+  wrapper: BotWrapper,
+  config: Config,
+  payload: Interaction,
+): Promise<void> {
+  const data = await getServerStatus(config);
+  const state = examineServerStatus(data["instance/state"] as number);
+  if (state === ServerStatus.Online) {
+    await interactionResponse(wrapper, payload, "Server is already online");
+  } else if (state === ServerStatus.Starting) {
+    await interactionResponse(wrapper, payload, "Server is already starting");
+  } else {
+    try {
+      await startServer(config);
+      await interactionResponse(wrapper, payload, "Got it, starting the server");
+    } catch (err) {
+      console.error(`Error in starting Valheim server: ${err}`)
+      await interactionResponse(wrapper, payload, "Something went wrong when trying to start the server");
+    }
+  }
 }
