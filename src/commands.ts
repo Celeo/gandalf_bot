@@ -16,6 +16,7 @@ import {
   ServerStatus,
   startServer,
 } from "./valheim.ts";
+import { logger } from "./deps.ts";
 
 const HELP_CONTEXT = `**Available commands**:
 
@@ -340,7 +341,7 @@ export async function commandValheim(
       );
     }
   } catch (err) {
-    console.error(`Error getting Valheim server details: ${err}`);
+    logger.error(`Error getting Valheim server details: ${err}`);
     await interactionResponse(wrapper, payload, "Something went wrong");
   }
 }
@@ -373,7 +374,7 @@ export async function buttonValheimStart(
         "Got it, starting the server",
       );
     } catch (err) {
-      console.error(`Error in starting Valheim server: ${err}`);
+      logger.error(`Error in starting Valheim server: ${err}`);
       await interactionResponse(
         wrapper,
         payload,
@@ -391,6 +392,7 @@ async function checkServerStartup(
   config: Config,
   payload: Interaction,
 ): Promise<void> {
+  logger.debug("Callback tick for Valhim server startup");
   const data = await getServerStatus(config);
   const state = examineServerStatus(data["instance/state"] as number);
   if (state === ServerStatus.Online) {
