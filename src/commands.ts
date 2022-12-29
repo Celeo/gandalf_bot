@@ -392,7 +392,7 @@ async function checkServerStartup(
   config: Config,
   payload: Interaction,
 ): Promise<void> {
-  logger.debug("Callback tick for Valhim server startup");
+  logger.debug("Callback tick for Valheim server startup");
   try {
     const data = await getServerStatus(config);
     const state = examineServerStatus(data["instance/state"] as number);
