@@ -379,6 +379,29 @@ export async function buttonValheimStart(
         payload,
         "Something went wrong when trying to start the server",
       );
+      setTimeout(() => {
+        checkServerStartup(wrapper, config, payload);
+      }, 1000 * 2); // 2 minutes
     }
+  }
+}
+
+async function checkServerStartup(
+  wrapper: BotWrapper,
+  config: Config,
+  payload: Interaction,
+): Promise<void> {
+  const data = await getServerStatus(config);
+  const state = examineServerStatus(data["instance/state"] as number);
+  if (state === ServerStatus.Online) {
+    await interactionResponse(
+      wrapper,
+      payload,
+      `Server is now online, password is ${config.valheim.password}`,
+    );
+  } else {
+    setTimeout(() => {
+      checkServerStartup(wrapper, config, payload);
+    }, 30_000); // 30 seconds
   }
 }
