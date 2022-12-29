@@ -393,17 +393,21 @@ async function checkServerStartup(
   payload: Interaction,
 ): Promise<void> {
   logger.debug("Callback tick for Valhim server startup");
-  const data = await getServerStatus(config);
-  const state = examineServerStatus(data["instance/state"] as number);
-  if (state === ServerStatus.Online) {
-    await interactionResponse(
-      wrapper,
-      payload,
-      `Server is now online, password is ${config.valheim.password}`,
-    );
-  } else {
-    setTimeout(() => {
-      checkServerStartup(wrapper, config, payload);
-    }, 30_000); // 30 seconds
+  try {
+    const data = await getServerStatus(config);
+    const state = examineServerStatus(data["instance/state"] as number);
+    if (state === ServerStatus.Online) {
+      await interactionResponse(
+        wrapper,
+        payload,
+        `Server is now online, password is ${config.valheim.password}`,
+      );
+    } else {
+      setTimeout(() => {
+        checkServerStartup(wrapper, config, payload);
+      }, 30_000); // 30 seconds
+    }
+  } catch (err) {
+    logger.error(`Error in Valheim server startup callback: ${err}`);
   }
 }
