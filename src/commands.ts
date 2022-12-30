@@ -373,6 +373,9 @@ export async function buttonValheimStart(
         payload,
         "Got it, starting the server",
       );
+      setTimeout(() => {
+        checkServerStartup(wrapper, config, payload);
+      }, 1000 * 60 * 2); // 2 minutes
     } catch (err) {
       logger.error(`Error in starting Valheim server: ${err}`);
       await interactionResponse(
@@ -380,9 +383,6 @@ export async function buttonValheimStart(
         payload,
         "Something went wrong when trying to start the server",
       );
-      setTimeout(() => {
-        checkServerStartup(wrapper, config, payload);
-      }, 1000 * 60 * 2); // 2 minutes
     }
   }
 }
