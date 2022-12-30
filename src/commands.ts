@@ -382,7 +382,7 @@ export async function buttonValheimStart(
       );
       setTimeout(() => {
         checkServerStartup(wrapper, config, payload);
-      }, 1000 * 2); // 2 minutes
+      }, 1000 * 60 * 2); // 2 minutes
     }
   }
 }
