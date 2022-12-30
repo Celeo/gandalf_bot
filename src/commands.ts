@@ -371,11 +371,8 @@ export async function buttonValheimStart(
       await interactionResponse(
         wrapper,
         payload,
-        "Got it, starting the server",
+        `Got it, starting the server. ETA 3 minutes, password is ${config.valheim.password}`,
       );
-      setTimeout(() => {
-        checkServerStartup(wrapper, config, payload);
-      }, 1000 * 60 * 2); // 2 minutes
     } catch (err) {
       logger.error(`Error in starting Valheim server: ${err}`);
       await interactionResponse(
@@ -384,30 +381,5 @@ export async function buttonValheimStart(
         "Something went wrong when trying to start the server",
       );
     }
-  }
-}
-
-async function checkServerStartup(
-  wrapper: BotWrapper,
-  config: Config,
-  payload: Interaction,
-): Promise<void> {
-  logger.debug("Callback tick for Valheim server startup");
-  try {
-    const data = await getServerStatus(config);
-    const state = examineServerStatus(data["instance/state"] as number);
-    if (state === ServerStatus.Online) {
-      await interactionResponse(
-        wrapper,
-        payload,
-        `Server is now online, password is ${config.valheim.password}`,
-      );
-    } else {
-      setTimeout(() => {
-        checkServerStartup(wrapper, config, payload);
-      }, 15_000); // 15 seconds
-    }
-  } catch (err) {
-    logger.error(`Error in Valheim server startup callback: ${err}`);
   }
 }
