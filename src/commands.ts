@@ -405,7 +405,7 @@ async function checkServerStartup(
     } else {
       setTimeout(() => {
         checkServerStartup(wrapper, config, payload);
-      }, 30_000); // 30 seconds
+      }, 15_000); // 15 seconds
     }
   } catch (err) {
     logger.error(`Error in Valheim server startup callback: ${err}`);
