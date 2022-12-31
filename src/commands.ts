@@ -11,10 +11,12 @@ import {
   MessageComponentTypes,
 } from "./deps.ts";
 import {
+  backupServer,
   examineServerStatus,
   getServerStatus,
   ServerStatus,
   startServer,
+  stopServer,
 } from "./valheim.ts";
 import { logger } from "./deps.ts";
 
@@ -144,6 +146,20 @@ export async function interactionCreate(
     switch (payload.data.customId) {
       case "valheim-start": {
         await buttonValheimStart(wrapper, config, payload);
+        break;
+      }
+      case "valheim-stop": {
+        await buttonValheimStop(wrapper, config, payload);
+        break;
+      }
+      case "valheim-backup": {
+        await buttonValheimBackup(wrapper, config, payload);
+        break;
+      }
+      case "valheim-dismiss": {
+        if (payload.channelId && payload.message?.id) {
+          await wrapper.deleteMessage(payload.channelId, payload.message.id);
+        }
         break;
       }
     }
@@ -302,44 +318,61 @@ export async function commandValheim(
   try {
     const data = await getServerStatus(config);
     const state = examineServerStatus(data["instance/state"] as number);
-    const url = data["instance/cloud-dns"] as string;
+    let content;
     if (state === ServerStatus.Online) {
-      await interactionResponse(
-        wrapper,
-        payload,
-        `Server is online ✅\n**Url**: \`${url}\`\n**Password**: \`${config.valheim.password}\``,
-      );
+      content =
+        `Server is online ✅\n**Password**: \`${config.valheim.password}\``;
     } else if (state === ServerStatus.Starting) {
-      await interactionResponse(
-        wrapper,
-        payload,
-        `Server is booting ⌚ - it should be on in a few minutes`,
-      );
+      content =
+        `Server is booting ⌚ - ETA 3 minutes max\n**Password**: \`${config.valheim.password}\``;
     } else {
-      await wrapper.bot.helpers.sendInteractionResponse(
-        payload.id,
-        payload.token,
-        {
-          type: InteractionResponseTypes.ChannelMessageWithSource,
-          data: {
-            content: "Server is offline ❌",
-            components: [
-              {
-                type: MessageComponentTypes.ActionRow,
-                components: [
-                  {
-                    type: MessageComponentTypes.Button,
-                    label: "Start it up",
-                    customId: "valheim-start",
-                    style: ButtonStyles.Primary,
-                  },
-                ],
-              },
-            ],
-          },
-        },
-      );
+      content = "Server is offline ❌";
     }
+    await wrapper.bot.helpers.sendInteractionResponse(
+      payload.id,
+      payload.token,
+      {
+        type: InteractionResponseTypes.ChannelMessageWithSource,
+        data: {
+          content,
+          components: [
+            {
+              type: MessageComponentTypes.ActionRow,
+              components: [
+                {
+                  type: MessageComponentTypes.Button,
+                  label: "Start",
+                  customId: "valheim-start",
+                  style: ButtonStyles.Success,
+                  disabled: state === ServerStatus.Online ||
+                    state === ServerStatus.Starting,
+                },
+                {
+                  type: MessageComponentTypes.Button,
+                  label: "Stop",
+                  customId: "valheim-stop",
+                  style: ButtonStyles.Danger,
+                  disabled: state === ServerStatus.Offline ||
+                    state === ServerStatus.Starting,
+                },
+                {
+                  type: MessageComponentTypes.Button,
+                  label: "Backup",
+                  customId: "valheim-backup",
+                  style: ButtonStyles.Primary,
+                },
+                {
+                  type: MessageComponentTypes.Button,
+                  label: "Dismiss",
+                  customId: "valheim-dismiss",
+                  style: ButtonStyles.Secondary,
+                },
+              ],
+            },
+          ],
+        },
+      },
+    );
   } catch (err) {
     logger.error(`Error getting Valheim server details: ${err}`);
     await interactionResponse(wrapper, payload, "Something went wrong");
@@ -371,7 +404,7 @@ export async function buttonValheimStart(
       await interactionResponse(
         wrapper,
         payload,
-        `Got it, starting the server. ETA 3 minutes, password is ${config.valheim.password}`,
+        `Got it, starting the server. ETA 3 minutes, password is \`${config.valheim.password}\``,
       );
     } catch (err) {
       logger.error(`Error in starting Valheim server: ${err}`);
@@ -381,5 +414,57 @@ export async function buttonValheimStart(
         "Something went wrong when trying to start the server",
       );
     }
+  }
+}
+
+export async function buttonValheimStop(
+  wrapper: BotWrapper,
+  config: Config,
+  payload: Interaction,
+): Promise<void> {
+  const data = await getServerStatus(config);
+  const state = examineServerStatus(data["instance/state"] as number);
+  if (state === ServerStatus.Online) {
+    try {
+      await stopServer(config);
+      await interactionResponse(
+        wrapper,
+        payload,
+        "Got it, stopping the server.",
+      );
+    } catch (err) {
+      logger.error(`Error in stopping Valheim server: ${err}`);
+      await interactionResponse(
+        wrapper,
+        payload,
+        "Something went wrong when trying to stop the server",
+      );
+    }
+  } else if (state === ServerStatus.Starting) {
+    await interactionResponse(
+      wrapper,
+      payload,
+      "Server is starting, please wait",
+    );
+  } else {
+    await interactionResponse(wrapper, payload, "Server is already offline");
+  }
+}
+
+export async function buttonValheimBackup(
+  wrapper: BotWrapper,
+  config: Config,
+  payload: Interaction,
+): Promise<void> {
+  try {
+    await backupServer(config);
+    await interactionResponse(wrapper, payload, "Server backup created");
+  } catch (err) {
+    logger.error(`Error in backing up Valheim server: ${err}`);
+    await interactionResponse(
+      wrapper,
+      payload,
+      "Something went wrong when trying to backup the server",
+    );
   }
 }

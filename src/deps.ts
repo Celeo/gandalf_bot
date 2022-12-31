@@ -29,6 +29,7 @@ export type {
 import {
   addReaction,
   addRole,
+  deleteMessage,
   editMessage,
   getDmChannel,
   getMember,
@@ -139,6 +140,10 @@ export class BotWrapper {
     options: EditMessage,
   ) {
     return await editMessage(this.bot, channelId, messageId, options);
+  }
+
+  async deleteMessage(channelId: bigint, messageId: bigint) {
+    return await deleteMessage(this.bot, channelId, messageId);
   }
 }
 

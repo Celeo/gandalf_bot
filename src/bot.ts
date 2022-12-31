@@ -46,6 +46,7 @@ async function messageHandler(
   message: Message,
 ): Promise<void> {
   if (message.isFromBot) {
+    messageFromBotHandler(wrapper, message);
     return;
   }
   for (const [handler, name] of HANDLERS) {
@@ -54,6 +55,22 @@ async function messageHandler(
     } catch (e) {
       logger.error(`Error when processing message handler "${name}: ${e}`);
     }
+  }
+}
+
+function messageFromBotHandler(
+  wrapper: BotWrapper,
+  message: Message,
+): void {
+  if (
+    message.applicationId === wrapper.bot.applicationId &&
+    message.interaction &&
+    message.interaction.name === "valheim"
+  ) {
+    setTimeout(() => {
+      logger.debug("Deleting interaction message");
+      wrapper.deleteMessage(message.channelId, message.id);
+    }, 1000 * 60 * 3); // 3 minutes
   }
 }
 
