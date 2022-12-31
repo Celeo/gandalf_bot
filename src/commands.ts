@@ -184,16 +184,10 @@ async function senderIsAdmin(
     ["ADMINISTRATOR"],
   );
   if (!isAdmin) {
-    await wrapper.bot.helpers.sendInteractionResponse(
-      payload.id,
-      payload.token,
-      {
-        type: InteractionResponseTypes.ChannelMessageWithSource,
-        data: {
-          content:
-            "https://tenor.com/view/no-nooo-nope-eat-fingerwag-gif-14832139",
-        },
-      },
+    await interactionResponse(
+      wrapper,
+      payload,
+      "https://tenor.com/view/no-nooo-nope-eat-fingerwag-gif-14832139",
     );
   }
   return isAdmin;
@@ -426,11 +420,17 @@ export async function buttonValheimStop(
   const state = examineServerStatus(data["instance/state"] as number);
   if (state === ServerStatus.Online) {
     try {
-      await stopServer(config);
+      // TODO implement
+      // await stopServer(config);
+      // await interactionResponse(
+      //   wrapper,
+      //   payload,
+      //   "Got it, stopping the server.",
+      // );
       await interactionResponse(
         wrapper,
         payload,
-        "Got it, stopping the server.",
+        "Feature not yet implemented",
       );
     } catch (err) {
       logger.error(`Error in stopping Valheim server: ${err}`);
@@ -456,15 +456,13 @@ export async function buttonValheimBackup(
   config: Config,
   payload: Interaction,
 ): Promise<void> {
+  await interactionResponse(wrapper, payload, "Got it, will make a backup.");
+  if (payload.channelId && payload?.message?.id) {
+    await wrapper.deleteMessage(payload.channelId, payload.message.id);
+  }
   try {
     await backupServer(config);
-    await interactionResponse(wrapper, payload, "Server backup created");
   } catch (err) {
     logger.error(`Error in backing up Valheim server: ${err}`);
-    await interactionResponse(
-      wrapper,
-      payload,
-      "Something went wrong when trying to backup the server",
-    );
   }
 }

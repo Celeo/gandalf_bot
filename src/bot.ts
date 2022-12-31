@@ -68,8 +68,12 @@ function messageFromBotHandler(
     message.interaction.name === "valheim"
   ) {
     setTimeout(() => {
-      logger.debug("Deleting interaction message");
-      wrapper.deleteMessage(message.channelId, message.id);
+      try {
+        logger.debug("Deleting interaction message");
+        wrapper.deleteMessage(message.channelId, message.id);
+      } catch (_err) {
+        // no-op
+      }
     }, 1000 * 60 * 3); // 3 minutes
   }
 }

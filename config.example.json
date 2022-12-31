@@ -13,6 +13,7 @@
   "minecraftServer": "",
   "valheim": {
     "server": "",
-    "password": ""
+    "password": "",
+    "authToken": ""
   }
 }

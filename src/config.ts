@@ -35,6 +35,7 @@ export interface Config {
   valheim: {
     server: number;
     password: string;
+    authToken: string;
   };
 }
 

@@ -19,7 +19,8 @@ Deno.test("config - loadConfig - works", async () => {
       "minecraftServer": "ghi",
       "valheim": {
         "host": 8,
-        "password": "jkl"
+        "password": "jkl",
+        "authToken": "mno"
       }
     }`,
   );
@@ -41,6 +42,7 @@ Deno.test("config - loadConfig - works", async () => {
     valheim: {
       host: 8,
       password: "jkl",
+      authToken: "mno",
     },
   });
   await Deno.remove(`./${filename}`);

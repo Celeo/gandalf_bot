@@ -25,6 +25,7 @@ export type {
 export type {
   BotWithCache,
 } from "https://deno.land/x/discordeno@17.0.1/plugins/mod.ts";
+export { ensureDir } from "https://deno.land/std@0.170.0/fs/mod.ts";
 
 import {
   addReaction,
