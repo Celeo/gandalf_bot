@@ -163,6 +163,17 @@ export async function interactionCreate(
         break;
       }
     }
+    try {
+      if (
+        payload.data.customId !== "valheim-dismiss" &&
+        payload.channelId &&
+        payload.message?.id
+      ) {
+        await wrapper.deleteMessage(payload.channelId, payload.message.id);
+      }
+    } catch (err) {
+      logger.debug(`Could not delete interaction message: ${err}`);
+    }
   }
 }
 
@@ -388,6 +399,9 @@ export async function buttonValheimStart(
 ): Promise<void> {
   const data = await getServerStatus(config);
   const state = examineServerStatus(data["instance/state"] as number);
+  logger.debug(
+    `Start button clicked; current server status is ${ServerStatus[state]}`,
+  );
   if (state === ServerStatus.Online) {
     await interactionResponse(wrapper, payload, "Server is already online");
   } else if (state === ServerStatus.Starting) {
@@ -420,13 +434,12 @@ export async function buttonValheimStop(
   const state = examineServerStatus(data["instance/state"] as number);
   if (state === ServerStatus.Online) {
     try {
-      // TODO implement
-      // await stopServer(config);
-      // await interactionResponse(
-      //   wrapper,
-      //   payload,
-      //   "Got it, stopping the server.",
-      // );
+      await stopServer(config);
+      await interactionResponse(
+        wrapper,
+        payload,
+        "Got it, stopping the server.",
+      );
       await interactionResponse(
         wrapper,
         payload,
@@ -457,9 +470,6 @@ export async function buttonValheimBackup(
   payload: Interaction,
 ): Promise<void> {
   await interactionResponse(wrapper, payload, "Got it, will make a backup.");
-  if (payload.channelId && payload?.message?.id) {
-    await wrapper.deleteMessage(payload.channelId, payload.message.id);
-  }
   try {
     await backupServer(config);
   } catch (err) {

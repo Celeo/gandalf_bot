@@ -18,6 +18,7 @@ export enum ServerStatus {
 export async function getServerStatus(
   config: Config,
 ): Promise<Record<string, unknown>> {
+  logger.debug("Getting Valheim server status");
   const response = await fetch(
     `https://api.ggod.io/api/worlds/${config.valheim.server}`,
     {
@@ -53,6 +54,7 @@ export function examineServerStatus(state: number): ServerStatus {
  * be done beforehand, and be aware of race conditions.
  */
 export async function startServer(config: Config): Promise<void> {
+  logger.debug("Starting Valheim server");
   const response = await fetch(
     `https://api.ggod.io/api/worlds/${config.valheim.server}/_start`,
     {
@@ -75,7 +77,20 @@ export async function startServer(config: Config): Promise<void> {
  * be done beforehand, and be aware of race conditions.
  */
 export async function stopServer(config: Config): Promise<void> {
-  // TODO
+  logger.debug("Stopping Valheim server");
+  const response = await fetch(
+    `https://api.ggod.io/api/worlds/${config.valheim.server}/_stop`,
+    {
+      method: "POST",
+      headers: {
+        "authorization":
+          `Auth-ggod token=undefined password=${config.valheim.password}`,
+      },
+    },
+  );
+  if (response.status !== 200) {
+    throw Error(`Server start - got status ${response.status}`);
+  }
 }
 
 /**
