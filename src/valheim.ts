@@ -1,3 +1,11 @@
+/*
+ * TODO
+ *
+ * Hosting site changed the API format of the status response (and maybe other things).
+ *
+ * Need to test and update the functions in this file.
+ */
+
 import { Config } from "./config.ts";
 import { ensureDir, logger } from "./deps.ts";
 
