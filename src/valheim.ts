@@ -1,31 +1,56 @@
-/*
- * TODO
- *
- * Hosting site changed the API format of the status response (and maybe other things).
- *
- * Need to test and update the functions in this file.
- */
-
 import { Config } from "./config.ts";
 import { ensureDir, logger } from "./deps.ts";
 
 const VALHEIM_BACKUP_DIR = "valheim_backups";
 
-/**
- * Server status as a more usable enum.
- */
-export enum ServerStatus {
-  Offline,
-  Online,
-  Starting,
+export enum InstanceStatus {
+  Online = "active",
+  OnlineEmpty = "empty",
+  Saving = "saving",
+  Offline = "shutdown",
+  ServerStarting = "init",
+  GameStarting = "booted",
+  GameStarted = "started",
 }
+
+/**
+ * Data returned for a server.
+ */
+export type ServiceInfo = {
+  "instance/init-date": string;
+  "instance/cloud-dns": string;
+  "world/active": boolean;
+  "world/id": number;
+  "instance/started-date": string;
+  "user/balance": number;
+  "user/id": number;
+  "world/price": number;
+  "world/created-date": string;
+  "instance/modified-date": string;
+  "world/game-config": {
+    "serverpassword": string;
+    "filebrowser": boolean;
+    "servername": string;
+    "gameworld": string;
+    "crossplay": false;
+  };
+  "world/game-type": string;
+  "world/server-password": null;
+  "instance/cloud-ip4": string;
+  "instance/status": InstanceStatus;
+  "world/filespace-id": number;
+  "instance/alive-date": string;
+  "world/region": string;
+  "instance/id": number;
+  "world/name": string;
+};
 
 /**
  * Get the status of the configured Valheim server.
  */
-export async function getServerStatus(
+export async function getInstanceStatus(
   config: Config,
-): Promise<Record<string, unknown>> {
+): Promise<ServiceInfo> {
   logger.debug("Getting Valheim server status");
   const response = await fetch(
     `https://api.ggod.io/api/worlds/${config.valheim.server}`,
@@ -40,19 +65,6 @@ export async function getServerStatus(
     throw Error(`Server info - got status ${response.status}`);
   }
   return response.json();
-}
-
-/**
- * Transform the server state from the site to a more usable enum.
- */
-export function examineServerStatus(state: number): ServerStatus {
-  if (state === 10 || state === 13) {
-    return ServerStatus.Online;
-  }
-  if (state === 0 || state === 5) {
-    return ServerStatus.Starting;
-  }
-  return ServerStatus.Offline;
 }
 
 /**
@@ -112,7 +124,7 @@ export async function backupServer(config: Config): Promise<void> {
 
   /* get the server data */
 
-  const status = await getServerStatus(config);
+  const status = await getInstanceStatus(config);
   const serverName = status["world/name"] as string;
   const fileSpaceId = status["world/filespace-id"] as number;
 
@@ -135,7 +147,7 @@ export async function backupServer(config: Config): Promise<void> {
   if (fileDbResponse.status !== 200) {
     throw Error(`DB file info - got status ${fileDbResponse.status}`);
   }
-  const dbFileUrl = ((await fileDbResponse.json())["url"] as string);
+  const dbFileUrl = (await fileDbResponse.json())["url"] as string;
 
   const fileDbDataResponse = await fetch(dbFileUrl);
   if (fileDbDataResponse.status !== 200) {
@@ -166,7 +178,7 @@ export async function backupServer(config: Config): Promise<void> {
   if (fileFwlResponse.status !== 200) {
     throw Error(`FWL file info - got status ${fileFwlResponse.status}`);
   }
-  const fwlFileUrl = ((await fileFwlResponse.json())["url"] as string);
+  const fwlFileUrl = (await fileFwlResponse.json())["url"] as string;
 
   const fileFwlDataResponse = await fetch(fwlFileUrl);
   if (fileFwlDataResponse.status !== 200) {

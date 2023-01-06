@@ -12,9 +12,8 @@ import {
 } from "./deps.ts";
 import {
   backupServer,
-  examineServerStatus,
-  getServerStatus,
-  ServerStatus,
+  getInstanceStatus,
+  InstanceStatus,
   startServer,
   stopServer,
 } from "./valheim.ts";
@@ -331,17 +330,28 @@ export async function commandValheim(
   payload: Interaction,
 ): Promise<void> {
   try {
-    const data = await getServerStatus(config);
-    const state = examineServerStatus(data["instance/state"] as number);
+    const instanceInfo = await getInstanceStatus(config);
+    const status = instanceInfo["instance/status"];
     let content;
-    if (state === ServerStatus.Online) {
-      content =
-        `Server is online ✅\n**Password**: \`${config.valheim.password}\``;
-    } else if (state === ServerStatus.Starting) {
-      content =
-        `Server is booting ⌚ - ETA 3 minutes max\n**Password**: \`${config.valheim.password}\``;
-    } else {
-      content = "Server is offline ❌";
+    switch (status) {
+      case InstanceStatus.Online:
+      case InstanceStatus.OnlineEmpty: {
+        content =
+          `Server is online ✅\n**Password**: \`${config.valheim.password}\``;
+        break;
+      }
+      case InstanceStatus.ServerStarting:
+      case InstanceStatus.GameStarting:
+      case InstanceStatus.GameStarted: {
+        content =
+          `Server is booting ⌚ - ETA 3 minutes max\n**Password**: \`${config.valheim.password}\``;
+        break;
+      }
+      case InstanceStatus.Saving:
+      case InstanceStatus.Offline: {
+        content = "Server is offline ❌";
+        break;
+      }
     }
     await wrapper.bot.helpers.sendInteractionResponse(
       payload.id,
@@ -359,16 +369,16 @@ export async function commandValheim(
                   label: "Start",
                   customId: "valheim-start",
                   style: ButtonStyles.Success,
-                  disabled: state === ServerStatus.Online ||
-                    state === ServerStatus.Starting,
+                  disabled: status === InstanceStatus.Online ||
+                    status === InstanceStatus.OnlineEmpty,
                 },
                 {
                   type: MessageComponentTypes.Button,
                   label: "Stop",
                   customId: "valheim-stop",
                   style: ButtonStyles.Danger,
-                  disabled: state === ServerStatus.Offline ||
-                    state === ServerStatus.Starting,
+                  disabled: status === InstanceStatus.Offline ||
+                    status === InstanceStatus.Saving,
                 },
                 {
                   type: MessageComponentTypes.Button,
@@ -407,14 +417,20 @@ export async function buttonValheimStart(
   config: Config,
   payload: Interaction,
 ): Promise<void> {
-  const data = await getServerStatus(config);
-  const state = examineServerStatus(data["instance/state"] as number);
+  const instanceInfo = await getInstanceStatus(config);
+  const status = instanceInfo["instance/status"];
   logger.debug(
-    `Start button clicked; current server status is ${ServerStatus[state]}`,
+    `Start button clicked; current server status is: ${status}`,
   );
-  if (state === ServerStatus.Online) {
+  if ([InstanceStatus.Online, InstanceStatus.OnlineEmpty].includes(status)) {
     await interactionResponse(wrapper, payload, VALHEIM_ALREADY_ONLINE);
-  } else if (state === ServerStatus.Starting) {
+  } else if (
+    [
+      InstanceStatus.ServerStarting,
+      InstanceStatus.GameStarting,
+      InstanceStatus.GameStarted,
+    ].includes(status)
+  ) {
     await interactionResponse(wrapper, payload, VALHEIM_ALREADY_STARTING);
   } else {
     try {
@@ -440,9 +456,9 @@ export async function buttonValheimStop(
   config: Config,
   payload: Interaction,
 ): Promise<void> {
-  const data = await getServerStatus(config);
-  const state = examineServerStatus(data["instance/state"] as number);
-  if (state === ServerStatus.Online) {
+  const instanceInfo = await getInstanceStatus(config);
+  const status = instanceInfo["instance/status"];
+  if ([InstanceStatus.Online, InstanceStatus.OnlineEmpty].includes(status)) {
     try {
       await stopServer(config);
       await interactionResponse(
@@ -458,7 +474,13 @@ export async function buttonValheimStop(
         "Something went wrong when trying to stop the server",
       );
     }
-  } else if (state === ServerStatus.Starting) {
+  } else if (
+    [
+      InstanceStatus.ServerStarting,
+      InstanceStatus.GameStarting,
+      InstanceStatus.GameStarted,
+    ].includes(status)
+  ) {
     await interactionResponse(
       wrapper,
       payload,
