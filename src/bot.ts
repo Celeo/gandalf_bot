@@ -62,6 +62,8 @@ function messageFromBotHandler(
   wrapper: BotWrapper,
   message: Message,
 ): void {
+  // After some time, delete Valheim interaction messages from
+  // the channel to avoid filling channels with bot spam.
   if (
     message.applicationId === wrapper.bot.applicationId &&
     message.interaction &&

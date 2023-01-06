@@ -19,6 +19,13 @@ import {
   stopServer,
 } from "./valheim.ts";
 import { logger } from "./deps.ts";
+import {
+  VALHEIM_ALREADY_ONLINE,
+  VALHEIM_ALREADY_STARTING,
+  VALHEIM_BACKUP,
+  VALHEIM_CANNOT_STOP,
+  VALHEIM_STOPPING,
+} from "./static.ts";
 
 const HELP_CONTEXT = `**Available commands**:
 
@@ -144,6 +151,8 @@ export async function interactionCreate(
     }
   } else if (payload.type === InteractionTypes.MessageComponent) {
     switch (payload.data.customId) {
+      /* buttons on Valheim message */
+
       case "valheim-start": {
         await buttonValheimStart(wrapper, config, payload);
         break;
@@ -164,6 +173,7 @@ export async function interactionCreate(
       }
     }
     try {
+      // delete the buttons message after interacting with it
       if (
         payload.data.customId !== "valheim-dismiss" &&
         payload.channelId &&
@@ -403,9 +413,9 @@ export async function buttonValheimStart(
     `Start button clicked; current server status is ${ServerStatus[state]}`,
   );
   if (state === ServerStatus.Online) {
-    await interactionResponse(wrapper, payload, "Server is already online");
+    await interactionResponse(wrapper, payload, VALHEIM_ALREADY_ONLINE);
   } else if (state === ServerStatus.Starting) {
-    await interactionResponse(wrapper, payload, "Server is already starting");
+    await interactionResponse(wrapper, payload, VALHEIM_ALREADY_STARTING);
   } else {
     try {
       await startServer(config);
@@ -438,12 +448,7 @@ export async function buttonValheimStop(
       await interactionResponse(
         wrapper,
         payload,
-        "Got it, stopping the server.",
-      );
-      await interactionResponse(
-        wrapper,
-        payload,
-        "Feature not yet implemented",
+        VALHEIM_STOPPING,
       );
     } catch (err) {
       logger.error(`Error in stopping Valheim server: ${err}`);
@@ -457,7 +462,7 @@ export async function buttonValheimStop(
     await interactionResponse(
       wrapper,
       payload,
-      "Server is starting, please wait",
+      VALHEIM_CANNOT_STOP,
     );
   } else {
     await interactionResponse(wrapper, payload, "Server is already offline");
@@ -469,7 +474,7 @@ export async function buttonValheimBackup(
   config: Config,
   payload: Interaction,
 ): Promise<void> {
-  await interactionResponse(wrapper, payload, "Got it, will make a backup.");
+  await interactionResponse(wrapper, payload, VALHEIM_BACKUP);
   try {
     await backupServer(config);
   } catch (err) {
