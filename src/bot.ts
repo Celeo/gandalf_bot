@@ -58,24 +58,22 @@ async function messageHandler(
   }
 }
 
+/**
+ * After some time, delete Valheim interaction messages from
+ * the channel to avoid filling channels with as much bot spam.
+ */
 function messageFromBotHandler(
   wrapper: BotWrapper,
   message: Message,
 ): void {
-  // After some time, delete Valheim interaction messages from
-  // the channel to avoid filling channels with bot spam.
   if (
     message.applicationId === wrapper.bot.applicationId &&
-    message.interaction &&
-    message.interaction.name === "valheim"
+    message.interaction?.name === "valheim"
   ) {
     setTimeout(() => {
-      try {
-        logger.debug("Deleting interaction message");
-        wrapper.deleteMessage(message.channelId, message.id);
-      } catch (_err) {
-        // no-op
-      }
+      logger.debug("Deleting interaction message");
+      wrapper.deleteMessage(message.channelId, message.id)
+        .catch(() => {/* no-op */});
     }, 1000 * 60 * 3); // 3 minutes
   }
 }
