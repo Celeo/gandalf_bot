@@ -16,7 +16,7 @@ Deno.test("config - loadConfig - works", async () => {
       "birthdays": [],
       "minecraftChannel": "7",
       "minecraftMessage": null,
-      "minecraftServer": "ghi",
+      "minecraftServer": "ghi"
     }`,
   );
   await Deno.writeFile(`./${filename}`, data);
