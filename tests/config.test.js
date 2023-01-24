@@ -17,11 +17,6 @@ Deno.test("config - loadConfig - works", async () => {
       "minecraftChannel": "7",
       "minecraftMessage": null,
       "minecraftServer": "ghi",
-      "valheim": {
-        "host": 8,
-        "password": "jkl",
-        "authToken": "mno"
-      }
     }`,
   );
   await Deno.writeFile(`./${filename}`, data);
@@ -39,11 +34,6 @@ Deno.test("config - loadConfig - works", async () => {
     minecraftChannel: 7n,
     minecraftMessage: null,
     minecraftServer: "ghi",
-    valheim: {
-      host: 8,
-      password: "jkl",
-      authToken: "mno",
-    },
   });
   await Deno.remove(`./${filename}`);
 });

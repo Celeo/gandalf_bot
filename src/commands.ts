@@ -4,27 +4,7 @@ import {
   InteractionResponseTypes,
   InteractionTypes,
 } from "./deps.ts";
-import {
-  BotWrapper,
-  ButtonStyles,
-  Interaction,
-  MessageComponentTypes,
-} from "./deps.ts";
-import {
-  backupServer,
-  getInstanceStatus,
-  InstanceStatus,
-  startServer,
-  stopServer,
-} from "./valheim.ts";
-import { logger } from "./deps.ts";
-import {
-  VALHEIM_ALREADY_ONLINE,
-  VALHEIM_ALREADY_STARTING,
-  VALHEIM_BACKUP,
-  VALHEIM_CANNOT_STOP,
-  VALHEIM_STOPPING,
-} from "./static.ts";
+import { BotWrapper, Interaction } from "./deps.ts";
 
 const HELP_CONTEXT = `**Available commands**:
 
@@ -32,7 +12,6 @@ const HELP_CONTEXT = `**Available commands**:
 - /unpin - Unpin a pinned message from a channel
 - /breach - Throw someone to the shadow realm
 - /unbreach - Save someone from the shadow realm
-- /valheim - Interact with the Valheim server
 
 When using (un)pin, you need the ID of the message. Enable developer \
 mode in Settings -> Advanced, and then right click a message -> Copy ID \
@@ -100,11 +79,6 @@ export function registerCommands(wrapper: BotWrapper): void {
   });
 
   wrapper.bot.helpers.createGlobalApplicationCommand({
-    name: "valheim",
-    description: "Interact with the Valheim server",
-  });
-
-  wrapper.bot.helpers.createGlobalApplicationCommand({
     name: "help",
     description: "Show available commands",
   });
@@ -139,49 +113,10 @@ export async function interactionCreate(
         await commandUnBreach(wrapper, config, payload);
         break;
       }
-      case "valheim": {
-        await commandValheim(wrapper, config, payload);
-        break;
-      }
       case "help": {
         await commandHelp(wrapper, config, payload);
         break;
       }
-    }
-  } else if (payload.type === InteractionTypes.MessageComponent) {
-    switch (payload.data.customId) {
-      /* buttons on Valheim message */
-
-      case "valheim-start": {
-        await buttonValheimStart(wrapper, config, payload);
-        break;
-      }
-      case "valheim-stop": {
-        await buttonValheimStop(wrapper, config, payload);
-        break;
-      }
-      case "valheim-backup": {
-        await buttonValheimBackup(wrapper, config, payload);
-        break;
-      }
-      case "valheim-dismiss": {
-        if (payload.channelId && payload.message?.id) {
-          await wrapper.deleteMessage(payload.channelId, payload.message.id);
-        }
-        break;
-      }
-    }
-    try {
-      // delete the buttons message after interacting with it
-      if (
-        payload.data.customId !== "valheim-dismiss" &&
-        payload.channelId &&
-        payload.message?.id
-      ) {
-        await wrapper.deleteMessage(payload.channelId, payload.message.id);
-      }
-    } catch (err) {
-      logger.debug(`Could not delete interaction message: ${err}`);
     }
   }
 }
@@ -324,182 +259,10 @@ export async function commandUnpin(
   }
 }
 
-export async function commandValheim(
-  wrapper: BotWrapper,
-  config: Config,
-  payload: Interaction,
-): Promise<void> {
-  try {
-    const instanceInfo = await getInstanceStatus(config);
-    const status = instanceInfo["instance/status"];
-    let content;
-    switch (status) {
-      case InstanceStatus.Online:
-      case InstanceStatus.OnlineEmpty: {
-        content =
-          `Server is online ✅\n**Password**: \`${config.valheim.password}\``;
-        break;
-      }
-      case InstanceStatus.ServerStarting:
-      case InstanceStatus.GameStarting:
-      case InstanceStatus.GameStarted: {
-        content =
-          `Server is booting ⌚ - ETA 3 minutes max\n**Password**: \`${config.valheim.password}\``;
-        break;
-      }
-      case InstanceStatus.Saving:
-      case InstanceStatus.Offline: {
-        content = "Server is offline ❌";
-        break;
-      }
-    }
-    await wrapper.bot.helpers.sendInteractionResponse(
-      payload.id,
-      payload.token,
-      {
-        type: InteractionResponseTypes.ChannelMessageWithSource,
-        data: {
-          content,
-          components: [
-            {
-              type: MessageComponentTypes.ActionRow,
-              components: [
-                {
-                  type: MessageComponentTypes.Button,
-                  label: "Start",
-                  customId: "valheim-start",
-                  style: ButtonStyles.Success,
-                  disabled: status === InstanceStatus.Online ||
-                    status === InstanceStatus.OnlineEmpty,
-                },
-                {
-                  type: MessageComponentTypes.Button,
-                  label: "Stop",
-                  customId: "valheim-stop",
-                  style: ButtonStyles.Danger,
-                  disabled: status === InstanceStatus.Offline ||
-                    status === InstanceStatus.Saving,
-                },
-                {
-                  type: MessageComponentTypes.Button,
-                  label: "Backup",
-                  customId: "valheim-backup",
-                  style: ButtonStyles.Primary,
-                },
-                {
-                  type: MessageComponentTypes.Button,
-                  label: "Dismiss",
-                  customId: "valheim-dismiss",
-                  style: ButtonStyles.Secondary,
-                },
-              ],
-            },
-          ],
-        },
-      },
-    );
-  } catch (err) {
-    logger.error(`Error getting Valheim server details: ${err}`);
-    await interactionResponse(wrapper, payload, "Something went wrong");
-  }
-}
-
 export async function commandHelp(
   wrapper: BotWrapper,
   _config: Config,
   payload: Interaction,
 ): Promise<void> {
   await interactionResponse(wrapper, payload, HELP_CONTEXT);
-}
-
-export async function buttonValheimStart(
-  wrapper: BotWrapper,
-  config: Config,
-  payload: Interaction,
-): Promise<void> {
-  const instanceInfo = await getInstanceStatus(config);
-  const status = instanceInfo["instance/status"];
-  logger.debug(
-    `Start button clicked; current server status is: ${status}`,
-  );
-  if ([InstanceStatus.Online, InstanceStatus.OnlineEmpty].includes(status)) {
-    await interactionResponse(wrapper, payload, VALHEIM_ALREADY_ONLINE);
-  } else if (
-    [
-      InstanceStatus.ServerStarting,
-      InstanceStatus.GameStarting,
-      InstanceStatus.GameStarted,
-    ].includes(status)
-  ) {
-    await interactionResponse(wrapper, payload, VALHEIM_ALREADY_STARTING);
-  } else {
-    try {
-      await startServer(config);
-      await interactionResponse(
-        wrapper,
-        payload,
-        `Got it, starting the server. ETA 3 minutes, password is \`${config.valheim.password}\``,
-      );
-    } catch (err) {
-      logger.error(`Error in starting Valheim server: ${err}`);
-      await interactionResponse(
-        wrapper,
-        payload,
-        "Something went wrong when trying to start the server",
-      );
-    }
-  }
-}
-
-export async function buttonValheimStop(
-  wrapper: BotWrapper,
-  config: Config,
-  payload: Interaction,
-): Promise<void> {
-  const instanceInfo = await getInstanceStatus(config);
-  const status = instanceInfo["instance/status"];
-  if ([InstanceStatus.Online, InstanceStatus.OnlineEmpty].includes(status)) {
-    try {
-      await stopServer(config);
-      await interactionResponse(
-        wrapper,
-        payload,
-        VALHEIM_STOPPING,
-      );
-    } catch (err) {
-      logger.error(`Error in stopping Valheim server: ${err}`);
-      await interactionResponse(
-        wrapper,
-        payload,
-        "Something went wrong when trying to stop the server",
-      );
-    }
-  } else if (
-    [
-      InstanceStatus.ServerStarting,
-      InstanceStatus.GameStarting,
-      InstanceStatus.GameStarted,
-    ].includes(status)
-  ) {
-    await interactionResponse(
-      wrapper,
-      payload,
-      VALHEIM_CANNOT_STOP,
-    );
-  } else {
-    await interactionResponse(wrapper, payload, "Server is already offline");
-  }
-}
-
-export async function buttonValheimBackup(
-  wrapper: BotWrapper,
-  config: Config,
-  payload: Interaction,
-): Promise<void> {
-  await interactionResponse(wrapper, payload, VALHEIM_BACKUP);
-  try {
-    await backupServer(config);
-  } catch (err) {
-    logger.error(`Error in backing up Valheim server: ${err}`);
-  }
 }

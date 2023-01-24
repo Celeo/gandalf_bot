@@ -32,11 +32,6 @@ export interface Config {
   minecraftChannel: bigint;
   minecraftMessage: bigint | null;
   minecraftServer: string;
-  valheim: {
-    server: number;
-    password: string;
-    authToken: string;
-  };
 }
 
 const CONFIG_FILE_NAME = "config.json";
