@@ -32,6 +32,8 @@ export interface Config {
   minecraftChannel: bigint;
   minecraftMessage: bigint | null;
   minecraftServer: string;
+  bookChannel: bigint;
+  bookReminders: Array<number>;
 }
 
 const CONFIG_FILE_NAME = "config.json";
@@ -61,6 +63,7 @@ export async function loadConfig(filename = CONFIG_FILE_NAME): Promise<Config> {
   if (data.minecraftMessage !== null) {
     data.minecraftMessage = BigInt(data.minecraftMessage);
   }
+  data.bookChannel = BigInt(data.bookChannel);
   return data as Config;
 }
 

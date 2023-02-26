@@ -1,4 +1,4 @@
-import type { Config } from "./config.ts";
+import { Config, saveConfig } from "./config.ts";
 import {
   ApplicationCommandOptionTypes,
   InteractionResponseTypes,
@@ -12,6 +12,7 @@ const HELP_CONTEXT = `**Available commands**:
 - /unpin - Unpin a pinned message from a channel
 - /breach - Throw someone to the shadow realm
 - /unbreach - Save someone from the shadow realm
+- /bookreminder - Add reminders to read the book of the month
 
 When using (un)pin, you need the ID of the message. Enable developer \
 mode in Settings -> Advanced, and then right click a message -> Copy ID \
@@ -21,7 +22,7 @@ Anyone can pin and unpin messages via those commands. These are available \
 as commands instead of default Discord permissions since Discord permissions \
 are bad.
 
-Breaching is only available to server admins (so, Charley).`;
+Breaching is only available to server admins.`;
 
 /**
  * Register the bot's slash commands.
@@ -79,6 +80,37 @@ export function registerCommands(wrapper: BotWrapper): void {
   });
 
   wrapper.bot.helpers.createGlobalApplicationCommand({
+    name: "bookreminder",
+    description: "Add reading reminders",
+    options: [
+      {
+        type: ApplicationCommandOptionTypes.Number,
+        name: "quarter",
+        description: "A quarter of the way through the month",
+        required: true,
+      },
+      {
+        type: ApplicationCommandOptionTypes.Number,
+        name: "half",
+        description: "Halfway of the way through the month",
+        required: true,
+      },
+      {
+        type: ApplicationCommandOptionTypes.Number,
+        name: "three-quarters",
+        description: "Three quarters of the way through the month",
+        required: true,
+      },
+      {
+        type: ApplicationCommandOptionTypes.Number,
+        name: "day-before",
+        description: "Day before book club",
+        required: true,
+      },
+    ],
+  });
+
+  wrapper.bot.helpers.createGlobalApplicationCommand({
     name: "help",
     description: "Show available commands",
   });
@@ -111,6 +143,10 @@ export async function interactionCreate(
       }
       case "unbreach": {
         await commandUnBreach(wrapper, config, payload);
+        break;
+      }
+      case "bookreminder": {
+        await commandBookReminder(wrapper, config, payload);
         break;
       }
       case "help": {
@@ -244,6 +280,7 @@ export async function commandUnpin(
   ) {
     return;
   }
+
   try {
     await wrapper.unpinMessage(
       payload.channelId,
@@ -257,6 +294,28 @@ export async function commandUnpin(
       "Unpin failed. Was that actually a message ID?",
     );
   }
+}
+
+export async function commandBookReminder(
+  wrapper: BotWrapper,
+  config: Config,
+  payload: Interaction,
+): Promise<void> {
+  if (
+    payload === undefined ||
+    payload.data === undefined ||
+    payload.data.options === undefined ||
+    payload.data.options.length !== 4 ||
+    !await senderIsAdmin(wrapper, payload)
+  ) {
+    return;
+  }
+  const args = [0, 1, 2, 3].map((i) =>
+    parseInt(payload?.data?.options?.[i].value as string)
+  );
+  config.bookReminders = args;
+  await saveConfig(config);
+  await interactionResponse(wrapper, payload, "👍");
 }
 
 export async function commandHelp(

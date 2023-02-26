@@ -15,5 +15,7 @@
     "server": "",
     "password": "",
     "authToken": ""
-  }
+  },
+  "bookChannel": "0",
+  "bookReminders": []
 }
