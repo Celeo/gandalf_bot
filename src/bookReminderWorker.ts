@@ -14,6 +14,7 @@ const reminded: Array<number> = [];
 (self as unknown as Worker).onmessage = (e: MessageEvent<Config>) => {
   logger.debug("Received new config in bookReminderWorker");
   config = e.data;
+  reminded.splice(0, reminded.length);
 };
 
 // give plenty of time for the gateway to get connected
