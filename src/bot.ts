@@ -9,7 +9,7 @@ import {
   logger,
   Message,
 } from "./deps.ts";
-import { Config, loadConfig } from "./config.ts";
+import { Config, CONFIG_FILE_NAME, loadConfig } from "./config.ts";
 import { interactionCreate, registerCommands } from "./commands.ts";
 import { handler as blessYouHandler } from "./blessYou.ts";
 import { handler as heyListenHandler } from "./heyListen.ts";
@@ -17,6 +17,10 @@ import { handler as quotesHandler } from "./quotes.ts";
 import { handler as grossHandler } from "./gross.ts";
 import { handler as guessingGamesHandler } from "./guessingGames.ts";
 import { reactionAdd, reactionRemove } from "./reactions.ts";
+
+const BOT_INTENTS = GatewayIntents.GuildMessages |
+  GatewayIntents.MessageContent | GatewayIntents.GuildMembers |
+  GatewayIntents.GuildMessageReactions | GatewayIntents.DirectMessages;
 
 /**
  * Collection of message handlers and their "friendly" names.
@@ -57,45 +61,108 @@ async function messageHandler(
 }
 
 /**
+ * Sleep for a number of milliseconds.
+ */
+function sleep(milliseconds: number): Promise<(() => Promise<void>)> {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+/**
+ * Check for birthdays, posting in the configured
+ * channel to wish people well.
+ */
+async function checkBirthday(
+  wrapper: BotWrapper,
+  config: Config,
+  data: Record<string, Array<number>>,
+): Promise<void> {
+  logger.debug("Checking for birthdays");
+  if (config.birthdays.length > 0) {
+    const date = new Date(new Date().getTime() - (1_000 * 60 * 60 * 8));
+    const dateMatch = `${date.getMonth() + 1}/${date.getDate()}`;
+    for (const birthday of config.birthdays) {
+      if (birthday.when === dateMatch) {
+        if (
+          birthday.who in data &&
+          data[birthday.who].includes(date.getFullYear())
+        ) {
+          continue;
+        }
+        await wrapper.sendMessage(config.birthdayChannel, {
+          content: `Happy birthday to <@!${birthday.who}>!`,
+        });
+        if (birthday.who in data) {
+          data[birthday.who].push(date.getFullYear());
+        } else {
+          data[birthday.who] = [date.getFullYear()];
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Remind people in the configured channel of the month's
+ * progress and their time to read the monthly book.
+ */
+async function checkBookReminder(
+  wrapper: BotWrapper,
+  config: Config,
+  data: Array<number>,
+): Promise<void> {
+  logger.debug("Checking for book reminders");
+  if (config.bookChannel && config.bookReminders.length > 0) {
+    const date = new Date(new Date().getTime() - (1_000 * 60 * 60 * 8));
+    const day = date.getDate();
+    if (config.bookReminders.includes(day)) {
+      if (data.includes(day)) {
+        return;
+      }
+      const index = config.bookReminders.indexOf(day);
+      let content;
+      switch (index) {
+        case 0: {
+          content = "First book reminder! 25% of the way through the month.";
+          break;
+        }
+        case 1: {
+          content = "Second book reminder! Halfway through the month.";
+          break;
+        }
+        case 2: {
+          content = "Third book reminder! 75% through the month!";
+          break;
+        }
+        case 3: {
+          content = "Last book reminder! Finish by tomorrow!";
+          break;
+        }
+      }
+      await wrapper.sendMessage(config.bookChannel, { content });
+      data.push(day);
+    }
+  }
+}
+
+/**
  * Entry point.
  */
 export async function main(): Promise<void> {
-  /* config first load */
+  /* initial config load */
 
   let config = await loadConfig();
   if (config.token.length === 0) {
     logger.error("No token supplied");
     return;
   }
-
-  /* worker setup */
-
-  const configWorker = new Worker(
-    new URL("./configWorker.ts", import.meta.url).href,
-    { type: "module" },
-  );
-  const birthdayWorker = new Worker(
-    new URL("./birthdaysWorker.ts", import.meta.url).href,
-    { type: "module" },
-  );
-  const bookReminderWorker = new Worker(
-    new URL("./bookReminderWorker.ts", import.meta.url).href,
-    {
-      type: "module",
-    },
-  );
-  birthdayWorker.postMessage(config);
-  bookReminderWorker.postMessage(config);
+  const birthdayData: Record<string, Array<number>> = {};
+  const bookReminderData: Array<number> = [];
 
   /* bot creation and plugin enablement */
 
   const baseBot = createBot({
     token: config.token,
-    intents: GatewayIntents.GuildMessages |
-      GatewayIntents.MessageContent |
-      GatewayIntents.GuildMembers |
-      GatewayIntents.GuildMessageReactions |
-      GatewayIntents.DirectMessages,
+    intents: BOT_INTENTS,
     botId: BigInt(atob(config.token.split(".")[0])),
     events: {},
   });
@@ -113,46 +180,65 @@ export async function main(): Promise<void> {
       messageHandler(wrapper, config, message);
     },
     reactionAdd(_bot, payload) {
-      reactionAdd(wrapper, config, payload);
+      try {
+        reactionAdd(wrapper, config, payload);
+      } catch (e) {
+        logger.error(`Error when handling reaction addition: ${e}`);
+      }
     },
     reactionRemove(_bot, payload) {
-      reactionRemove(wrapper, config, payload);
+      try {
+        reactionRemove(wrapper, config, payload);
+      } catch (e) {
+        logger.error(`Error when handling reaction removal: ${e}`);
+      }
     },
     interactionCreate(_bot, payload) {
-      interactionCreate(wrapper, config, payload);
+      try {
+        interactionCreate(wrapper, config, payload);
+      } catch (e) {
+        logger.error(`Error when handling interaction creation: ${e}`);
+      }
     },
   });
 
-  /* handle worker messages */
+  /* background functions */
 
-  configWorker.onmessage = (e: MessageEvent<Config>) => {
-    logger.debug("Received message from configWorker in main thread");
-    config = e.data;
-    birthdayWorker.postMessage(config);
-  };
-
-  birthdayWorker.onmessage = async (e: MessageEvent<string>) => {
-    try {
-      logger.debug("Sending happy birthday message");
-      await wrapper.sendMessage(config.birthdayChannel, {
-        content: `Happy birthday to <@!${e.data}>!`,
-      });
-    } catch (err) {
-      logger.error(`Could not send birthday announcement: ${err}`);
+  (async () => {
+    const watcher = Deno.watchFs(`./${CONFIG_FILE_NAME}`);
+    for await (const event of watcher) {
+      if (event.kind === "modify") {
+        logger.info("Found config file edit; reloading");
+        try {
+          config = await loadConfig();
+          for (const prop of Object.getOwnPropertyNames(birthdayData)) {
+            delete birthdayData[prop];
+          }
+          bookReminderData.splice(0, bookReminderData.length);
+        } catch (err) {
+          logger.error(`Could not load config in worker: ${err}`);
+        }
+      }
     }
-  };
+  })();
 
-  bookReminderWorker.onmessage = async (e: MessageEvent<string>) => {
-    try {
-      logger.debug("Sending book reminder message");
-      await wrapper.sendMessage(config.bookChannel, {
-        content: e.data,
-      });
-    } catch (err) {
-      logger.error(`Could not send book reminder: ${err}`);
+  (async () => {
+    await sleep(1_000 * 30);
+    while (true) {
+      await checkBirthday(wrapper, config, birthdayData);
+      await sleep(1_000 * 60 * 60 * 3); // 3 hours
     }
-  };
+  })();
 
-  // start and block
+  (async () => {
+    await sleep(1_000 * 30);
+    while (true) {
+      await checkBookReminder(wrapper, config, bookReminderData);
+      await sleep(1_000 * 60 * 60 * 12); // 12 hours
+    }
+  })();
+
+  /* start and block */
+
   await wrapper.startBot();
 }

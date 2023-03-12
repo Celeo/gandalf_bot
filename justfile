@@ -2,10 +2,10 @@ set dotenv-load := false
 
 default: run
 
+output_name := "gandalf_bot"
 network := "discord.com,gateway.discord.gg,minecraft-api.com,api.ggod.io,vh-testing-bucket.fra1.digitaloceanspaces.com"
-read_files := "config.json,roles.db,roles.db-journal,words.txt,src/configWorker.ts,src/birthdaysWorker.ts,src/minecraftWorker.ts,src/bookReminderWorker.ts"
+read_files := "config.json,roles.db,roles.db-journal,words.txt"
 write_files := "roles.db,roles.db-journal,config.json,config.json.bak"
-packaged_output := "/tmp/gandalf_bot.dist.tar.gz"
 
 run:
     @deno run \
@@ -24,13 +24,19 @@ test-cov:
 download_words:
     @wget https://raw.githubusercontent.com/dwyl/english-words/master/words.txt -O words.txt
 
+compile:
+    @deno compile \
+        --allow-read={{read_files}} \
+        --allow-write={{write_files}} \
+        --allow-net={{network}} \
+        --output {{output_name}} \
+        main.ts
+
 deploy:
-    @tar -cpzf {{packaged_output}} main.ts src words.txt
-    @scp {{packaged_output}} "$SSH_HOST_NAME:/srv/"
-    @rm -f {{packaged_output}}
+    @scp {{output_name}} "$SSH_HOST_NAME:/srv/"
 
 docker-build:
-    @docker build -t gandalf_bot .
+    @docker build -t {{output_name}} .
 
 docker-run:
-    @docker run --rm -v ./config.json:/opt/config.json gandalf_bot
+    @docker run --rm -v ./config.json:/opt/config.json {{output_name}}

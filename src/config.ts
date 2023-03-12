@@ -36,7 +36,7 @@ export interface Config {
   bookReminders: Array<number>;
 }
 
-const CONFIG_FILE_NAME = "config.json";
+export const CONFIG_FILE_NAME = "config.json";
 
 /**
  * Load the bot configuration from the configuration file,
