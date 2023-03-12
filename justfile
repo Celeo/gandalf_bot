@@ -25,6 +25,7 @@ download_words:
     @wget https://raw.githubusercontent.com/dwyl/english-words/master/words.txt -O words.txt
 
 compile:
+    @rm -f {{output_name}}
     @deno compile \
         --allow-read={{read_files}} \
         --allow-write={{write_files}} \
@@ -33,7 +34,7 @@ compile:
         main.ts
 
 deploy:
-    @scp {{output_name}} "$SSH_HOST_NAME:/srv/"
+    @scp {{output_name}} "$SSH_HOST_NAME:/srv/{{output_name}}.new"
 
 docker-build:
     @docker build -t {{output_name}} .
