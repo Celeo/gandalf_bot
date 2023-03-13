@@ -3,7 +3,6 @@ set dotenv-load := false
 default: run
 
 output_name := "gandalf_bot"
-network := "discord.com,gateway.discord.gg,minecraft-api.com,api.ggod.io,vh-testing-bucket.fra1.digitaloceanspaces.com"
 read_files := "config.json,roles.db,roles.db-journal,words.txt"
 write_files := "roles.db,roles.db-journal,config.json,config.json.bak"
 
@@ -11,7 +10,7 @@ run:
     @deno run \
         --allow-read={{read_files}} \
         --allow-write={{write_files}} \
-        --allow-net={{network}} \
+        --allow-net \
         main.ts
 
 test:
@@ -29,7 +28,7 @@ compile:
     @deno compile \
         --allow-read={{read_files}} \
         --allow-write={{write_files}} \
-        --allow-net={{network}} \
+        --allow-net \
         --output {{output_name}} \
         main.ts
 
