@@ -7,23 +7,23 @@ export {
   GatewayIntents,
   InteractionResponseTypes,
   InteractionTypes,
-} from "https://deno.land/x/discordeno@17.0.1/mod.ts";
+} from "https://deno.land/x/discordeno@18.0.1/mod.ts";
 export {
   enableCachePlugin,
   enableCacheSweepers,
   enablePermissionsPlugin,
-} from "https://deno.land/x/discordeno@17.0.1/plugins/mod.ts";
+} from "https://deno.land/x/discordeno@18.0.1/plugins/mod.ts";
 export type {
   Emoji,
   Interaction,
   Member,
   Message,
   User,
-} from "https://deno.land/x/discordeno@17.0.1/mod.ts";
+} from "https://deno.land/x/discordeno@18.0.1/mod.ts";
 export type {
   BotWithCache,
-} from "https://deno.land/x/discordeno@17.0.1/plugins/mod.ts";
-export { ensureDir } from "https://deno.land/std@0.170.0/fs/mod.ts";
+} from "https://deno.land/x/discordeno@18.0.1/plugins/mod.ts";
+export { ensureDir } from "https://deno.land/std@0.180.0/fs/mod.ts";
 
 import {
   addReaction,
@@ -38,11 +38,11 @@ import {
   sendMessage,
   startBot,
   unpinMessage,
-} from "https://deno.land/x/discordeno@17.0.1/mod.ts";
+} from "https://deno.land/x/discordeno@18.0.1/mod.ts";
 import {
   BotWithCache,
   hasGuildPermissions,
-} from "https://deno.land/x/discordeno@17.0.1/plugins/mod.ts";
+} from "https://deno.land/x/discordeno@18.0.1/plugins/mod.ts";
 import type {
   Bot,
   CreateMessage,
@@ -51,7 +51,7 @@ import type {
   Member,
   Message,
   PermissionStrings,
-} from "https://deno.land/x/discordeno@17.0.1/mod.ts";
+} from "https://deno.land/x/discordeno@18.0.1/mod.ts";
 
 /**
  * Wrapper for Discordeno's `Bot` object.

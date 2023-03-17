@@ -1,5 +1,5 @@
 export {
   assert,
   assertEquals,
-} from "https://deno.land/std@0.119.0/testing/asserts.ts";
-export { default as sinon } from "https://cdn.skypack.dev/sinon@12.0.1?dts";
+} from "https://deno.land/std@0.180.0/testing/asserts.ts";
+export { default as sinon } from "https://cdn.skypack.dev/sinon@15.0.2?dts";
