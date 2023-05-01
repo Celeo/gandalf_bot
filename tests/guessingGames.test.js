@@ -76,14 +76,16 @@ https://oec.world/en/tradle`,
   assertEquals(addReaction.getCalls().length, 0);
 });
 
-Deno.test("guessingGames - worldle - matches correctly", async () => {
+Deno.test("guessingGames - games - matches correctly", async () => {
   const addReaction = sinon.stub();
   const wrapper = { addReaction };
   const config = {};
   const message = {
-    content: `#Worldle #282 1/6 (100%)
-🟩🟩🟩🟩🟩🎉
-https://worldle.teuteuf.fr/`,
+    content: `#GuessTheGame #351
+
+🎮 🟩 ⬜ ⬜ ⬜ ⬜ ⬜
+
+https://guessthe.game/`,
   };
 
   await handler(wrapper, config, message);
@@ -91,16 +93,16 @@ https://worldle.teuteuf.fr/`,
   assertEquals(addReaction.getCalls().length, 1);
 });
 
-Deno.test("guessingGames - worldle - ignores correctly", async () => {
+Deno.test("guessingGames - games - ignores correctly", async () => {
   const addReaction = sinon.stub();
   const wrapper = { addReaction };
   const config = {};
   const message = {
-    content: `#Tradle #237 3/6
-🟩🟩🟨⬜⬜
-🟩🟩🟩🟩🟨
-🟩🟩🟩🟩🟩
-https://oec.world/en/tradle`,
+    content: `#GuessTheGame #350
+
+🎮 🟥 🟥 🟩 ⬜ ⬜ ⬜
+
+https://guessthe.game/`,
   };
 
   await handler(wrapper, config, message);
