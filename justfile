@@ -31,12 +31,3 @@ compile:
         --allow-net \
         --output {{output_name}} \
         main.ts
-
-deploy:
-    @scp {{output_name}} "$SSH_HOST_NAME:/srv/{{output_name}}.new"
-
-docker-build:
-    @docker build -t {{output_name}} .
-
-docker-run:
-    @docker run --rm -v ./config.json:/opt/config.json {{output_name}}

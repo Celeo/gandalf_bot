@@ -1,7 +1,27 @@
-FROM denoland/deno:latest
+# Based on https://github.com/denoland/deno_docker/blob/main/alpine.dockerfile
 
-WORKDIR /opt
-COPY main.ts words.txt /opt/
-COPY src /opt/src
+ARG DENO_VERSION=1.33.1
+ARG BIN_IMAGE=denoland/deno:bin-${DENO_VERSION}
+FROM ${BIN_IMAGE} AS bin
 
-CMD ["run", "--allow-all", "main.ts"]
+FROM frolvlad/alpine-glibc:alpine-3.13
+
+RUN apk --no-cache add ca-certificates
+
+RUN addgroup --gid 1000 deno \
+  && adduser --uid 1000 --disabled-password deno --ingroup deno \
+  && mkdir /deno-dir/ \
+  && chown deno:deno /deno-dir/
+
+ENV DENO_DIR /deno-dir/
+ENV DENO_INSTALL_ROOT /usr/local
+
+ARG DENO_VERSION
+ENV DENO_VERSION=${DENO_VERSION}
+COPY --from=bin /deno /bin/deno
+
+WORKDIR /deno-dir
+COPY . .
+
+ENTRYPOINT ["/bin/deno"]
+CMD ["task", "run"]
