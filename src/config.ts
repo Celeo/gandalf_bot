@@ -35,15 +35,14 @@ export interface Config {
   bookReminders: Array<number>;
 }
 
-export const REDIS_KEY = "gandalf-config";
+export const KEY = "gandalf-config";
 
 /**
- * Load the bot configuration from the configuration file,
- * which is "config.json" unless otherwise specified.
+ * Load and return the bot's configuration.
  */
 export async function loadConfig(connectFn = redisConnect): Promise<Config> {
-  const redis = await connectFn({ hostname: "127.0.0.1" });
-  const raw = await redis.get(REDIS_KEY);
+  const redis = await connectFn();
+  const raw = await redis.get(KEY);
   if (raw === null) {
     throw new Error("Got empty config from Redis");
   }
@@ -63,5 +62,6 @@ export async function loadConfig(connectFn = redisConnect): Promise<Config> {
   );
   data.birthdayChannel = BigInt(data.birthdayChannel);
   data.bookChannel = BigInt(data.bookChannel);
+  redis.close();
   return data as Config;
 }
