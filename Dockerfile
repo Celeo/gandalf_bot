@@ -22,7 +22,6 @@ COPY --from=bin /deno /bin/deno
 
 WORKDIR /deno-dir
 COPY . .
-RUN curl -s https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt | tr -d '\r' > words.txt
 
 ENTRYPOINT ["/bin/deno"]
 CMD ["run", "--allow-all", "main.ts"]
