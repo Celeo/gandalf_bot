@@ -29,9 +29,6 @@ export interface Config {
   reactionRoles: Array<ReactionRole>;
   birthdayChannel: bigint;
   birthdays: Array<Birthday>;
-  minecraftChannel: bigint;
-  minecraftMessage: bigint | null;
-  minecraftServer: string;
   bookChannel: bigint;
   bookReminders: Array<number>;
 }
@@ -59,10 +56,6 @@ export async function loadConfig(filename = CONFIG_FILE_NAME): Promise<Config> {
     },
   );
   data.birthdayChannel = BigInt(data.birthdayChannel);
-  data.minecraftChannel = BigInt(data.minecraftChannel);
-  if (data.minecraftMessage !== null) {
-    data.minecraftMessage = BigInt(data.minecraftMessage);
-  }
   data.bookChannel = BigInt(data.bookChannel);
   return data as Config;
 }

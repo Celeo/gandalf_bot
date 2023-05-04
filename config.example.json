@@ -8,14 +8,6 @@
   "reactionRoles": [],
   "birthdayChannel": "",
   "birthdays": [],
-  "minecraftChannel": "0",
-  "minecraftMessage": null,
-  "minecraftServer": "",
-  "valheim": {
-    "server": "",
-    "password": "",
-    "authToken": ""
-  },
   "bookChannel": "0",
   "bookReminders": []
 }

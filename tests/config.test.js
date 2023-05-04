@@ -14,11 +14,8 @@ Deno.test("config - loadConfig - works", async () => {
       "reactionRoles": [],
       "birthdayChannel": "6",
       "birthdays": [],
-      "minecraftChannel": "7",
-      "minecraftMessage": null,
-      "minecraftServer": "ghi",
-      "bookChannel": "8",
-      "bookReminders": [9, 10, 11, 12]
+      "bookChannel": "7",
+      "bookReminders": [8, 9, 10, 11]
     }`,
   );
   await Deno.writeFile(`./${filename}`, data);
@@ -33,11 +30,8 @@ Deno.test("config - loadConfig - works", async () => {
     reactionRoles: [],
     birthdayChannel: 6n,
     birthdays: [],
-    minecraftChannel: 7n,
-    minecraftMessage: null,
-    minecraftServer: "ghi",
-    bookChannel: 8n,
-    bookReminders: [9, 10, 11, 12],
+    bookChannel: 7n,
+    bookReminders: [8, 9, 10, 11],
   });
   await Deno.remove(`./${filename}`);
 });
