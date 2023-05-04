@@ -6,10 +6,11 @@ import {
   enableCacheSweepers,
   enablePermissionsPlugin,
   GatewayIntents,
+  isEqual,
   logger,
   Message,
 } from "./deps.ts";
-import { Config, CONFIG_FILE_NAME, loadConfig } from "./config.ts";
+import { Config, loadConfig } from "./config.ts";
 import { interactionCreate, registerCommands } from "./commands.ts";
 import { handler as blessYouHandler } from "./blessYou.ts";
 import { handler as heyListenHandler } from "./heyListen.ts";
@@ -204,22 +205,23 @@ export async function main(): Promise<void> {
 
   /* background functions */
 
-  // TODO this will have to be turned into a scheduled thing like the scheduled posts
   (async () => {
-    const watcher = Deno.watchFs(`./${CONFIG_FILE_NAME}`);
-    for await (const event of watcher) {
-      if (event.kind === "modify") {
-        logger.info("Found config file edit; reloading");
-        try {
+    await sleep(1_000 * 30);
+    while (true) {
+      try {
+        const maybeNewConfig = await loadConfig();
+        if (!isEqual(maybeNewConfig, config)) {
+          logger.info("Found config file edit; reloading");
           config = await loadConfig();
           for (const prop of Object.getOwnPropertyNames(birthdayData)) {
             delete birthdayData[prop];
           }
           bookReminderData.splice(0, bookReminderData.length);
-        } catch (err) {
-          logger.error(`Could not load config in worker: ${err}`);
         }
+      } catch (err) {
+        logger.error(`Could not load config: ${err}`);
       }
+      await sleep(1_000 * 60 * 30); // 30 minutes
     }
   })();
 
@@ -227,7 +229,7 @@ export async function main(): Promise<void> {
     await sleep(1_000 * 30);
     while (true) {
       await checkBirthday(wrapper, config, birthdayData);
-      await sleep(1_000 * 60 * 60 * 3); // 3 hours
+      await sleep(1_000 * 60 * 60 * 6); // 6 hours
     }
   })();
 

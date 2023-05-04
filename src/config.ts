@@ -1,3 +1,5 @@
+import { redisConnect } from "./deps.ts";
+
 /**
  * An entry in the "reactionRoles" list.
  */
@@ -33,14 +35,18 @@ export interface Config {
   bookReminders: Array<number>;
 }
 
-export const CONFIG_FILE_NAME = "config.json";
+export const REDIS_KEY = "gandalf-config";
 
 /**
  * Load the bot configuration from the configuration file,
  * which is "config.json" unless otherwise specified.
  */
-export async function loadConfig(filename = CONFIG_FILE_NAME): Promise<Config> {
-  const raw = await Deno.readTextFile(`./${filename}`);
+export async function loadConfig(connectFn = redisConnect): Promise<Config> {
+  const redis = await connectFn({ hostname: "127.0.0.1" });
+  const raw = await redis.get(REDIS_KEY);
+  if (raw === null) {
+    throw new Error("Got empty config from Redis");
+  }
   const data = JSON.parse(raw);
   data.containmentRoleId = BigInt(data.containmentRoleId);
   data.blessableUserIds = data.blessableUserIds.map((s: string) => BigInt(s));

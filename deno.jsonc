@@ -4,6 +4,7 @@
     "compile": "deno compile --allow-read=words.txt --allow-net --output {{output_name}} main.ts",
     "test": "deno test --allow-all",
     "test:cov": "deno test --allow-all --coverage=coverage && deno coverage coverage",
-    "download_words": "curl -s https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt | tr -d '\r' > words.txt"
+    "download_words": "curl -s https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt | tr -d '\r' > words.txt",
+    "redis:load:local": "deno run --allow-net --allow-read=config.json loadRedisWithConfig.ts"
   }
 }

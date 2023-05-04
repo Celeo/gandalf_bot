@@ -23,8 +23,6 @@ export type {
 export type {
   BotWithCache,
 } from "https://deno.land/x/discordeno@18.0.1/plugins/mod.ts";
-export { ensureDir } from "https://deno.land/std@0.185.0/fs/mod.ts";
-export { connect as redisConnect } from "https://deno.land/x/redis@v0.29.3/mod.ts";
 
 import {
   addReaction,
@@ -152,6 +150,10 @@ export class BotWrapper {
 export { memoizy } from "https://deno.land/x/memoizy@1.0.0/mod.ts";
 import * as log from "https://deno.land/std@0.163.0/log/mod.ts";
 import { dateAsString } from "./dateUtil.ts";
+export { ensureDir } from "https://deno.land/std@0.185.0/fs/mod.ts";
+export { connect as redisConnect } from "https://deno.land/x/redis@v0.29.3/mod.ts";
+import isEqual from "https://deno.land/x/lodash@4.17.15-es/isEqual.js";
+export { isEqual };
 
 log.setup({
   handlers: {
