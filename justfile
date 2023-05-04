@@ -21,7 +21,7 @@ test-cov:
     @deno coverage coverage
 
 download_words:
-    @wget https://raw.githubusercontent.com/dwyl/english-words/master/words.txt -O words.txt
+    @wget https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt -O words.txt
 
 compile:
     @rm -f {{output_name}}
