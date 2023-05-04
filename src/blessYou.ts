@@ -1,4 +1,4 @@
-import { BotWrapper, logger, memoizy, Message } from "./deps.ts";
+import { BotWrapper, logger, memoizy, Message, redisConnect } from "./deps.ts";
 import { Config } from "./config.ts";
 
 /**
@@ -16,14 +16,17 @@ const PATTERNS: Array<RegExp> = [
 ];
 
 /**
- * Load the words.txt file into memory.
+ * Load the English words from Redis.
  */
-function loadWords(): Array<string> {
-  logger.info("Loading words.txt into memory");
-  const decoder = new TextDecoder("utf-8");
-  const raw = Deno.readFileSync("./words.txt");
-  const text = decoder.decode(raw);
-  return text.split("\n");
+export async function loadWords(): Promise<Array<string>> {
+  logger.info("Loading English words from Redis into memory");
+  const redis = await redisConnect({ hostname: "127.0.0.1", port: 6379 });
+  const data = await redis.get("english_words");
+  if (data === null) {
+    throw new Error("Got a null value from Redis");
+  }
+  redis.close();
+  return data.split(",");
 }
 
 /**
@@ -38,6 +41,7 @@ export async function handler(
   wrapper: BotWrapper,
   config: Config,
   message: Message,
+  wordsFunction: () => Promise<Array<string>> = memoziedLoadWords,
 ): Promise<void> {
   if (!config.blessableUserIds.includes(message.authorId)) {
     return;
@@ -53,7 +57,7 @@ export async function handler(
   if (PATTERNS.find((pattern) => pattern.test(content))) {
     return;
   }
-  const realWords = memoziedLoadWords();
+  const realWords = await wordsFunction();
   if (realWords.includes(content.toLowerCase())) {
     return;
   }
