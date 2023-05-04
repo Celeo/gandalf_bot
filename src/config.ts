@@ -59,23 +59,3 @@ export async function loadConfig(filename = CONFIG_FILE_NAME): Promise<Config> {
   data.bookChannel = BigInt(data.bookChannel);
   return data as Config;
 }
-
-/**
- * Save the config file in memory to disk.
- *
- * A backup is saved at "config.json.bak".
- */
-export async function saveConfig(
-  config: Config,
-  filename = CONFIG_FILE_NAME,
-): Promise<void> {
-  await Deno.copyFile(filename, `${filename}.bak`);
-  await Deno.writeTextFile(
-    filename,
-    JSON.stringify(
-      config,
-      (_, v) => typeof v === "bigint" ? v.toString() : v,
-      2,
-    ),
-  );
-}

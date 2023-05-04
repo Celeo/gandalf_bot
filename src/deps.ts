@@ -24,6 +24,7 @@ export type {
   BotWithCache,
 } from "https://deno.land/x/discordeno@18.0.1/plugins/mod.ts";
 export { ensureDir } from "https://deno.land/std@0.185.0/fs/mod.ts";
+export { connect as redisConnect } from "https://deno.land/x/redis@v0.29.3/mod.ts";
 
 import {
   addReaction,

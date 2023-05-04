@@ -204,6 +204,7 @@ export async function main(): Promise<void> {
 
   /* background functions */
 
+  // TODO this will have to be turned into a scheduled thing like the scheduled posts
   (async () => {
     const watcher = Deno.watchFs(`./${CONFIG_FILE_NAME}`);
     for await (const event of watcher) {
