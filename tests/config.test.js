@@ -1,7 +1,7 @@
 import { assertEquals, sinon } from "./test_deps.ts";
 import { loadConfig } from "../src/config.ts";
 
-Deno.test("config - loadConfig - works", async () => {
+Deno.test("config - loadConfig - works when mocked", async () => {
   const data = `{
     "token": "abc",
     "containmentRoleId": "1",
@@ -16,8 +16,9 @@ Deno.test("config - loadConfig - works", async () => {
     "bookReminders": [8, 9, 10, 11]
   }`;
   const redisGet = sinon.stub();
+  const redisClose = sinon.stub();
   redisGet.returns(data);
-  const loaded = await loadConfig(() => ({ get: redisGet }));
+  const loaded = await loadConfig(() => ({ get: redisGet, close: redisClose }));
   assertEquals(loaded, {
     token: "abc",
     containmentRoleId: 1n,
@@ -31,4 +32,6 @@ Deno.test("config - loadConfig - works", async () => {
     bookChannel: 7n,
     bookReminders: [8, 9, 10, 11],
   });
+  assertEquals(redisGet.getCalls().length, 1);
+  assertEquals(redisClose.getCalls().length, 1);
 });

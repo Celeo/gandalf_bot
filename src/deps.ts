@@ -148,19 +148,22 @@ export class BotWrapper {
 // ===== other =====
 
 export { memoizy } from "https://deno.land/x/memoizy@1.0.0/mod.ts";
-import * as log from "https://deno.land/std@0.163.0/log/mod.ts";
-import { dateAsString } from "./dateUtil.ts";
-export { ensureDir } from "https://deno.land/std@0.185.0/fs/mod.ts";
 import {
   connect as _redisConnect,
   Redis,
 } from "https://deno.land/x/redis@v0.29.3/mod.ts";
+import * as log from "https://deno.land/std@0.163.0/log/mod.ts";
+import { dateAsString } from "./dateUtil.ts";
 import isEqual from "https://deno.land/x/lodash@4.17.15-es/isEqual.js";
 export { isEqual };
 
 const REDIS_ENV_VAR = "REDIS_URL";
 
-export async function redisConnect(): Promise<Redis> {
+/**
+ * Connect to Redis, using the connection information from the
+ * environment variable.
+ */
+export function redisConnect(): Promise<Redis> {
   const raw = Deno.env.get(REDIS_ENV_VAR);
   if (raw === undefined) {
     throw new Error(`Missing required env var ${REDIS_ENV_VAR}`);
