@@ -244,7 +244,7 @@ export async function main(): Promise<void> {
   // uptime logging (TEMPORARY)
   (async () => {
     while (true) {
-      await sleep(1_100 * 60 * 30); // 30 minutes
+      await sleep(1_100 * 60 * 10); // 10 minutes
       console.log("Health tick");
     }
   })();
