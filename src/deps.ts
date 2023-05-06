@@ -157,7 +157,7 @@ import { dateAsString } from "./dateUtil.ts";
 import isEqual from "https://deno.land/x/lodash@4.17.15-es/isEqual.js";
 export { isEqual };
 
-const REDIS_ENV_VAR = "REDIS_URL";
+export const REDIS_ENV_VAR = "REDIS_URL";
 
 /**
  * Connect to Redis, using the connection information from the

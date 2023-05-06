@@ -1,8 +1,8 @@
 #!/usr/bin/env -S deno run --allow-read=config.deploy.json --allow-net=127.0.0.1
 
 import { parse } from "https://deno.land/std@0.185.0/flags/mod.ts";
-import { redisConnect } from "./src/deps.ts";
-import { REDIS_KEY } from "./src/config.ts";
+import { connect } from "https://deno.land/x/redis@v0.29.3/mod.ts";
+import { KEY } from "./src/config.ts";
 
 let hostname = "127.0.0.1";
 let port = 6379;
@@ -28,6 +28,6 @@ if (Object.keys(args).includes("a")) {
   password = args["a"];
 }
 
-const redis = await redisConnect({ hostname, port, password });
+const redis = await connect({ hostname, port, password });
 const configText = await Deno.readTextFile(`./config.deploy.json`);
-redis.set(REDIS_KEY, configText);
+redis.set(KEY, configText);
