@@ -1,11 +1,10 @@
-import { assertEquals, sinon } from "./test_deps.ts";
+import { assertEquals, sinon } from "./_test_deps.js";
 import { loadConfig } from "../src/config.ts";
 
 Deno.test("config - loadConfig - works when mocked", async () => {
   const data = `{
-    "token": "abc",
     "containmentRoleId": "1",
-    "containmentResponseGif": "def",
+    "containmentResponseGif": "abc",
     "blessableUserIds": ["2", "3"],
     "listenableUserIds": ["4"],
     "grossUserIds": ["5"],
@@ -20,9 +19,8 @@ Deno.test("config - loadConfig - works when mocked", async () => {
   redisGet.returns(data);
   const loaded = await loadConfig(() => ({ get: redisGet, close: redisClose }));
   assertEquals(loaded, {
-    token: "abc",
     containmentRoleId: 1n,
-    containmentResponseGif: "def",
+    containmentResponseGif: "abc",
     blessableUserIds: [2n, 3n],
     listenableUserIds: [4n],
     grossUserIds: [5n],

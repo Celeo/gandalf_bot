@@ -1,4 +1,4 @@
-import { assertEquals, sinon } from "./test_deps.ts";
+import { assertEquals, sinon } from "./_test_deps.js";
 import { handler } from "../src/quotes.ts";
 
 Deno.test("quotes - does not trigger when not mentioned", async () => {

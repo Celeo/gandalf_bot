@@ -23,6 +23,8 @@ const BOT_INTENTS = GatewayIntents.GuildMessages |
   GatewayIntents.MessageContent | GatewayIntents.GuildMembers |
   GatewayIntents.GuildMessageReactions | GatewayIntents.DirectMessages;
 
+const DISCORD_BOT_TOKEN = "DISCORD_BOT_TOKEN";
+
 /**
  * Collection of message handlers and their "friendly" names.
  */
@@ -157,22 +159,23 @@ async function checkBookReminder(
  * Entry point.
  */
 export async function main(): Promise<void> {
-  /* initial config load */
+  /* initial setup */
 
-  let config = await loadConfig();
-  if (config.token.length === 0) {
+  const token = Deno.env.get(DISCORD_BOT_TOKEN);
+  if (token === undefined || token.length === 0) {
     logger.error("No token supplied");
     return;
   }
   const birthdayData: Record<string, Array<number>> = {};
   const bookReminderData: Array<number> = [];
+  let config = await loadConfig();
 
   /* bot creation and plugin enablement */
 
   const baseBot = createBot({
-    token: config.token,
+    token: token,
     intents: BOT_INTENTS,
-    botId: BigInt(atob(config.token.split(".")[0])),
+    botId: BigInt(atob(token.split(".")[0])),
     events: {},
   });
   const bot = enableCachePlugin(baseBot);
@@ -254,14 +257,6 @@ export async function main(): Promise<void> {
         logger.error(`Error in background task checkBookReminder: ${err}`);
       }
       await sleep(1_000 * 60 * 60 * 12); // 12 hours
-    }
-  })();
-
-  // uptime logging (TEMPORARY)
-  (async () => {
-    while (true) {
-      logger.debug("Health tick");
-      await sleep(1_000 * 60 * 5); // 5 minutes
     }
   })();
 

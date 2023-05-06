@@ -1,8 +1,6 @@
 #!/usr/bin/env -S deno run --allow-read --allow-net=127.0.0.1
-
 import { parse } from "https://deno.land/std@0.185.0/flags/mod.ts";
 import { connect } from "https://deno.land/x/redis@v0.29.3/mod.ts";
-import { KEY } from "./src/config.ts";
 
 let file = "config.deploy.json";
 let hostname = "127.0.0.1";
@@ -35,4 +33,4 @@ if (Object.keys(args).includes("a")) {
 
 const redis = await connect({ hostname, port, password });
 const configText = await Deno.readTextFile(`./${file}`);
-redis.set(KEY, configText);
+redis.set("gandalf-config", configText);

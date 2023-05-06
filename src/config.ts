@@ -22,7 +22,6 @@ export interface Birthday {
  * Bot configuration.
  */
 export interface Config {
-  token: string;
   containmentRoleId: bigint;
   containmentResponseGif: string;
   blessableUserIds: Array<bigint>;

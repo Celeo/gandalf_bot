@@ -1,4 +1,4 @@
-import { assertEquals, sinon } from "./test_deps.ts";
+import { assertEquals, sinon } from "./_test_deps.js";
 import {
   commandBreach,
   commandPin,

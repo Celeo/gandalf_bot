@@ -1,4 +1,4 @@
-import { assertEquals, sinon } from "./test_deps.ts";
+import { assertEquals, sinon } from "./_test_deps.js";
 import { reactionAdd, reactionRemove } from "../src/reactions.ts";
 
 Deno.test("reactions - no match", async () => {

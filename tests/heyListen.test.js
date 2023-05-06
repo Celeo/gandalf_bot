@@ -1,4 +1,4 @@
-import { assertEquals, sinon } from "./test_deps.ts";
+import { assertEquals, sinon } from "./_test_deps.js";
 import { handler } from "../src/heyListen.ts";
 
 Deno.test("heyListen - does not trigger for un-configured users", async () => {
