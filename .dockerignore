@@ -1,3 +1,4 @@
 fly.toml
 .env
+config.*
 gandalf_bot
