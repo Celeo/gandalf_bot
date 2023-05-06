@@ -245,7 +245,7 @@ export async function main(): Promise<void> {
   (async () => {
     while (true) {
       console.log("Health tick");
-      await sleep(1_100 * 60 * 10); // 10 minutes
+      await sleep(1_000 * 60 * 5); // 5 minutes
     }
   })();
 
