@@ -5,7 +5,7 @@ import {
   logger,
   Member,
   User,
-} from "./deps.ts";
+} from "./_deps.ts";
 import { Config } from "./config.ts";
 
 /**

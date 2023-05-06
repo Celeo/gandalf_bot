@@ -1,4 +1,4 @@
-import { BotWrapper, logger, memoizy, Message } from "./deps.ts";
+import { BotWrapper, logger, memoizy, Message } from "./_deps.ts";
 import { Config } from "./config.ts";
 
 /**

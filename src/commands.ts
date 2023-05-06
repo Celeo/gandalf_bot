@@ -3,8 +3,8 @@ import {
   ApplicationCommandOptionTypes,
   InteractionResponseTypes,
   InteractionTypes,
-} from "./deps.ts";
-import { BotWrapper, Interaction } from "./deps.ts";
+} from "./_deps.ts";
+import { BotWrapper, Interaction } from "./_deps.ts";
 
 const HELP_CONTEXT = `**Available commands**:
 

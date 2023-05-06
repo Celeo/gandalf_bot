@@ -9,7 +9,7 @@ import {
   isEqual,
   logger,
   Message,
-} from "./deps.ts";
+} from "./_deps.ts";
 import { Config, loadConfig } from "./config.ts";
 import { interactionCreate, registerCommands } from "./commands.ts";
 import { handler as blessYouHandler } from "./blessYou.ts";

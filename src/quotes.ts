@@ -1,4 +1,4 @@
-import { BotWrapper, Message } from "./deps.ts";
+import { BotWrapper, Message } from "./_deps.ts";
 import { Config } from "./config.ts";
 
 const QUOTES = [

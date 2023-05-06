@@ -1,4 +1,4 @@
-import { redisConnect } from "./deps.ts";
+import { redisConnect } from "./_deps.ts";
 
 /**
  * An entry in the "reactionRoles" list.
