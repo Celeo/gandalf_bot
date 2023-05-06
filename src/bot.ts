@@ -241,6 +241,14 @@ export async function main(): Promise<void> {
     }
   })();
 
+  // uptime logging (TEMPORARY)
+  (async () => {
+    while (true) {
+      await sleep(1_100 * 60 * 30); // 30 minutes
+      console.log("Health tick");
+    }
+  })();
+
   /* start and block */
 
   await wrapper.startBot();
