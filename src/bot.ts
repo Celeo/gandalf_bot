@@ -89,13 +89,21 @@ async function checkBirthday(
         ) {
           continue;
         }
-        await wrapper.sendMessage(config.birthdayChannel, {
-          content: `Happy birthday to <@!${birthday.who}>!`,
-        });
-        if (birthday.who in data) {
-          data[birthday.who].push(date.getFullYear());
-        } else {
-          data[birthday.who] = [date.getFullYear()];
+        try {
+          await wrapper.sendMessage(config.birthdayChannel, {
+            content: `Happy birthday to <@!${birthday.who}>!`,
+          });
+          if (birthday.who in data) {
+            data[birthday.who].push(date.getFullYear());
+          } else {
+            data[birthday.who] = [date.getFullYear()];
+          }
+        } catch (err) {
+          logger.error(
+            `Error in sending birthday message: ${
+              JSON.stringify(birthday)
+            }: ${err}`,
+          );
         }
       }
     }
@@ -219,7 +227,7 @@ export async function main(): Promise<void> {
           bookReminderData.splice(0, bookReminderData.length);
         }
       } catch (err) {
-        logger.error(`Could not load config: ${err}`);
+        logger.error(`Error in background task loadConfig: ${err}`);
       }
       await sleep(1_000 * 60 * 30); // 30 minutes
     }
@@ -228,7 +236,11 @@ export async function main(): Promise<void> {
   (async () => {
     await sleep(1_000 * 30);
     while (true) {
-      await checkBirthday(wrapper, config, birthdayData);
+      try {
+        await checkBirthday(wrapper, config, birthdayData);
+      } catch (err) {
+        logger.error(`Error in background task checkBirthday: ${err}`);
+      }
       await sleep(1_000 * 60 * 60 * 6); // 6 hours
     }
   })();
@@ -236,7 +248,11 @@ export async function main(): Promise<void> {
   (async () => {
     await sleep(1_000 * 30);
     while (true) {
-      await checkBookReminder(wrapper, config, bookReminderData);
+      try {
+        await checkBookReminder(wrapper, config, bookReminderData);
+      } catch (err) {
+        logger.error(`Error in background task checkBookReminder: ${err}`);
+      }
       await sleep(1_000 * 60 * 60 * 12); // 12 hours
     }
   })();
@@ -244,7 +260,7 @@ export async function main(): Promise<void> {
   // uptime logging (TEMPORARY)
   (async () => {
     while (true) {
-      console.log("Health tick");
+      logger.debug("Health tick");
       await sleep(1_000 * 60 * 5); // 5 minutes
     }
   })();
