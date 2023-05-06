@@ -80,33 +80,34 @@ async function checkBirthday(
   data: Record<string, Array<number>>,
 ): Promise<void> {
   logger.debug("Checking for birthdays");
-  if (config.birthdays.length > 0) {
-    const date = new Date(new Date().getTime() - (1_000 * 60 * 60 * 8));
-    const dateMatch = `${date.getMonth() + 1}/${date.getDate()}`;
-    for (const birthday of config.birthdays) {
-      if (birthday.when === dateMatch) {
-        if (
-          birthday.who in data &&
-          data[birthday.who].includes(date.getFullYear())
-        ) {
-          continue;
+  if (config.birthdays.length === 0) {
+    return;
+  }
+  const date = new Date(new Date().getTime() - (1_000 * 60 * 60 * 7));
+  const dateMatch = `${date.getMonth() + 1}/${date.getDate()}`;
+  for (const birthday of config.birthdays) {
+    if (birthday.when === dateMatch) {
+      if (
+        birthday.who in data &&
+        data[birthday.who].includes(date.getFullYear())
+      ) {
+        continue;
+      }
+      try {
+        await wrapper.sendMessage(config.birthdayChannel, {
+          content: `Happy birthday to <@!${birthday.who}>!`,
+        });
+        if (birthday.who in data) {
+          data[birthday.who].push(date.getFullYear());
+        } else {
+          data[birthday.who] = [date.getFullYear()];
         }
-        try {
-          await wrapper.sendMessage(config.birthdayChannel, {
-            content: `Happy birthday to <@!${birthday.who}>!`,
-          });
-          if (birthday.who in data) {
-            data[birthday.who].push(date.getFullYear());
-          } else {
-            data[birthday.who] = [date.getFullYear()];
-          }
-        } catch (err) {
-          logger.error(
-            `Error in sending birthday message: ${
-              JSON.stringify(birthday)
-            }: ${err}`,
-          );
-        }
+      } catch (err) {
+        logger.error(
+          `Error in sending birthday message: ${
+            JSON.stringify(birthday)
+          }: ${err}`,
+        );
       }
     }
   }

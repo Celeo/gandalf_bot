@@ -54,8 +54,7 @@ import type {
 /**
  * Wrapper for Discordeno's `Bot` object.
  *
- * In a class rather than separately-imported functions
- * to facilitate testing and organization.
+ * In a class rather than separately-imported functions to facilitate testing.
  */
 export class BotWrapper {
   readonly bot: Bot;
