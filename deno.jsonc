@@ -2,9 +2,8 @@
   "tasks": {
     "run": "deno run --allow-read=words.txt,.env,.env.defaults,.env.example --allow-env --allow-net main.ts",
     "compile": "deno compile --allow-read=words.txt,.env,.env.defaults,.env.example --allow-env --allow-net --output gandalf_bot main.ts",
-    "test": "deno test --allow-all",
+    "test": "deno test --allow-read --allow-env --allow-net=127.0.0.1",
     "test:cov": "deno test --allow-all --coverage=coverage && deno coverage coverage",
-    "download_words": "curl -s https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt | tr -d '\r' > words.txt",
-    "redis:load:local": "deno run --allow-env=DISCORD_BOT_TOKEN --allow-net --allow-read=config.json loadRedisWithConfig.ts"
+    "download_words": "curl -s https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt | tr -d '\r' > words.txt"
   }
 }
