@@ -142,41 +142,10 @@ export class BotWrapper {
 // ===== other =====
 
 export { memoizy } from "https://deno.land/x/memoizy@1.0.0/mod.ts";
-import {
-  connect as _redisConnect,
-  Redis,
-  RedisConnectOptions,
-} from "https://deno.land/x/redis@v0.29.3/mod.ts";
 import * as log from "https://deno.land/std@0.186.0/log/mod.ts";
 export { default as isEqual } from "https://deno.land/x/lodash@4.17.15-es/isEqual.js";
 import { dateAsString } from "./dateUtil.ts";
 import "https://deno.land/std@0.186.0/dotenv/load.ts";
-
-export const ENV_REDIS_HOSTNAME = "REDIS_HOSTNAME";
-export const ENV_REDIS_USERNAME = "REDIS_USERNAME";
-export const ENV_REDIS_PASSWORD = "REDIS_PASSWORD";
-
-/**
- * Connect to Redis, using the connection information from the
- * environment variables.
- */
-export function redisConnect(): Promise<Redis> {
-  logger.debug("Connecting to Redis");
-  const hostname = Deno.env.get(ENV_REDIS_HOSTNAME);
-  const username = Deno.env.get(ENV_REDIS_USERNAME);
-  const password = Deno.env.get(ENV_REDIS_PASSWORD);
-  if (hostname === undefined || hostname.length === 0) {
-    throw new Error("Missing Redis hostname env var");
-  }
-  const args: RedisConnectOptions = { hostname };
-  if (username) {
-    args.username = username;
-  }
-  if (password) {
-    args.password = password;
-  }
-  return _redisConnect(args);
-}
 
 log.setup({
   handlers: {

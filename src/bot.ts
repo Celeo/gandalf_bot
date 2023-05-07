@@ -224,7 +224,7 @@ export async function main(): Promise<void> {
         const maybeNewConfig = await loadConfig();
         if (!isEqual(maybeNewConfig, config)) {
           logger.info("Found config file edit; reloading");
-          config = await loadConfig();
+          config = maybeNewConfig;
           for (const prop of Object.getOwnPropertyNames(birthdayData)) {
             delete birthdayData[prop];
           }

@@ -2,7 +2,7 @@ import { assertEquals, sinon } from "./_test_deps.js";
 import { loadConfig } from "../src/config.ts";
 
 Deno.test("config - loadConfig - works when mocked", async () => {
-  const data = `{
+  const data = {
     "containmentRoleId": "1",
     "containmentResponseGif": "abc",
     "blessableUserIds": ["2", "3"],
@@ -12,12 +12,29 @@ Deno.test("config - loadConfig - works when mocked", async () => {
     "birthdayChannel": "6",
     "birthdays": [],
     "bookChannel": "7",
-    "bookReminders": [8, 9, 10, 11]
-  }`;
-  const redisGet = sinon.stub();
-  const redisClose = sinon.stub();
-  redisGet.returns(data);
-  const loaded = await loadConfig(() => ({ get: redisGet, close: redisClose }));
+    "bookReminders": [8, 9, 10, 11],
+  };
+
+  const fetchStub = sinon.stub();
+  fetchStub.onFirstCall().returns(
+    Promise.resolve({
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          authorizationToken: "aaa",
+          downloadUrl: "bbb",
+          allowed: { bucketName: "ccc" },
+        }),
+    }),
+  );
+  fetchStub.onSecondCall().returns(
+    Promise.resolve({
+      status: 200,
+      json: () => Promise.resolve(data),
+    }),
+  );
+
+  const loaded = await loadConfig(fetchStub);
   assertEquals(loaded, {
     containmentRoleId: 1n,
     containmentResponseGif: "abc",
@@ -30,6 +47,9 @@ Deno.test("config - loadConfig - works when mocked", async () => {
     bookChannel: 7n,
     bookReminders: [8, 9, 10, 11],
   });
-  assertEquals(redisGet.getCalls().length, 1);
-  assertEquals(redisClose.getCalls().length, 1);
+  assertEquals(fetchStub.getCalls().length, 2);
+  assertEquals(fetchStub.getCalls()[1].args, [
+    "bbb/file/ccc/config.test.json",
+    { headers: { authorization: "aaa" } },
+  ]);
 });
