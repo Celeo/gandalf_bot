@@ -4,6 +4,9 @@ on:
   push:
     branches: [master]
 
+env:
+  B2_FILE_NAME: config.test.json
+
 jobs:
   build:
     runs-on: ubuntu-latest
