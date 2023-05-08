@@ -3,8 +3,9 @@ primary_region = "lax"
 
 [checks]
   [checks.tcp_health]
+    type = "tcp"
     grace_period = "1m"
     interval = "5m"
     port = 8000
     timeout = "10s"
-    type = "tcp"
+    restart_limit = 3
