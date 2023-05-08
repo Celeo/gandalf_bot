@@ -260,17 +260,6 @@ export async function main(): Promise<void> {
     }
   })();
 
-  (async () => {
-    const encoder = new TextEncoder();
-    const tcpListener = Deno.listen({ port: 8000 });
-    logger.debug("TCP host listening");
-    for await (const conn of tcpListener) {
-      logger.debug("Incoming TCP connection");
-      await conn.write(encoder.encode("Pong"));
-      conn.close();
-    }
-  })();
-
   /* start and block */
 
   await wrapper.startBot();
