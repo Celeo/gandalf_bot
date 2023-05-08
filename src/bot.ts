@@ -218,8 +218,8 @@ export async function main(): Promise<void> {
   /* background functions */
 
   (async () => {
-    await sleep(1_000 * 30);
     while (true) {
+      await sleep(1_000 * 60 * 30); // 30 minutes
       try {
         const maybeNewConfig = await loadConfig();
         if (!isEqual(maybeNewConfig, config)) {
@@ -233,7 +233,6 @@ export async function main(): Promise<void> {
       } catch (err) {
         logger.error(`Error in background task loadConfig: ${err}`);
       }
-      await sleep(1_000 * 60 * 30); // 30 minutes
     }
   })();
 
@@ -258,6 +257,17 @@ export async function main(): Promise<void> {
         logger.error(`Error in background task checkBookReminder: ${err}`);
       }
       await sleep(1_000 * 60 * 60 * 12); // 12 hours
+    }
+  })();
+
+  (async () => {
+    const encoder = new TextEncoder();
+    const tcpListener = Deno.listen({ port: 8000 });
+    logger.debug("TCP host listening");
+    for await (const conn of tcpListener) {
+      logger.debug("Incoming TCP connection");
+      await conn.write(encoder.encode("Pong"));
+      conn.close();
     }
   })();
 

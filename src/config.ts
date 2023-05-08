@@ -79,6 +79,7 @@ export async function loadConfig(get = fetch): Promise<Config> {
     );
   }
   const data = await downloadResponse.json();
+  logger.debug("Got config data from B2");
 
   data.containmentRoleId = BigInt(data.containmentRoleId);
   data.blessableUserIds = data.blessableUserIds.map((s: string) => BigInt(s));

@@ -1,2 +1,10 @@
 app = "celeo-gandalf-bot"
 primary_region = "lax"
+
+[checks]
+  [checks.tcp]
+    grace_period = "2m"
+    interval = "5m"
+    port = 8000
+    timeout = "10s"
+    type = "tcp"
