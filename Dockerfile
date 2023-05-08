@@ -23,6 +23,5 @@ COPY --from=bin /deno /bin/deno
 WORKDIR /deno-dir
 COPY . .
 
-EXPOSE 8000
 ENTRYPOINT ["/bin/deno"]
 CMD ["run", "--allow-all", "main.ts"]
