@@ -193,7 +193,7 @@ const QUOTES = [
   "The authority is not granted you to deny the return of the King - Steward!",
   "Three days ride as the Nazgul flies. And you'd better hope we don't have one of those on our tail.",
   "Now come the days of the King. May they be blessed.",
-  "There is one who could unite them. One who could reclaim the throne of Gondor",
+  "There is one who could unite them. One who could reclaim the throne of Gondor.",
   "This is not the weather of the world. This is a device of Sauron's making. A broil of fume he sends ahead of his host. The Orcs of Mordor have no love of daylight, so he covers the face of the sun to ease their passage along the road to war. When the shadow of Mordor reaches this city it will begin.",
   "The dark fire will not avail you Flame of Udun!",
   "Good gracious me!",
