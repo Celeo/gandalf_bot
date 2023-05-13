@@ -1,4 +1,5 @@
-fly.toml
+/target
 .env
+LICENSE-*
+README.md
 config.*
-gandalf_bot

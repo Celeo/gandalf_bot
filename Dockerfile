@@ -1,27 +1,26 @@
-# Based on https://github.com/denoland/deno_docker/blob/main/alpine.dockerfile
+FROM rust:latest as builder
 
-ARG DENO_VERSION=1.33.1
-ARG BIN_IMAGE=denoland/deno:bin-${DENO_VERSION}
-FROM ${BIN_IMAGE} AS bin
-
-FROM frolvlad/alpine-glibc:alpine-3.13
-
-RUN apk --no-cache add ca-certificates
-
-RUN addgroup --gid 1000 deno \
-  && adduser --uid 1000 --disabled-password deno --ingroup deno \
-  && mkdir /deno-dir/ \
-  && chown deno:deno /deno-dir/
-
-ENV DENO_DIR /deno-dir/
-ENV DENO_INSTALL_ROOT /usr/local
-
-ARG DENO_VERSION
-ENV DENO_VERSION=${DENO_VERSION}
-COPY --from=bin /deno /bin/deno
-
-WORKDIR /deno-dir
+WORKDIR /usr/src/app
 COPY . .
+# Will build and cache the binary and dependent crates in release mode
+RUN --mount=type=cache,target=/usr/local/cargo,from=rust:latest,source=/usr/local/cargo \
+    --mount=type=cache,target=target \
+    cargo build --release && mv ./target/release/gandalf_bot ./gandalf_bot
 
-ENTRYPOINT ["/bin/deno"]
-CMD ["run", "--allow-all", "main.ts"]
+# Runtime image
+FROM debian:bullseye-slim
+RUN apt update && apt install ca-certificates curl -y && apt-get clean
+# Run as "app" user
+RUN useradd -ms /bin/bash app
+
+USER app
+WORKDIR /app
+
+# get the words
+RUN curl -s https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt | tr -d '\r' > words.txt
+
+# Get compiled binaries from builder's cargo install directory
+COPY --from=builder /usr/src/app/gandalf_bot /app/gandalf_bot
+
+# Run the app
+CMD ./gandalf_bot

@@ -13,14 +13,25 @@ jobs:
     if: |
       !(github.event_name == 'push' && contains(github.event.head_commit.message, '[skip ci]'))
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Deno Version ${{ matrix.deno-version }}
-        uses: denolib/setup-deno@v2
-        with:
-          deno-version: "~1.27"
-      - name: Lint Deno Module
-        run: deno fmt --check --ignore='README.md'
-      - name: Create sample words.txt
-        run: echo "dictionary" >> words.txt
-      - name: Test Deno Module
-        run: deno test --allow-all
+    - uses: actions/checkout@v2
+    - name: Cache cargo registry
+      uses: actions/cache@v1
+      with:
+        path: ~/.cargo/registry
+        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+    - name: Cache cargo index
+      uses: actions/cache@v1
+      with:
+        path: ~/.cargo/git
+        key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+    - name: Cache cargo build
+      uses: actions/cache@v1
+      with:
+        path: target
+        key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+    - name: Install clippy
+      run: rustup component add clippy
+    - name: Run tests
+      run: cargo test --verbose --all
+    - name: Run clippy
+      run: cargo clippy -- -D warnings
