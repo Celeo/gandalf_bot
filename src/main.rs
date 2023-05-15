@@ -1,5 +1,6 @@
 #![deny(clippy::all, clippy::pedantic)]
 
+use crate::config::{load_config, Config};
 use anyhow::Result;
 use base64::{engine::general_purpose, Engine as _};
 use dotenv::dotenv;
@@ -7,6 +8,9 @@ use log::{error, info, warn};
 use std::{env, sync::Arc};
 use twilight_gateway::{Event, Intents, Shard, ShardId};
 use twilight_http::Client as HttpClient;
+
+mod config;
+mod event_handlers;
 
 /// Parse a bot ID from the token.
 ///
@@ -23,6 +27,7 @@ fn bot_id_from_token(token: &str) -> u64 {
     .unwrap()
 }
 
+/// Entrypoint.
 #[tokio::main]
 async fn main() {
     dotenv().ok();
@@ -40,6 +45,14 @@ async fn main() {
     let mut shard = Shard::new(ShardId::ONE, token.clone(), intents);
     let http = Arc::new(HttpClient::new(token));
 
+    let config = match load_config().await {
+        Ok(c) => Arc::new(c),
+        Err(e) => {
+            error!("Could not load config: {e}");
+            std::process::exit(1);
+        }
+    };
+
     info!("Waiting for events");
     loop {
         let event = match shard.next_event().await {
@@ -54,8 +67,9 @@ async fn main() {
         };
 
         let http = Arc::clone(&http);
+        let config = Arc::clone(&config);
         tokio::spawn(async move {
-            if let Err(e) = handle_event(event, http, bot_id).await {
+            if let Err(e) = handle_event(config, event, http, bot_id).await {
                 error!("Error in future: {e}");
             }
         });
@@ -63,6 +77,11 @@ async fn main() {
 }
 
 /// Handle a single Event from the Discord Gateway.
-async fn handle_event(event: Event, http: Arc<HttpClient>, bot_id: u64) -> Result<()> {
+async fn handle_event(
+    config: Arc<Config>,
+    event: Event,
+    http: Arc<HttpClient>,
+    bot_id: u64,
+) -> Result<()> {
     todo!()
 }
