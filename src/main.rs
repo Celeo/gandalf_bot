@@ -1,7 +1,6 @@
 #![deny(clippy::all, clippy::pedantic)]
 
-use crate::config::{load_config, Config};
-use anyhow::Result;
+use crate::config::{load as load_config, Config};
 use base64::{engine::general_purpose, Engine as _};
 use dotenv::dotenv;
 use log::{error, info, warn};
@@ -68,20 +67,19 @@ async fn main() {
 
         let http = Arc::clone(&http);
         let config = Arc::clone(&config);
-        tokio::spawn(async move {
-            if let Err(e) = handle_event(config, event, http, bot_id).await {
-                error!("Error in future: {e}");
-            }
-        });
+        tokio::spawn(async move { handle_event(event, config, http, bot_id).await });
     }
 }
 
 /// Handle a single Event from the Discord Gateway.
-async fn handle_event(
-    config: Arc<Config>,
-    event: Event,
-    http: Arc<HttpClient>,
-    bot_id: u64,
-) -> Result<()> {
-    todo!()
+async fn handle_event(event: Event, config: Arc<Config>, http: Arc<HttpClient>, bot_id: u64) {
+    let handlers = &[event_handlers::bless_you::handler];
+
+    for handler in handlers {
+        let config = Arc::clone(&config);
+        let http = Arc::clone(&http);
+        if let Err(e) = handler(&event, config, http, bot_id).await {
+            error!("Error in event handler: {e}");
+        }
+    }
 }
