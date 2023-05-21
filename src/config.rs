@@ -15,7 +15,7 @@ pub struct ReactionRole {
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Birthday {
-    pub who: String,
+    pub who: u64,
     pub when: String,
 }
 

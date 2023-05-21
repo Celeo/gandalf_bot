@@ -2,9 +2,12 @@ use crate::config::Config;
 use anyhow::Result;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use std::sync::{Arc, Mutex};
+use std::{
+    collections::HashSet,
+    sync::{Arc, Mutex, MutexGuard},
+};
 use twilight_gateway::Event;
-use twilight_http::Client as HttpClient;
+use twilight_http::{request::channel::reaction::RequestReactionType, Client as HttpClient};
 
 static PATTERNS: Lazy<Vec<Regex>> = Lazy::new(|| {
     vec![
@@ -20,18 +23,18 @@ static PATTERNS: Lazy<Vec<Regex>> = Lazy::new(|| {
     ]
 });
 
-static WORDS: Lazy<Mutex<Vec<String>>> = Lazy::new(|| Mutex::new(Vec::new()));
+static WORDS: Lazy<Mutex<HashSet<String>>> = Lazy::new(|| Mutex::new(HashSet::new()));
 
-fn load_words() -> Vec<String> {
+fn load_words() -> MutexGuard<'static, HashSet<String>> {
     if WORDS.lock().unwrap().is_empty() {
         let text = std::fs::read_to_string("./words.txt").expect("Could not load words.txt");
-        let mut words: Vec<String> = text
+        let words: Vec<String> = text
             .split('\n')
             .map(std::string::ToString::to_string)
             .collect();
-        WORDS.lock().unwrap().append(&mut words);
+        WORDS.lock().unwrap().extend(words);
     }
-    WORDS.lock().unwrap().to_vec()
+    WORDS.lock().unwrap()
 }
 
 fn should_post(author_id: u64, content: &str, config: &Arc<Config>) -> bool {
@@ -68,10 +71,12 @@ pub async fn handler(
 ) -> Result<()> {
     if let Event::MessageCreate(event) = e {
         if should_post(event.author.id.get(), &event.content, &config) {
-            http.create_message(event.channel_id)
-                .reply(event.id)
-                .content("🤧")?
-                .await?;
+            http.create_reaction(
+                event.channel_id,
+                event.id,
+                &RequestReactionType::Unicode { name: "🤧" },
+            )
+            .await?;
         }
     }
     Ok(())
