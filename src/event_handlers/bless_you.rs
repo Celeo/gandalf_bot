@@ -7,7 +7,7 @@ use std::{
     sync::{Arc, Mutex, MutexGuard},
 };
 use twilight_gateway::Event;
-use twilight_http::{request::channel::reaction::RequestReactionType, Client as HttpClient};
+use twilight_http::{request::channel::reaction::RequestReactionType, Client};
 
 static PATTERNS: Lazy<Vec<Regex>> = Lazy::new(|| {
     vec![
@@ -37,7 +37,7 @@ fn load_words() -> MutexGuard<'static, HashSet<String>> {
     WORDS.lock().unwrap()
 }
 
-fn should_post(author_id: u64, content: &str, config: &Arc<Config>) -> bool {
+fn should_react(author_id: u64, content: &str, config: &Arc<Config>) -> bool {
     if !config.blessable_user_ids.contains(&author_id) {
         return false;
     }
@@ -63,14 +63,9 @@ fn should_post(author_id: u64, content: &str, config: &Arc<Config>) -> bool {
     true
 }
 
-pub async fn handler(
-    e: &Event,
-    config: Arc<Config>,
-    http: Arc<HttpClient>,
-    _bot_id: u64,
-) -> Result<()> {
+pub async fn handler(e: &Event, config: &Arc<Config>, http: &Arc<Client>) -> Result<()> {
     if let Event::MessageCreate(event) = e {
-        if should_post(event.author.id.get(), &event.content, &config) {
+        if should_react(event.author.id.get(), &event.content, &config) {
             http.create_reaction(
                 event.channel_id,
                 event.id,
@@ -84,25 +79,25 @@ pub async fn handler(
 
 #[cfg(test)]
 mod tests {
-    use super::should_post;
+    use super::should_react;
     use crate::config::Config;
     use std::sync::Arc;
 
     #[test]
-    fn test_should_post() {
+    fn test_should_react() {
         let config = {
             let mut config = Config::default();
             config.blessable_user_ids.push(1);
             Arc::new(config)
         };
 
-        assert!(!should_post(2, "", &config));
-        assert!(!should_post(1, "a b", &config));
-        assert!(!should_post(1, "a\nb", &config));
-        assert!(!should_post(1, "abcdef", &config));
-        assert!(!should_post(1, "https://example.com/", &config));
-        assert!(!should_post(1, "abdominohysterectomy", &config));
+        assert!(!should_react(2, "", &config));
+        assert!(!should_react(1, "a b", &config));
+        assert!(!should_react(1, "a\nb", &config));
+        assert!(!should_react(1, "abcdef", &config));
+        assert!(!should_react(1, "https://example.com/", &config));
+        assert!(!should_react(1, "abdominohysterectomy", &config));
 
-        assert!(should_post(1, "adlfgjlafsgljgakfs", &config));
+        assert!(should_react(1, "adlfgjlafsgljgakfs", &config));
     }
 }

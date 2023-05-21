@@ -1,6 +1,7 @@
 #![deny(clippy::all, clippy::pedantic)]
 
 use crate::config::{load as load_config, Config};
+use anyhow::Result;
 use base64::{engine::general_purpose, Engine as _};
 use dotenv::dotenv;
 use log::{error, info, warn};
@@ -67,19 +68,22 @@ async fn main() {
 
         let http = Arc::clone(&http);
         let config = Arc::clone(&config);
-        tokio::spawn(async move { handle_event(event, config, http, bot_id).await });
+        tokio::spawn(async move {
+            if let Err(e) = handle_event(event, config, http, bot_id).await {
+                error!("Error processing event handler: {e}");
+            }
+        });
     }
 }
 
-/// Handle a single Event from the Discord Gateway.
-async fn handle_event(event: Event, config: Arc<Config>, http: Arc<HttpClient>, bot_id: u64) {
-    let handlers = &[event_handlers::bless_you::handler];
-
-    for handler in handlers {
-        let config = Arc::clone(&config);
-        let http = Arc::clone(&http);
-        if let Err(e) = handler(&event, config, http, bot_id).await {
-            error!("Error in event handler: {e}");
-        }
-    }
+/// Handle a single event from the Discord Gateway.
+async fn handle_event(
+    event: Event,
+    config: Arc<Config>,
+    http: Arc<HttpClient>,
+    _bot_id: u64,
+) -> Result<()> {
+    event_handlers::bless_you::handler(&event, &config, &http).await?;
+    event_handlers::guessing_games::handler(&event, &http).await?;
+    Ok(())
 }
