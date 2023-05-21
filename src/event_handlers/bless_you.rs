@@ -16,9 +16,9 @@ static PATTERNS: Lazy<Vec<Regex>> = Lazy::new(|| {
         Regex::new(r"(?i)^[lo]{5,}$").unwrap(),
         Regex::new(r"^https?://").unwrap(),
         Regex::new(r"^re{5,}").unwrap(),
-        Regex::new(r"^<:\w+:\d+>$/").unwrap(),
-        Regex::new(r"^<@!?\d+>$/").unwrap(),
-        Regex::new(r"^!/").unwrap(),
+        Regex::new(r"^<:\w+:\d+>$").unwrap(),
+        Regex::new(r"^<@!?\d+>$").unwrap(),
+        Regex::new(r"^!").unwrap(),
         Regex::new(r"^\d+$").unwrap(),
     ]
 });

@@ -9,8 +9,10 @@ use std::{env, sync::Arc};
 use twilight_gateway::{Event, Intents, Shard, ShardId};
 use twilight_http::Client as HttpClient;
 
+mod commands;
 mod config;
 mod event_handlers;
+mod quotes;
 
 /// Parse a bot ID from the token.
 ///
@@ -81,9 +83,10 @@ async fn handle_event(
     event: Event,
     config: Arc<Config>,
     http: Arc<HttpClient>,
-    _bot_id: u64,
+    bot_id: u64,
 ) -> Result<()> {
     event_handlers::bless_you::handler(&event, &config, &http).await?;
     event_handlers::guessing_games::handler(&event, &http).await?;
+    event_handlers::respond::handler(&event, &http, bot_id).await?;
     Ok(())
 }
