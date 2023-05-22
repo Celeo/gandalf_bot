@@ -65,7 +65,7 @@ fn should_react(author_id: u64, content: &str, config: &Arc<Config>) -> bool {
 
 pub async fn handler(e: &Event, config: &Arc<Config>, http: &Arc<Client>) -> Result<()> {
     if let Event::MessageCreate(event) = e {
-        if should_react(event.author.id.get(), &event.content, &config) {
+        if should_react(event.author.id.get(), &event.content, config) {
             http.create_reaction(
                 event.channel_id,
                 event.id,
