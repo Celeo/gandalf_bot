@@ -43,7 +43,8 @@ async fn main() {
     let intents = Intents::GUILD_MESSAGES
         | Intents::MESSAGE_CONTENT
         | Intents::GUILD_MEMBERS
-        | Intents::GUILD_MESSAGE_REACTIONS;
+        | Intents::GUILD_MESSAGE_REACTIONS
+        | Intents::DIRECT_MESSAGES;
     let mut shard = Shard::new(ShardId::ONE, token.clone(), intents);
     let http = Arc::new(HttpClient::new(token));
 
@@ -88,5 +89,6 @@ async fn handle_event(
     event_handlers::bless_you::handler(&event, &config, &http).await?;
     event_handlers::guessing_games::handler(&event, &http).await?;
     event_handlers::respond::handler(&event, &http, bot_id).await?;
+    event_handlers::roles::handler(&event, &config, &http).await?;
     Ok(())
 }
