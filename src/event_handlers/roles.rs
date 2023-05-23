@@ -98,5 +98,92 @@ pub async fn handler(e: &Event, config: &Arc<Config>, http: &Arc<Client>) -> Res
 
 #[cfg(test)]
 mod tests {
-    // TODO
+    use super::handle_reaction;
+    use crate::config::{Config, ReactionRole};
+    use std::sync::Arc;
+    use twilight_model::{
+        channel::message::ReactionType,
+        guild::{Permissions, Role},
+        id::Id,
+    };
+
+    #[test]
+    fn test_handle_reaction_no_config() {
+        assert!(handle_reaction(
+            &Arc::new(Config::default()),
+            &vec![],
+            1,
+            2,
+            &ReactionType::Unicode {
+                name: String::from("🤧"),
+            },
+        )
+        .unwrap()
+        .is_none());
+    }
+
+    #[test]
+    fn test_handle_reaction_no_match() {
+        let config = {
+            let mut config = Config::default();
+            config.reaction_roles.push(ReactionRole {
+                channel_id: 1,
+                message_id: 2,
+                role_name: String::from("role-1"),
+                emoji: String::from("1️⃣"),
+            });
+            Arc::new(config)
+        };
+        assert!(handle_reaction(
+            &config,
+            &vec![],
+            1,
+            2,
+            &ReactionType::Unicode {
+                name: String::from("2️⃣"),
+            },
+        )
+        .unwrap()
+        .is_none());
+    }
+
+    #[test]
+    fn test_handle_reaction_match() {
+        let config = {
+            let mut config = Config::default();
+            config.reaction_roles.push(ReactionRole {
+                channel_id: 1,
+                message_id: 2,
+                role_name: String::from("role-1"),
+                emoji: String::from("1️⃣"),
+            });
+            Arc::new(config)
+        };
+        let roles = vec![Role {
+            color: 0,
+            hoist: true,
+            icon: None,
+            id: Id::new(3),
+            managed: false,
+            mentionable: true,
+            name: String::from("role-1"),
+            permissions: Permissions::CREATE_INVITE,
+            position: 1,
+            tags: None,
+            unicode_emoji: None,
+        }];
+        assert_eq!(
+            handle_reaction(
+                &config,
+                &roles,
+                1,
+                2,
+                &ReactionType::Unicode {
+                    name: String::from("1️⃣"),
+                },
+            )
+            .unwrap(),
+            Some(roles.get(0).unwrap())
+        );
+    }
 }
