@@ -8,6 +8,8 @@ use log::{error, info, warn};
 use std::{env, sync::Arc};
 use twilight_gateway::{Event, Intents, Shard, ShardId};
 use twilight_http::Client as HttpClient;
+use twilight_interactions::command::CreateCommand;
+use twilight_model::id::Id;
 
 mod commands;
 mod config;
@@ -47,6 +49,18 @@ async fn main() {
         | Intents::DIRECT_MESSAGES;
     let mut shard = Shard::new(ShardId::ONE, token.clone(), intents);
     let http = Arc::new(HttpClient::new(token));
+    let interaction_client = http.interaction(Id::new(bot_id));
+
+    interaction_client
+        .set_global_commands(&[
+            commands::PinCommand::create_command().into(),
+            commands::UnpinCommand::create_command().into(),
+            commands::BreachCommand::create_command().into(),
+            commands::UnbreachCommand::create_command().into(),
+            commands::HelpCommand::create_command().into(),
+        ])
+        .await
+        .unwrap();
 
     let config = match load_config().await {
         Ok(c) => Arc::new(c),
@@ -69,7 +83,7 @@ async fn main() {
             }
         };
 
-        let http = Arc::clone(&http);
+        let http: Arc<HttpClient> = Arc::clone(&http);
         let config = Arc::clone(&config);
         tokio::spawn(async move {
             if let Err(e) = handle_event(event, config, http, bot_id).await {
@@ -90,5 +104,7 @@ async fn handle_event(
     event_handlers::guessing_games::handler(&event, &http).await?;
     event_handlers::respond::handler(&event, &http, bot_id).await?;
     event_handlers::roles::handler(&event, &config, &http).await?;
+    commands::handler(&event, &config, &http, bot_id).await?;
+
     Ok(())
 }
