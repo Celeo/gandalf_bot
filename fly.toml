@@ -1,2 +1,5 @@
 app = "celeo-gandalf-bot"
 primary_region = "lax"
+
+[env]
+  RUST_LOG = "gandalf_bot"
