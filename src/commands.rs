@@ -1,11 +1,13 @@
 use crate::config::Config;
 use anyhow::Result;
-use std::sync::Arc;
+use std::{str::FromStr, sync::Arc};
 use twilight_gateway::Event;
-use twilight_http::Client;
+use twilight_http::{client::InteractionClient, Client};
 use twilight_interactions::command::{CommandInputData, CommandModel, CreateCommand};
 use twilight_model::{
     application::interaction::{InteractionData, InteractionType},
+    gateway::payload::incoming::InteractionCreate,
+    guild::Permissions,
     http::interaction::{InteractionResponse, InteractionResponseType},
     id::Id,
     user::User,
@@ -47,23 +49,45 @@ pub struct UnpinCommand {
 #[command(name = "breach", desc = "Send someone to Mordor")]
 pub struct BreachCommand {
     /// User to target
-    pub target: User,
+    pub user: User,
 }
 
 #[derive(Debug, CommandModel, CreateCommand)]
 #[command(name = "unbreach", desc = "Save someone from Mordor")]
 pub struct UnbreachCommand {
     /// User to target
-    pub target: User,
+    pub user: User,
 }
 
 #[derive(Debug, CommandModel, CreateCommand)]
 #[command(name = "help", desc = "Show bot commands")]
 pub struct HelpCommand;
 
+async fn resp<'a>(
+    event: &InteractionCreate,
+    interaction: &InteractionClient<'a>,
+    message: &str,
+) -> Result<()> {
+    interaction
+        .create_response(
+            event.id,
+            &event.token,
+            &InteractionResponse {
+                kind: InteractionResponseType::ChannelMessageWithSource,
+                data: Some(
+                    InteractionResponseDataBuilder::new()
+                        .content(message)
+                        .build(),
+                ),
+            },
+        )
+        .await?;
+    Ok(())
+}
+
 pub async fn handler(
     e: &Event,
-    _config: &Arc<Config>,
+    config: &Arc<Config>,
     http: &Arc<Client>,
     bot_id: u64,
 ) -> Result<()> {
@@ -73,29 +97,73 @@ pub async fn handler(
         }
         let interaction = http.interaction(Id::new(bot_id));
         if let InteractionData::ApplicationCommand(app_command) = &event.0.data.as_ref().unwrap() {
-            let input_data = CommandInputData::from(app_command.as_ref().to_owned());
-            let executor_is_admin = false; // TODO
+            let input_data = CommandInputData::from(app_command.as_ref().clone());
+            let sender_is_admin = event
+                .member
+                .as_ref()
+                .unwrap()
+                .permissions
+                .map_or(false, |p| p.contains(Permissions::ADMINISTRATOR));
 
             match app_command.name.as_str() {
-                "pin" => (),
-                "unpin" => (),
-                "breach" => (),
-                "unbreach" => (),
-                "help" => {
-                    interaction
-                        .create_response(
-                            event.id,
-                            &event.token,
-                            &InteractionResponse {
-                                kind: InteractionResponseType::ChannelMessageWithSource,
-                                data: Some(
-                                    InteractionResponseDataBuilder::new()
-                                        .content(HELP_CONTENT)
-                                        .build(),
-                                ),
-                            },
+                "pin" => {
+                    let pin = PinCommand::from_interaction(input_data)?;
+                    http.create_pin(
+                        event.channel.as_ref().unwrap().id,
+                        Id::from_str(&pin.message_id)?,
+                    )
+                    .await?;
+                    resp(event, &interaction, "👍").await?;
+                }
+                "unpin" => {
+                    let unpin = UnpinCommand::from_interaction(input_data)?;
+                    http.delete_pin(
+                        event.channel.as_ref().unwrap().id,
+                        Id::from_str(&unpin.message_id)?,
+                    )
+                    .await?;
+                    resp(event, &interaction, "👍").await?;
+                }
+                "breach" => {
+                    if !sender_is_admin {
+                        resp(
+                            event,
+                            &interaction,
+                            "https://tenor.com/view/no-nooo-nope-eat-fingerwag-gif-14832139",
                         )
                         .await?;
+                        return Ok(());
+                    }
+                    let breach = BreachCommand::from_interaction(input_data)?;
+                    http.add_guild_member_role(
+                        event.guild_id.unwrap(),
+                        breach.user.id,
+                        Id::new(config.containment_role_id),
+                    )
+                    .await?;
+                    resp(event, &interaction, &config.containment_response_gif).await?;
+                }
+                "unbreach" => {
+                    if !sender_is_admin {
+                        resp(
+                            event,
+                            &interaction,
+                            "https://tenor.com/view/no-nooo-nope-eat-fingerwag-gif-14832139",
+                        )
+                        .await?;
+                        return Ok(());
+                    }
+                    let breach = BreachCommand::from_interaction(input_data)?;
+                    http.remove_guild_member_role(
+                        event.guild_id.unwrap(),
+                        breach.user.id,
+                        Id::new(config.containment_role_id),
+                    )
+                    .await?;
+                    resp(event, &interaction, "👍").await?;
+                }
+                "help" => {
+                    resp(event, &interaction, HELP_CONTENT).await?;
                 }
                 _ => (),
             }
