@@ -1,5 +1,4 @@
+/target
 .env
-config.*
+config.*json
 words.txt
-gandalf_bot
-coverage
