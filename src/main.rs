@@ -20,6 +20,9 @@ mod quotes;
 ///
 /// This function panics instead of returning a Result, as the token
 /// must confirm to this layout in order to be valid for Discord.
+///
+/// There's a function in the bot library for this, but it's simpler
+/// to just do this.
 fn bot_id_from_token(token: &str) -> u64 {
     std::str::from_utf8(
         &general_purpose::STANDARD_NO_PAD
