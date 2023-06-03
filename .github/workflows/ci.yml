@@ -29,6 +29,8 @@ jobs:
       with:
         path: target
         key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+    - name: Get words
+      run: curl -s https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt | tr -d '\r' > words.txt
     - name: Install clippy
       run: rustup component add clippy
     - name: Run tests
