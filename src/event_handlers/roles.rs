@@ -60,7 +60,7 @@ pub async fn handler(e: &Event, config: &Arc<Config>, http: &Arc<Client>) -> Res
             event.message_id.get(),
             &event.emoji,
         )? {
-            let _ = http
+            _ = http
                 .add_guild_member_role(guild_id, event.user_id, role.id)
                 .await?;
             let dm = http
@@ -80,7 +80,7 @@ pub async fn handler(e: &Event, config: &Arc<Config>, http: &Arc<Client>) -> Res
             event.message_id.get(),
             &event.emoji,
         )? {
-            let _ = http
+            _ = http
                 .remove_guild_member_role(guild_id, event.user_id, role.id)
                 .await?;
             let dm = http
