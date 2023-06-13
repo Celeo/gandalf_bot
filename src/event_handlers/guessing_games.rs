@@ -7,13 +7,15 @@ use twilight_http::{request::channel::reaction::RequestReactionType, Client};
 
 static PATTERNS: Lazy<Vec<Regex>> = Lazy::new(|| {
     vec![
-        Regex::new(r"Framed #\d+\n🎥 🟩 ⬛ ⬛ ⬛ ⬛ ⬛\n\nhttps://framed.wtf").unwrap(),
-        Regex::new(r"#Tradle #\d+ \d+/\d+\n🟩🟩🟩🟩🟩\nhttps://oec.world/en/tradle").unwrap(),
+        Regex::new(r"Framed #\d+\n🎥 🟩 ⬛ ⬛ ⬛ ⬛ ⬛\n\nhttps://framed\.wtf").unwrap(),
+        Regex::new(r"#Tradle #\d+ \d+/\d+\n🟩🟩🟩🟩🟩\nhttps://oec\.world/en/tradle").unwrap(),
         Regex::new(r"#Heardle #\d+\n\n🔊🟩⬜⬜⬜⬜⬜\n\nhttps://spotify\.com/heardle").unwrap(),
-        Regex::new(r"#Tradle \(🇺🇸 Edition\) #\d+ 1/6\n🟩🟩🟩🟩🟩\nhttps://oec.world/en/tradle")
+        Regex::new(r"#Tradle \(🇺🇸 Edition\) #\d+ 1/6\n🟩🟩🟩🟩🟩\nhttps://oec\.world/en/tradle")
             .unwrap(),
-        Regex::new(r"#GuessTheGame #\d+\n\n🎮 🟩 ⬜ ⬜ ⬜ ⬜ ⬜\n\nhttps://GuessThe.Game/")
-            .unwrap(),
+        Regex::new(
+            r"#GuessTheGame #\d+\n\n🎮 🟩 ⬜ ⬜ ⬜ ⬜ ⬜\n\n(?:#\w+\n)?https://GuessThe\.Game/",
+        )
+        .unwrap(),
     ]
 });
 
@@ -55,6 +57,12 @@ https://framed.wtf/",
 
 🎮 🟩 ⬜ ⬜ ⬜ ⬜ ⬜
 
+https://GuessThe.Game/"#,
+            r#"#GuessTheGame #394
+
+🎮 🟩 ⬜ ⬜ ⬜ ⬜ ⬜
+
+#RookieGameGuesser
 https://GuessThe.Game/"#,
         ];
         let no = &[
