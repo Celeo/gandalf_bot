@@ -57,7 +57,7 @@ async fn birthday_loop(
             }
             info!("Sending birthday message");
             http.create_message(Id::new(config.birthday_channel))
-                .content(&format!("Happy birthday to <@!${}>!", entry.who))?
+                .content(&format!("Happy birthday to <@!{}>!", entry.who))?
                 .await?;
             posted
                 .entry(entry.who)
