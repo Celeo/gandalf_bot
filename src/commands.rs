@@ -3,7 +3,9 @@ use anyhow::Result;
 use std::{str::FromStr, sync::Arc};
 use twilight_gateway::Event;
 use twilight_http::{client::InteractionClient, Client};
-use twilight_interactions::command::{CommandInputData, CommandModel, CreateCommand};
+use twilight_interactions::command::{
+    CommandInputData, CommandModel, CommandOption, CreateCommand, CreateOption,
+};
 use twilight_model::{
     application::interaction::{InteractionData, InteractionType},
     gateway::payload::incoming::InteractionCreate,
@@ -16,6 +18,7 @@ use twilight_util::builder::InteractionResponseDataBuilder;
 
 const HELP_CONTENT: &str = r"**Available commands**:
 
+- /color_me - Set your username's color in the server
 - /pin - Pin a message to a channel
 - /unpin - Unpin a pinned message from a channel
 - /breach - Throw someone to the shadow realm
@@ -62,6 +65,48 @@ pub struct UnbreachCommand {
 #[derive(Debug, CommandModel, CreateCommand)]
 #[command(name = "help", desc = "Show bot commands")]
 pub struct HelpCommand;
+
+#[derive(Debug, CommandOption, CreateOption)]
+pub enum Color {
+    #[option(name = "white", value = 10)]
+    White,
+    #[option(name = "red", value = 20)]
+    Red,
+    #[option(name = "orange", value = 30)]
+    Orange,
+    #[option(name = "yellow", value = 40)]
+    Yellow,
+    #[option(name = "green", value = 50)]
+    Green,
+    #[option(name = "blue", value = 60)]
+    Blue,
+    #[option(name = "purple", value = 70)]
+    Purple,
+    #[option(name = "pink", value = 80)]
+    Pink,
+}
+
+impl Color {
+    fn role_name(&self) -> String {
+        String::from(match self {
+            Color::White => "name-white",
+            Color::Red => "name-red",
+            Color::Orange => "name-orange",
+            Color::Yellow => "name-yellow",
+            Color::Green => "name-green",
+            Color::Blue => "name-blue",
+            Color::Purple => "name-purple",
+            Color::Pink => "name-pink",
+        })
+    }
+}
+
+#[derive(Debug, CommandModel, CreateCommand)]
+#[command(name = "color_me", desc = "Color your username")]
+pub struct ColorMeCommand {
+    /// The color you want to be.
+    pub color: Color,
+}
 
 async fn resp<'a>(
     event: &InteractionCreate,
@@ -161,6 +206,28 @@ pub async fn handler(
                     )
                     .await?;
                     resp(event, &interaction, "👍").await?;
+                }
+                "color_me" => {
+                    let color_me = ColorMeCommand::from_interaction(input_data)?;
+                    let roles = http.roles(event.guild_id.unwrap()).await?.model().await?;
+                    for role in &roles {
+                        if role.name == color_me.color.role_name() {
+                            http.add_guild_member_role(
+                                event.guild_id.unwrap(),
+                                event.member.as_ref().unwrap().user.as_ref().unwrap().id,
+                                role.id,
+                            )
+                            .await?;
+                            resp(event, &interaction, "👍").await?;
+                        } else if role.name.starts_with("name-") {
+                            http.remove_guild_member_role(
+                                event.guild_id.unwrap(),
+                                event.member.as_ref().unwrap().user.as_ref().unwrap().id,
+                                role.id,
+                            )
+                            .await?;
+                        }
+                    }
                 }
                 "help" => {
                     resp(event, &interaction, HELP_CONTENT).await?;

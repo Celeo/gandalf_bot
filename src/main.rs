@@ -123,12 +123,14 @@ async fn main() {
     let http = Arc::new(HttpClient::new(token));
     let interaction_client = http.interaction(Id::new(bot_id));
 
+    // FIXME
     interaction_client
         .set_global_commands(&[
             commands::PinCommand::create_command().into(),
             commands::UnpinCommand::create_command().into(),
             commands::BreachCommand::create_command().into(),
             commands::UnbreachCommand::create_command().into(),
+            commands::ColorMeCommand::create_command().into(),
             commands::HelpCommand::create_command().into(),
         ])
         .await
