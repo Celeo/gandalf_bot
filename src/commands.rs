@@ -130,6 +130,7 @@ async fn resp<'a>(
     Ok(())
 }
 
+#[allow(clippy::too_many_lines)]
 pub async fn handler(
     e: &Event,
     config: &Arc<Config>,
