@@ -84,6 +84,8 @@ pub enum Color {
     Purple,
     #[option(name = "pink", value = 80)]
     Pink,
+    #[option(name = "black", value = 90)]
+    Black,
 }
 
 impl Color {
@@ -97,6 +99,7 @@ impl Color {
             Color::Blue => "name-blue",
             Color::Purple => "name-purple",
             Color::Pink => "name-pink",
+            Color::Black => "name-black",
         })
     }
 }
