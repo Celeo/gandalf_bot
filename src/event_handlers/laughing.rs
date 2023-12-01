@@ -10,7 +10,7 @@ use twilight_gateway::Event;
 use twilight_http::Client;
 use twilight_model::channel::message::ReactionType;
 
-const LOWER_LIMIT: u64 = 2;
+const LOWER_LIMIT: u64 = 7;
 static EMOJIS: Lazy<Vec<&str>> = Lazy::new(|| vec!["😆", "😂", "🤣", "😄"]);
 static RESPONSES: Lazy<Mutex<HashSet<u64>>> = Lazy::new(|| Mutex::new(HashSet::new()));
 
