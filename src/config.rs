@@ -24,6 +24,8 @@ pub struct Birthday {
 pub struct Config {
     pub containment_role_id: u64,
     pub containment_response_gif: String,
+    pub invalid_permissions_response_gif: String,
+    pub laughing_response_gif: String,
     pub blessable_user_ids: Vec<u64>,
     pub listenable_user_ids: Vec<u64>,
     pub gross_user_ids: Vec<u64>,

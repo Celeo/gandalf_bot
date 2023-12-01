@@ -6,7 +6,6 @@ use twilight_gateway::Event;
 use twilight_http::Client;
 use twilight_model::{channel::message::ReactionType, guild::Role};
 
-#[allow(clippy::too_many_arguments)]
 fn handle_reaction<'a>(
     config: &Arc<Config>,
     guild_roles: &'a [Role],
@@ -30,7 +29,10 @@ fn handle_reaction<'a>(
         if entry.emoji != *emoji {
             continue;
         }
-        let Some(role) = guild_roles.iter().find(|&role| role.name == entry.role_name) else {
+        let Some(role) = guild_roles
+            .iter()
+            .find(|&role| role.name == entry.role_name)
+        else {
             warn!("Could not find role by name: {}", entry.role_name);
             return Ok(None);
         };
@@ -48,7 +50,7 @@ fn handle_reaction<'a>(
 
 pub async fn handler(e: &Event, config: &Arc<Config>, http: &Arc<Client>) -> Result<()> {
     let Some(guild_id) = e.guild_id() else {
-        return Ok(())
+        return Ok(());
     };
     let guild = http.guild(guild_id).await?.model().await?;
 

@@ -214,6 +214,7 @@ async fn handle_event(
     event_handlers::guessing_games::handler(&event, &http).await?;
     event_handlers::respond::handler(&event, &http, bot_id).await?;
     event_handlers::roles::handler(&event, &config, &http).await?;
+    event_handlers::laughing::handler(&event, &config, &http).await?;
     commands::handler(&event, &config, &http, bot_id).await?;
 
     Ok(())

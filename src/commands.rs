@@ -178,7 +178,7 @@ pub async fn handler(
                         resp(
                             event,
                             &interaction,
-                            "https://tenor.com/view/no-nooo-nope-eat-fingerwag-gif-14832139",
+                            &config.invalid_permissions_response_gif,
                         )
                         .await?;
                         return Ok(());
@@ -197,7 +197,7 @@ pub async fn handler(
                         resp(
                             event,
                             &interaction,
-                            "https://tenor.com/view/no-nooo-nope-eat-fingerwag-gif-14832139",
+                            &config.invalid_permissions_response_gif,
                         )
                         .await?;
                         return Ok(());
