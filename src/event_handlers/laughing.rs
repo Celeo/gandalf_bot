@@ -54,6 +54,7 @@ pub async fn handler(e: &Event, config: &Arc<Config>, http: &Arc<Client>) -> Res
                 .reply(event.message_id)
                 .content(&config.laughing_response_gif)?
                 .await?;
+            RESPONSES.lock().unwrap().insert(event.message_id.get());
         }
     }
 
