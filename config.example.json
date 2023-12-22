@@ -1,0 +1,16 @@
+{
+  "containment_role_id": 0,
+  "containment_response_gif": "",
+  "laughing_response_gif": "",
+  "invalid_permissions_response_gif": "",
+  "blessable_user_ids": [],
+  "listenable_user_ids": [],
+  "gross_user_ids": [],
+  "laugh_threshold": 7,
+  "laugh_chance": 1.0,
+  "reaction_roles": [],
+  "birthday_channel": 0,
+  "birthdays": [],
+  "book_channel": 0,
+  "book_reminders": []
+}
