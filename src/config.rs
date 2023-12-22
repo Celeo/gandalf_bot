@@ -29,6 +29,8 @@ pub struct Config {
     pub blessable_user_ids: Vec<u64>,
     pub listenable_user_ids: Vec<u64>,
     pub gross_user_ids: Vec<u64>,
+    pub laugh_threshold: u64,
+    pub laugh_chance: f32,
     pub reaction_roles: Vec<ReactionRole>,
     pub birthday_channel: u64,
     pub birthdays: Vec<Birthday>,

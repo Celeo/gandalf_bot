@@ -6,11 +6,11 @@ use std::{
 use crate::config::Config;
 use anyhow::Result;
 use once_cell::sync::Lazy;
+use rand::Rng;
 use twilight_gateway::Event;
 use twilight_http::Client;
 use twilight_model::channel::message::ReactionType;
 
-const LOWER_LIMIT: u64 = 7;
 static EMOJIS: Lazy<Vec<&str>> = Lazy::new(|| vec!["😆", "😂", "🤣", "😄"]);
 static RESPONSES: Lazy<Mutex<HashSet<u64>>> = Lazy::new(|| Mutex::new(HashSet::new()));
 
@@ -49,12 +49,15 @@ pub async fn handler(e: &Event, config: &Arc<Config>, http: &Arc<Client>) -> Res
         }
 
         // conditionally post the response gif
-        if count >= LOWER_LIMIT {
-            http.create_message(event.channel_id)
-                .reply(event.message_id)
-                .content(&config.laughing_response_gif)?
-                .await?;
-            RESPONSES.lock().unwrap().insert(event.message_id.get());
+        if count >= config.laugh_threshold {
+            let chance: f32 = rand::thread_rng().gen();
+            if chance < config.laugh_chance {
+                http.create_message(event.channel_id)
+                    .reply(event.message_id)
+                    .content(&config.laughing_response_gif)?
+                    .await?;
+                RESPONSES.lock().unwrap().insert(event.message_id.get());
+            }
         }
     }
 
