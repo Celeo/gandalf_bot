@@ -105,7 +105,7 @@ mod tests {
     use std::sync::Arc;
     use twilight_model::{
         channel::message::ReactionType,
-        guild::{Permissions, Role},
+        guild::{Permissions, Role, RoleFlags},
         id::Id,
     };
 
@@ -171,6 +171,7 @@ mod tests {
             name: String::from("role-1"),
             permissions: Permissions::CREATE_INVITE,
             position: 1,
+            flags: RoleFlags::IN_PROMPT,
             tags: None,
             unicode_emoji: None,
         }];
