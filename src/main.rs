@@ -108,7 +108,7 @@ async fn book_loop(config: Arc<Config>, http: Arc<HttpClient>, posted: &mut Vec<
 async fn main() {
     dotenv().ok();
     if env::var("RUST_LOG").is_err() {
-        env::set_var("RUST_LOG", "info");
+        env::set_var("RUST_LOG", "warn,gandalf_bot=info");
     }
     pretty_env_logger::init();
 

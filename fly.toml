@@ -1,5 +1,5 @@
-app = "celeo-gandalf-bot"
-primary_region = "lax"
+app = 'celeo-gandalf-bot'
+primary_region = 'lax'
 
 [env]
-  RUST_LOG = "gandalf_bot"
+  RUST_LOG = 'warn,gandalf_bot=info'
