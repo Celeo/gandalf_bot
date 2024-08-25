@@ -202,7 +202,7 @@ pub async fn handler(
                         .await?;
                         return Ok(());
                     }
-                    let breach = BreachCommand::from_interaction(input_data)?;
+                    let breach = UnbreachCommand::from_interaction(input_data)?;
                     http.remove_guild_member_role(
                         event.guild_id.unwrap(),
                         breach.user.id,

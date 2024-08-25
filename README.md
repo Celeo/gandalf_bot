@@ -11,20 +11,7 @@ A Discord bot.
 
 ## Using
 
-I am hosting this bot on [https://fly.io](fly.io); consequently, I can only use environment variables. To that end, due to the complexity of the configuration that this bot uses, I utilize [B2 Cloud Storage](https://www.backblaze.com/cloud-storage) (think of AWS S3) to store the configuration JSON and dynamically download it when the bot runs.
-
-The bot also requires 4 environment variables. If there is an `.env` file in the same directory where the bot is executed (`cargo r` counts), the bot will read it.
-
-```ini
-B2_KEY_ID=
-B2_APP_KEY=
-B2_FILE_NAME=
-DISCORD_BOT_TOKEN=
-```
-
-The "DISCORD_BOT_TOKEN" is from your [Discord Developer Portal](https://discord.com/developers/applications). The B2 info is from your B2 account.
-
-Create the env file, put your config file in B2, and run the bot with `cargo run` in the project root or by executing the built binary.
+Create a `gandalf.json` file in the same directory as the binary and fill it out. You can copy from the example.
 
 ## License
 

@@ -1,5 +1,3 @@
-set dotenv-load := false
-
 default:
 
 download_words:

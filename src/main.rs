@@ -4,7 +4,6 @@ use crate::config::{load as load_config, Config};
 use anyhow::Result;
 use base64::{engine::general_purpose, Engine as _};
 use chrono::{Datelike, TimeZone};
-use dotenv::dotenv;
 use log::{debug, error, info, warn};
 use std::{collections::HashMap, env, sync::Arc, time::Duration};
 use tokio::time::sleep;
@@ -106,24 +105,32 @@ async fn book_loop(config: Arc<Config>, http: Arc<HttpClient>, posted: &mut Vec<
 /// Entrypoint.
 #[tokio::main]
 async fn main() {
-    dotenv().ok();
     if env::var("RUST_LOG").is_err() {
         env::set_var("RUST_LOG", "warn,gandalf_bot=info");
     }
     pretty_env_logger::init();
 
-    let token = env::var("DISCORD_BOT_TOKEN").expect("Missing 'DISCORD_BOT_TOKEN' env var");
-    let bot_id = bot_id_from_token(&token);
+    debug!("Loading config");
+    let config = match load_config().await {
+        Ok(c) => Arc::new(c),
+        Err(e) => {
+            error!("Could not load config: {e}");
+            std::process::exit(1);
+        }
+    };
+    debug!("Config loaded");
+
+    let bot_id = bot_id_from_token(&config.discord_token);
     let intents = Intents::GUILD_MESSAGES
         | Intents::MESSAGE_CONTENT
         | Intents::GUILD_MEMBERS
         | Intents::GUILD_MESSAGE_REACTIONS
         | Intents::DIRECT_MESSAGES;
-    let mut shard = Shard::new(ShardId::ONE, token.clone(), intents);
-    let http = Arc::new(HttpClient::new(token));
+    let mut shard = Shard::new(ShardId::ONE, config.discord_token.clone(), intents);
+    let http = Arc::new(HttpClient::new(config.discord_token.clone()));
     let interaction_client = http.interaction(Id::new(bot_id));
 
-    // FIXME
+    // FIXME these are broken ...?
     interaction_client
         .set_global_commands(&[
             commands::PinCommand::create_command().into(),
@@ -135,14 +142,6 @@ async fn main() {
         ])
         .await
         .unwrap();
-
-    let config = match load_config().await {
-        Ok(c) => Arc::new(c),
-        Err(e) => {
-            error!("Could not load config: {e}");
-            std::process::exit(1);
-        }
-    };
 
     {
         debug!("Starting birthday task");
