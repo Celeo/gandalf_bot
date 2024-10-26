@@ -130,7 +130,6 @@ async fn main() {
     let http = Arc::new(HttpClient::new(config.discord_token.clone()));
     let interaction_client = http.interaction(Id::new(bot_id));
 
-    // FIXME these are broken ...?
     interaction_client
         .set_global_commands(&[
             commands::PinCommand::create_command().into(),
