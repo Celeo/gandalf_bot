@@ -5,6 +5,7 @@ use anyhow::Result;
 use base64::{engine::general_purpose, Engine as _};
 use chrono::{Datelike, TimeZone};
 use log::{debug, error, info, warn};
+use mc_query::status;
 use std::{collections::HashMap, env, sync::Arc, time::Duration};
 use tokio::time::sleep;
 use twilight_gateway::{Event, Intents, Shard, ShardId};
@@ -102,7 +103,18 @@ async fn book_loop(config: Arc<Config>, http: Arc<HttpClient>, posted: &mut Vec<
     Ok(())
 }
 
+/// Loop, updating the Minecraft channel with the current online player count.
+async fn minecraft_loop(config: Arc<Config>, http: Arc<HttpClient>) -> Result<()> {
+    let data = status(&config.minecraft_server_ip, config.minecraft_server_port).await?;
+    let channel_name = format!("minecraft_{}-of-{}", data.players.online, data.players.max);
+    http.update_channel(Id::new(config.minecraft_channel_id))
+        .name(&channel_name)?
+        .await?;
+    Ok(())
+}
+
 /// Entrypoint.
+#[allow(clippy::too_many_lines)]
 #[tokio::main]
 async fn main() {
     if env::var("RUST_LOG").is_err() {
@@ -174,6 +186,23 @@ async fn main() {
                     error!("Issue in book task: {e}");
                 }
                 sleep(Duration::from_millis(1_000 * 60 * 60 * 12)).await; // 12hrs
+            }
+        });
+    }
+
+    {
+        debug!("Starting Minecraft task");
+        let http = Arc::clone(&http);
+        let config = Arc::clone(&config);
+        tokio::spawn(async move {
+            loop {
+                sleep(Duration::from_millis(1_000 * 3)).await; // 30s
+                let http = Arc::clone(&http);
+                let config = Arc::clone(&config);
+                if let Err(e) = minecraft_loop(config, http).await {
+                    error!("Issue in Minecraft task: {e}");
+                }
+                sleep(Duration::from_millis(1_000 * 60 * 10)).await; // 10m
             }
         });
     }

@@ -31,6 +31,9 @@ pub struct Config {
     pub birthdays: Vec<Birthday>,
     pub book_channel: u64,
     pub book_reminders: Vec<u8>,
+    pub minecraft_channel_id: u64,
+    pub minecraft_server_ip: String,
+    pub minecraft_server_port: u16,
 }
 
 /// Load the configuration from disk.
