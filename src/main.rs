@@ -196,7 +196,7 @@ async fn main() {
         let config = Arc::clone(&config);
         tokio::spawn(async move {
             loop {
-                sleep(Duration::from_millis(1_000 * 3)).await; // 30s
+                sleep(Duration::from_millis(1_000 * 30)).await; // 30s
                 let http = Arc::clone(&http);
                 let config = Arc::clone(&config);
                 if let Err(e) = minecraft_loop(config, http).await {
