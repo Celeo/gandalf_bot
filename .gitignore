@@ -3,3 +3,4 @@
 config.*json
 !config.example.json
 words.txt
+gandalf.json
