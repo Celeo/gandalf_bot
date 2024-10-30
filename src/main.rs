@@ -106,10 +106,18 @@ async fn book_loop(config: Arc<Config>, http: Arc<HttpClient>, posted: &mut Vec<
 /// Loop, updating the Minecraft channel with the current online player count.
 async fn minecraft_loop(config: Arc<Config>, http: Arc<HttpClient>) -> Result<()> {
     let data = status(&config.minecraft_server_ip, config.minecraft_server_port).await?;
-    let channel_name = format!("minecraft_{}-of-{}", data.players.online, data.players.max);
-    http.update_channel(Id::new(config.minecraft_channel_id))
-        .name(&channel_name)?
-        .await?;
+    let new_name = format!("minecraft_{}-of-{}", data.players.online, data.players.max);
+    let channel_id = Id::new(config.minecraft_channel_id);
+    let current_name = http
+        .channel(channel_id)
+        .await?
+        .model()
+        .await?
+        .name
+        .unwrap_or_default();
+    if new_name != current_name {
+        http.update_channel(channel_id).name(&new_name)?.await?;
+    }
     Ok(())
 }
 
