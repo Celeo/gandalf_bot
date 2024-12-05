@@ -111,9 +111,9 @@ pub struct ColorMeCommand {
     pub color: Color,
 }
 
-async fn resp<'a>(
+async fn resp(
     event: &InteractionCreate,
-    interaction: &InteractionClient<'a>,
+    interaction: &InteractionClient<'_>,
     message: &str,
 ) -> Result<()> {
     interaction
@@ -152,7 +152,7 @@ pub async fn handler(
                 .as_ref()
                 .unwrap()
                 .permissions
-                .map_or(false, |p| p.contains(Permissions::ADMINISTRATOR));
+                .is_some_and(|p| p.contains(Permissions::ADMINISTRATOR));
 
             match app_command.name.as_str() {
                 "pin" => {

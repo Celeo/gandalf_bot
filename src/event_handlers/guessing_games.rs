@@ -64,6 +64,10 @@ https://GuessThe.Game/"#,
 
 #RookieGameGuesser
 https://GuessThe.Game/"#,
+            r#"Framed #1000
+🎥 🟩 ⬛ ⬛ ⬛ ⬛ ⬛
+
+https://framed.wtf"#,
         ];
         let no = &[
             "",
