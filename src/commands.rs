@@ -8,6 +8,7 @@ use twilight_interactions::command::{
 };
 use twilight_model::{
     application::interaction::{InteractionData, InteractionType},
+    channel::message::MessageFlags,
     gateway::payload::incoming::InteractionCreate,
     guild::Permissions,
     http::interaction::{InteractionResponse, InteractionResponseType},
@@ -162,7 +163,22 @@ pub async fn handler(
                         Id::from_str(&pin.message_id)?,
                     )
                     .await?;
-                    resp(event, &interaction, "👍").await?;
+                    interaction
+                        .create_response(
+                            event.id,
+                            &event.token,
+                            &InteractionResponse {
+                                kind: InteractionResponseType::ChannelMessageWithSource,
+                                data: Some(
+                                    InteractionResponseDataBuilder::new()
+                                        .content("👍")
+                                        .flags(MessageFlags::EPHEMERAL)
+                                        .components(None)
+                                        .build(),
+                                ),
+                            },
+                        )
+                        .await?;
                 }
                 "unpin" => {
                     let unpin = UnpinCommand::from_interaction(input_data)?;
@@ -171,7 +187,22 @@ pub async fn handler(
                         Id::from_str(&unpin.message_id)?,
                     )
                     .await?;
-                    resp(event, &interaction, "👍").await?;
+                    interaction
+                        .create_response(
+                            event.id,
+                            &event.token,
+                            &InteractionResponse {
+                                kind: InteractionResponseType::ChannelMessageWithSource,
+                                data: Some(
+                                    InteractionResponseDataBuilder::new()
+                                        .content("👍")
+                                        .flags(MessageFlags::EPHEMERAL)
+                                        .components(None)
+                                        .build(),
+                                ),
+                            },
+                        )
+                        .await?;
                 }
                 "breach" => {
                     if !sender_is_admin {
