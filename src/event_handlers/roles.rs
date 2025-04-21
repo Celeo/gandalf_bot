@@ -39,10 +39,7 @@ fn handle_reaction<'a>(
         return Ok(Some(role));
     }
     if partial_match {
-        debug!(
-            "Matching channel & message, but no matching reaction emoji for: {}",
-            emoji
-        );
+        debug!("Matching channel & message, but no matching reaction emoji for: {emoji}");
     }
 
     Ok(None)

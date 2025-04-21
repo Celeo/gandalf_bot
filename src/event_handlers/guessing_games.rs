@@ -1,11 +1,10 @@
 use anyhow::Result;
-use once_cell::sync::Lazy;
 use regex::Regex;
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
 use twilight_gateway::Event;
 use twilight_http::{request::channel::reaction::RequestReactionType, Client};
 
-static PATTERNS: Lazy<Vec<Regex>> = Lazy::new(|| {
+static PATTERNS: LazyLock<Vec<Regex>> = LazyLock::new(|| {
     vec![
         Regex::new(r"Framed #\d+\n🎥 🟩 ⬛ ⬛ ⬛ ⬛ ⬛\n\nhttps://framed\.wtf").unwrap(),
         Regex::new(r"#Tradle #\d+ \d+/\d+\n🟩🟩🟩🟩🟩\nhttps://oec\.world/en/tradle").unwrap(),

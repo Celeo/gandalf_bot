@@ -5,14 +5,14 @@ use std::{
 
 use crate::config::Config;
 use anyhow::Result;
-use once_cell::sync::Lazy;
 use rand::Rng;
+use std::sync::LazyLock;
 use twilight_gateway::Event;
 use twilight_http::Client;
 use twilight_model::channel::message::ReactionType;
 
-static EMOJIS: Lazy<Vec<&str>> = Lazy::new(|| vec!["😆", "😂", "🤣", "😄"]);
-static RESPONSES: Lazy<Mutex<HashSet<u64>>> = Lazy::new(|| Mutex::new(HashSet::new()));
+static EMOJIS: LazyLock<Vec<&str>> = LazyLock::new(|| vec!["😆", "😂", "🤣", "😄"]);
+static RESPONSES: LazyLock<Mutex<HashSet<u64>>> = LazyLock::new(|| Mutex::new(HashSet::new()));
 
 pub async fn handler(e: &Event, config: &Arc<Config>, http: &Arc<Client>) -> Result<()> {
     if let Event::ReactionAdd(event) = e {

@@ -168,13 +168,13 @@ async fn main() {
         tokio::spawn(async move {
             let mut posted = Vec::new();
             loop {
-                sleep(Duration::from_millis(1_000 * 30)).await; // 30s
+                sleep(Duration::from_secs(30)).await;
                 let http = Arc::clone(&http);
                 let config = Arc::clone(&config);
                 if let Err(e) = book_loop(config, http, &mut posted).await {
                     error!("Issue in book task: {e}");
                 }
-                sleep(Duration::from_millis(1_000 * 60 * 60 * 12)).await; // 12hrs
+                sleep(Duration::from_secs(43_200)).await; // 12hrs
             }
         });
     }
@@ -184,7 +184,7 @@ async fn main() {
         let event = match shard.next_event().await {
             Ok(event) => event,
             Err(source) => {
-                warn!("Error receiving event: {:?}", source);
+                warn!("Error receiving event: {source:?}");
                 if source.is_fatal() {
                     break;
                 }

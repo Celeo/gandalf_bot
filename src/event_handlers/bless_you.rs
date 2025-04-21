@@ -1,15 +1,14 @@
 use crate::config::Config;
 use anyhow::Result;
-use once_cell::sync::Lazy;
 use regex::Regex;
 use std::{
     collections::HashSet,
-    sync::{Arc, Mutex, MutexGuard},
+    sync::{Arc, LazyLock, Mutex, MutexGuard},
 };
 use twilight_gateway::Event;
 use twilight_http::{request::channel::reaction::RequestReactionType, Client};
 
-static PATTERNS: Lazy<Vec<Regex>> = Lazy::new(|| {
+static PATTERNS: LazyLock<Vec<Regex>> = LazyLock::new(|| {
     vec![
         Regex::new(r"(?i)^[hue]{5,}$").unwrap(),
         Regex::new(r"(?i)^[bha]{5,}$").unwrap(),
@@ -23,7 +22,7 @@ static PATTERNS: Lazy<Vec<Regex>> = Lazy::new(|| {
     ]
 });
 
-static WORDS: Lazy<Mutex<HashSet<String>>> = Lazy::new(|| Mutex::new(HashSet::new()));
+static WORDS: LazyLock<Mutex<HashSet<String>>> = LazyLock::new(|| Mutex::new(HashSet::new()));
 
 fn load_words() -> MutexGuard<'static, HashSet<String>> {
     if WORDS.lock().unwrap().is_empty() {
