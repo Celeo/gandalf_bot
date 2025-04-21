@@ -67,41 +67,6 @@ async fn birthday_loop(
     Ok(())
 }
 
-/// Loop, sending book reminder alerts every 12 hours on matching days.
-async fn book_loop(config: Arc<Config>, http: Arc<HttpClient>, posted: &mut Vec<u8>) -> Result<()> {
-    debug!("Checking for book reminders");
-    if config.book_reminders.is_empty() {
-        return Ok(());
-    }
-    let now = chrono_tz::US::Pacific.from_utc_datetime(&chrono::offset::Utc::now().naive_utc());
-    #[allow(clippy::cast_possible_truncation)]
-    let day = now.day() as u8; // no idea why they don't have the day as u8 anyway
-
-    if config.book_reminders.contains(&day) && !posted.contains(&day) {
-        let message = match config.book_reminders.iter().position(|&b| b == day) {
-            Some(0) => "First book reminder! 25% of the way through the month.",
-            Some(1) => "Second book reminder! Halfway through the month.",
-            Some(2) => "Third book reminder! 75% through the month!",
-            Some(3) => "Last book reminder! Finish by tomorrow!",
-            Some(_) => {
-                error!("OOB day index");
-                return Ok(());
-            }
-            None => {
-                error!("Could not get day index");
-                return Ok(());
-            }
-        };
-        info!("Sending book reminder message");
-        http.create_message(Id::new(config.book_channel))
-            .content(message)?
-            .await?;
-        posted.push(day);
-    }
-
-    Ok(())
-}
-
 /// Entrypoint.
 #[allow(clippy::too_many_lines)]
 #[tokio::main]
@@ -157,24 +122,6 @@ async fn main() {
                     error!("Issue in birthday task: {e}");
                 }
                 sleep(Duration::from_millis(1_000 * 60 * 60 * 6)).await; // 6hrs
-            }
-        });
-    }
-
-    {
-        debug!("Starting book task");
-        let http = Arc::clone(&http);
-        let config = Arc::clone(&config);
-        tokio::spawn(async move {
-            let mut posted = Vec::new();
-            loop {
-                sleep(Duration::from_secs(30)).await;
-                let http = Arc::clone(&http);
-                let config = Arc::clone(&config);
-                if let Err(e) = book_loop(config, http, &mut posted).await {
-                    error!("Issue in book task: {e}");
-                }
-                sleep(Duration::from_secs(43_200)).await; // 12hrs
             }
         });
     }

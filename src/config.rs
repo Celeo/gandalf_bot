@@ -29,8 +29,6 @@ pub struct Config {
     pub reaction_roles: Vec<ReactionRole>,
     pub birthday_channel: u64,
     pub birthdays: Vec<Birthday>,
-    pub book_channel: u64,
-    pub book_reminders: Vec<u8>,
 }
 
 /// Load the configuration from disk.
