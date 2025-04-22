@@ -22,7 +22,7 @@ jobs:
     - name: Cache Rust artifacts
       uses: Swatinem/rust-cache@v2
       with:
-        prefix-key: "7ee02414-911d-42f1-8867-383492c41111"
+        prefix-key: "0aca4b3d-ab48-4ec0-8044-f2be53fcd69a"
         save-if: ${{ github.ref == 'refs/heads/master' }}
     - name: Install clippy
       run: rustup component add clippy
@@ -32,4 +32,3 @@ jobs:
       run: cargo test --verbose --all
     - name: Run clippy
       run: cargo clippy
-    - name: Run tests
