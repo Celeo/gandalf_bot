@@ -8,5 +8,6 @@
   "laugh_chance": 1.0,
   "reaction_roles": [],
   "birthday_channel": 0,
-  "birthdays": []
+  "birthdays": [],
+  "game_channel": 0
 }

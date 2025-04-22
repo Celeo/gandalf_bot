@@ -3,7 +3,7 @@
 use crate::config::{load as load_config, Config};
 use anyhow::Result;
 use base64::{engine::general_purpose, Engine as _};
-use chrono::{Datelike, TimeZone};
+use chrono::{Datelike, TimeZone, Timelike, Weekday};
 use log::{debug, error, info, warn};
 use std::{collections::HashMap, env, sync::Arc, time::Duration};
 use tokio::time::sleep;
@@ -35,8 +35,6 @@ fn bot_id_from_token(token: &str) -> u64 {
     .unwrap()
 }
 
-/// Loop, sending birthday messages to the configured channel
-/// every 6 hours on matching days.
 async fn birthday_loop(
     config: Arc<Config>,
     http: Arc<HttpClient>,
@@ -63,6 +61,15 @@ async fn birthday_loop(
                 .and_modify(|d| d.push(now.year()))
                 .or_insert(vec![now.year()]);
         }
+    }
+    Ok(())
+}
+
+async fn aspirations_reminder(config: Arc<Config>, http: Arc<HttpClient>) -> Result<()> {
+    debug!("Checking for aspiration reminder");
+    let now = chrono_tz::US::Pacific.from_utc_datetime(&chrono::offset::Utc::now().naive_utc());
+    if now.weekday() == Weekday::Tue && now.hour() >= 8 && now.hour() < 14 {
+        http.create_message(Id::new(config.game_channel)).content("Think of your aspirations for this afternoon!\n\nMessage the Storyteller with them if they've changed.")?.await?;
     }
     Ok(())
 }
@@ -115,13 +122,30 @@ async fn main() {
         tokio::spawn(async move {
             let mut posted = HashMap::new();
             loop {
-                sleep(Duration::from_millis(1_000 * 30)).await; // 30s
+                sleep(Duration::from_secs(30)).await;
                 let http = Arc::clone(&http);
                 let config = Arc::clone(&config);
                 if let Err(e) = birthday_loop(config, http, &mut posted).await {
                     error!("Issue in birthday task: {e}");
                 }
-                sleep(Duration::from_millis(1_000 * 60 * 60 * 6)).await; // 6hrs
+                sleep(Duration::from_secs(10_800)).await; // 6hrs
+            }
+        });
+    }
+
+    {
+        debug!("Starting aspirations task");
+        let http = Arc::clone(&http);
+        let config = Arc::clone(&config);
+        tokio::spawn(async move {
+            loop {
+                sleep(Duration::from_secs(30)).await;
+                let http = Arc::clone(&http);
+                let config = Arc::clone(&config);
+                if let Err(e) = aspirations_reminder(config, http).await {
+                    error!("Issue in aspirations task: {e}");
+                }
+                sleep(Duration::from_secs(10_800)).await; // 6hrs
             }
         });
     }
