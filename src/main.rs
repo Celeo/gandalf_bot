@@ -145,7 +145,7 @@ async fn main() {
                 if let Err(e) = aspirations_reminder(config, http).await {
                     error!("Issue in aspirations task: {e}");
                 }
-                sleep(Duration::from_secs(10_800)).await; // 6hrs
+                sleep(Duration::from_secs(21_600)).await; // 6hrs
             }
         });
     }
