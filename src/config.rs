@@ -15,6 +15,12 @@ pub struct Birthday {
     pub when: String,
 }
 
+#[derive(Debug, Deserialize, Clone, Default)]
+pub struct Location {
+    pub lat: f64,
+    pub lon: f64,
+}
+
 /// Bot config.
 #[derive(Debug, Deserialize, Clone, Default)]
 pub struct Config {
@@ -30,6 +36,7 @@ pub struct Config {
     pub birthday_channel: u64,
     pub birthdays: Vec<Birthday>,
     pub game_channel: u64,
+    pub home: Location,
 }
 
 /// Load the configuration from disk.

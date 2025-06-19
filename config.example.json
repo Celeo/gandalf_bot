@@ -9,5 +9,9 @@
   "reaction_roles": [],
   "birthday_channel": 0,
   "birthdays": [],
-  "game_channel": 0
+  "game_channel": 0,
+  "home": {
+    "lat": 0.0,
+    "lon": 0.0
+  }
 }

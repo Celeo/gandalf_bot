@@ -15,6 +15,7 @@ use twilight_model::id::Id;
 mod commands;
 mod config;
 mod event_handlers;
+mod fires;
 mod quotes;
 
 /// Parse a bot ID from the token.
@@ -110,6 +111,7 @@ async fn main() {
             commands::BreachCommand::create_command().into(),
             commands::UnbreachCommand::create_command().into(),
             commands::ColorMeCommand::create_command().into(),
+            commands::FiresCommand::create_command().into(),
             commands::HelpCommand::create_command().into(),
         ])
         .await

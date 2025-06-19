@@ -1,5 +1,6 @@
-use crate::config::Config;
+use crate::{config::Config, fires};
 use anyhow::Result;
+use log::error;
 use std::{str::FromStr, sync::Arc};
 use twilight_gateway::Event;
 use twilight_http::{client::InteractionClient, Client};
@@ -15,7 +16,10 @@ use twilight_model::{
     id::Id,
     user::User,
 };
-use twilight_util::builder::InteractionResponseDataBuilder;
+use twilight_util::builder::{
+    embed::{EmbedBuilder, EmbedFieldBuilder},
+    InteractionResponseDataBuilder,
+};
 
 const HELP_CONTENT: &str = r"**Available commands**:
 
@@ -24,6 +28,7 @@ const HELP_CONTENT: &str = r"**Available commands**:
 - /unpin - Unpin a pinned message from a channel
 - /breach - Throw someone to the shadow realm
 - /unbreach - Save someone from the shadow realm
+- /fires - See data about nearby fires
 
 When using (un)pin, you need the ID of the message. Enable developer \
 mode in Settings -> Advanced, and then right click a message -> Copy ID \
@@ -88,6 +93,10 @@ pub enum Color {
     #[option(name = "black", value = 90)]
     Black,
 }
+
+#[derive(Debug, CommandModel, CreateCommand)]
+#[command(name = "fires", desc = "Show nearby fires")]
+pub struct FiresCommand;
 
 impl Color {
     fn role_name(&self) -> String {
@@ -262,6 +271,85 @@ pub async fn handler(
                             )
                             .await?;
                         }
+                    }
+                }
+                "fires" => {
+                    let response = reqwest::get(
+                        "https://incidents.fire.ca.gov/umbraco/api/IncidentApi/List?inactive=false",
+                    )
+                    .await?;
+                    if !response.status().is_success() {
+                        resp(event, &interaction, "Error getting data").await?;
+                    } else {
+                        match fires::get_fire_data(config).await {
+                            Ok(data) => {
+                                interaction
+                                    .create_response(
+                                        event.id,
+                                        &event.token,
+                                        &InteractionResponse {
+                                            kind: InteractionResponseType::ChannelMessageWithSource,
+                                            data: Some(
+                                                InteractionResponseDataBuilder::new()
+                                                    .content("Posted")
+                                                    .flags(MessageFlags::EPHEMERAL)
+                                                    .components(None)
+                                                    .build(),
+                                            ),
+                                        },
+                                    )
+                                    .await?;
+
+                                let mut embeds = Vec::new();
+                                for fire in &data {
+                                    let embed = EmbedBuilder::new()
+                                        .title(&fire.name)
+                                        .url(&fire.url)
+                                        .field(
+                                            EmbedFieldBuilder::new("Started", &fire.started)
+                                                .inline(),
+                                        )
+                                        .field(
+                                            EmbedFieldBuilder::new("Updated", &fire.updated)
+                                                .inline(),
+                                        )
+                                        .field(
+                                            EmbedFieldBuilder::new("County", &fire.county).inline(),
+                                        )
+                                        .field(
+                                            EmbedFieldBuilder::new("Location", &fire.location)
+                                                .inline(),
+                                        )
+                                        .field(
+                                            EmbedFieldBuilder::new(
+                                                "Acres burned",
+                                                fire.acres_burned.to_string(),
+                                            )
+                                            .inline(),
+                                        )
+                                        .field(
+                                            EmbedFieldBuilder::new(
+                                                "Percent contained",
+                                                fire.percent_contained
+                                                    .unwrap_or_default()
+                                                    .to_string(),
+                                            )
+                                            .inline(),
+                                        )
+                                        .validate()?
+                                        .build();
+                                    embeds.push(embed);
+                                }
+                                http.create_message(event.channel.as_ref().unwrap().id)
+                                    .content("## Local fire data")?
+                                    .embeds(&embeds)?
+                                    .await?;
+                            }
+                            Err(e) => {
+                                error!("Error getting fire API data: {e}");
+                                resp(event, &interaction, "Something went wrong").await?;
+                            }
+                        };
                     }
                 }
                 "help" => {
