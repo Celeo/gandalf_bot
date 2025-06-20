@@ -278,9 +278,7 @@ pub async fn handler(
                         "https://incidents.fire.ca.gov/umbraco/api/IncidentApi/List?inactive=false",
                     )
                     .await?;
-                    if !response.status().is_success() {
-                        resp(event, &interaction, "Error getting data").await?;
-                    } else {
+                    if response.status().is_success() {
                         match fires::get_fire_data(config).await {
                             Ok(data) => {
                                 interaction
@@ -350,6 +348,8 @@ pub async fn handler(
                                 resp(event, &interaction, "Something went wrong").await?;
                             }
                         };
+                    } else {
+                        resp(event, &interaction, "Error getting data").await?;
                     }
                 }
                 "help" => {
