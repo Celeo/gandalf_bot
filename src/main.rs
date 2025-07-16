@@ -16,6 +16,7 @@ mod commands;
 mod config;
 mod event_handlers;
 mod fires;
+mod openai;
 mod quotes;
 
 /// Parse a bot ID from the token.
@@ -112,6 +113,7 @@ async fn main() {
             commands::UnbreachCommand::create_command().into(),
             commands::ColorMeCommand::create_command().into(),
             commands::FiresCommand::create_command().into(),
+            commands::SummarizeCommand::create_command().into(),
             commands::HelpCommand::create_command().into(),
         ])
         .await

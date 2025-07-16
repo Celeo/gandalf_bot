@@ -1,7 +1,8 @@
-use crate::{config::Config, fires};
+use crate::{config::Config, fires, openai};
 use anyhow::Result;
+use chrono::{TimeDelta, TimeZone, Utc};
 use log::error;
-use std::{str::FromStr, sync::Arc};
+use std::{fmt::Write, str::FromStr, sync::Arc};
 use twilight_gateway::Event;
 use twilight_http::{client::InteractionClient, Client};
 use twilight_interactions::command::{
@@ -65,6 +66,13 @@ pub struct BreachCommand {
 #[command(name = "unbreach", desc = "Save someone from Mordor")]
 pub struct UnbreachCommand {
     /// User to target
+    pub user: User,
+}
+
+#[derive(Debug, CommandModel, CreateCommand)]
+#[command(name = "summarize", desc = "When someone hits you with a wall of text")]
+pub struct SummarizeCommand {
+    /// User to read from
     pub user: User,
 }
 
@@ -351,6 +359,32 @@ pub async fn handler(
                     } else {
                         resp(event, &interaction, "Error getting data").await?;
                     }
+                }
+                "summarize" => {
+                    let channel_id = event.channel.as_ref().unwrap().id;
+                    let messages = http.channel_messages(channel_id).await?.models().await?;
+                    let cmd = SummarizeCommand::from_interaction(input_data)?;
+                    let now = Utc::now();
+                    let text = messages.iter().filter(|m| m.author.id == cmd.user.id).fold(
+                        String::new(),
+                        |mut acc, m| {
+                            let created = Utc.timestamp_opt(m.timestamp.as_secs(), 0).unwrap();
+                            if (now - created) <= TimeDelta::hours(6) {
+                                writeln!(acc, "{}", &m.content).unwrap();
+                            }
+                            acc
+                        },
+                    );
+                    let summary = openai::summarize(config, &text).await?;
+                    resp(
+                        event,
+                        &interaction,
+                        &format!(
+                            "Here is your summary of {}'s messages in this channel from the last few hours:\n {summary}",
+                            cmd.user.name
+                        ),
+                    )
+                    .await?;
                 }
                 "help" => {
                     resp(event, &interaction, HELP_CONTENT).await?;

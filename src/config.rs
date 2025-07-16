@@ -37,6 +37,7 @@ pub struct Config {
     pub birthdays: Vec<Birthday>,
     pub game_channel: u64,
     pub home: Location,
+    pub openai_key: String,
 }
 
 /// Load the configuration from disk.
