@@ -375,8 +375,11 @@ pub async fn handler(
                             acc
                         },
                     );
-                    let summary = openai::summarize(config, &text).await?;
-                    resp(
+                    if text.trim().is_empty() {
+                        resp(event, &interaction, "No recent messages found").await?;
+                    } else {
+                        let summary = openai::summarize(config, &text).await?;
+                        resp(
                         event,
                         &interaction,
                         &format!(
@@ -385,6 +388,7 @@ pub async fn handler(
                         ),
                     )
                     .await?;
+                    }
                 }
                 "help" => {
                     resp(event, &interaction, HELP_CONTENT).await?;
