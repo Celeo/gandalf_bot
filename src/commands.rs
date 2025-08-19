@@ -30,6 +30,8 @@ const HELP_CONTENT: &str = r"**Available commands**:
 - /breach - Throw someone to the shadow realm
 - /unbreach - Save someone from the shadow realm
 - /fires - See data about nearby fires
+- /summarize - Summarize a person's recent messages in a channel
+- /summarize_this - Summarize a single post
 
 When using (un)pin, you need the ID of the message. Enable developer \
 mode in Settings -> Advanced, and then right click a message -> Copy ID \
@@ -74,6 +76,16 @@ pub struct UnbreachCommand {
 pub struct SummarizeCommand {
     /// User to read from
     pub user: User,
+}
+
+#[derive(Debug, CommandModel, CreateCommand)]
+#[command(
+    name = "summarize_this",
+    desc = "When someone hits you with a big post"
+)]
+pub struct SummarizeThisCommand {
+    /// ID of the message to summary
+    pub message_id: String,
 }
 
 #[derive(Debug, CommandModel, CreateCommand)]
@@ -395,6 +407,43 @@ pub async fn handler(
                         ),
                     )
                     .await?;
+                    }
+                }
+                "summarize_this" => {
+                    let cmd = SummarizeThisCommand::from_interaction(input_data)?;
+                    let selected_msg = http
+                        .message(
+                            event.channel.as_ref().unwrap().id,
+                            Id::from_str(&cmd.message_id)?,
+                        )
+                        .await?
+                        .model()
+                        .await?;
+                    if selected_msg.content.len() <= 100 {
+                        interaction
+                            .create_response(
+                                event.id,
+                                &event.token,
+                                &InteractionResponse {
+                                    kind: InteractionResponseType::ChannelMessageWithSource,
+                                    data: Some(
+                                        InteractionResponseDataBuilder::new()
+                                            .content("Targetted message is too short")
+                                            .flags(MessageFlags::EPHEMERAL)
+                                            .components(None)
+                                            .build(),
+                                    ),
+                                },
+                            )
+                            .await?;
+                    } else {
+                        let summary = openai::summarize(config, &selected_msg.content).await?;
+                        resp(
+                            event,
+                            &interaction,
+                            &format!("Here is your summary of that post:\n {summary}"),
+                        )
+                        .await?;
                     }
                 }
                 "help" => {
