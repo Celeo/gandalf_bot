@@ -289,7 +289,12 @@ pub async fn handler(
                     if response.status().is_success() {
                         match fires::get_fire_data(config).await {
                             Ok(data) => {
-                                interaction
+                                if data.is_empty() {
+                                    http.create_message(event.channel.as_ref().unwrap().id)
+                                        .content("No local fires")?
+                                        .await?;
+                                } else {
+                                    interaction
                                     .create_response(
                                         event.id,
                                         &event.token,
@@ -306,50 +311,52 @@ pub async fn handler(
                                     )
                                     .await?;
 
-                                let mut embeds = Vec::new();
-                                for fire in &data {
-                                    let embed = EmbedBuilder::new()
-                                        .title(&fire.name)
-                                        .url(&fire.url)
-                                        .field(
-                                            EmbedFieldBuilder::new("Started", &fire.started)
-                                                .inline(),
-                                        )
-                                        .field(
-                                            EmbedFieldBuilder::new("Updated", &fire.updated)
-                                                .inline(),
-                                        )
-                                        .field(
-                                            EmbedFieldBuilder::new("County", &fire.county).inline(),
-                                        )
-                                        .field(
-                                            EmbedFieldBuilder::new("Location", &fire.location)
-                                                .inline(),
-                                        )
-                                        .field(
-                                            EmbedFieldBuilder::new(
-                                                "Acres burned",
-                                                fire.acres_burned.to_string(),
+                                    let mut embeds = Vec::new();
+                                    for fire in &data {
+                                        let embed = EmbedBuilder::new()
+                                            .title(&fire.name)
+                                            .url(&fire.url)
+                                            .field(
+                                                EmbedFieldBuilder::new("Started", &fire.started)
+                                                    .inline(),
                                             )
-                                            .inline(),
-                                        )
-                                        .field(
-                                            EmbedFieldBuilder::new(
-                                                "Percent contained",
-                                                fire.percent_contained
-                                                    .unwrap_or_default()
-                                                    .to_string(),
+                                            .field(
+                                                EmbedFieldBuilder::new("Updated", &fire.updated)
+                                                    .inline(),
                                             )
-                                            .inline(),
-                                        )
-                                        .validate()?
-                                        .build();
-                                    embeds.push(embed);
+                                            .field(
+                                                EmbedFieldBuilder::new("County", &fire.county)
+                                                    .inline(),
+                                            )
+                                            .field(
+                                                EmbedFieldBuilder::new("Location", &fire.location)
+                                                    .inline(),
+                                            )
+                                            .field(
+                                                EmbedFieldBuilder::new(
+                                                    "Acres burned",
+                                                    fire.acres_burned.to_string(),
+                                                )
+                                                .inline(),
+                                            )
+                                            .field(
+                                                EmbedFieldBuilder::new(
+                                                    "Percent contained",
+                                                    fire.percent_contained
+                                                        .unwrap_or_default()
+                                                        .to_string(),
+                                                )
+                                                .inline(),
+                                            )
+                                            .validate()?
+                                            .build();
+                                        embeds.push(embed);
+                                    }
+                                    http.create_message(event.channel.as_ref().unwrap().id)
+                                        .content("## Local fire data")?
+                                        .embeds(&embeds)?
+                                        .await?;
                                 }
-                                http.create_message(event.channel.as_ref().unwrap().id)
-                                    .content("## Local fire data")?
-                                    .embeds(&embeds)?
-                                    .await?;
                             }
                             Err(e) => {
                                 error!("Error getting fire API data: {e}");
