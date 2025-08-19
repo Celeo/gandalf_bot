@@ -114,6 +114,7 @@ async fn main() {
             commands::ColorMeCommand::create_command().into(),
             commands::FiresCommand::create_command().into(),
             commands::SummarizeCommand::create_command().into(),
+            commands::SummarizeThisCommand::create_command().into(),
             commands::HelpCommand::create_command().into(),
         ])
         .await

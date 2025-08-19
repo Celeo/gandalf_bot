@@ -30,6 +30,8 @@ const HELP_CONTENT: &str = r"**Available commands**:
 - /breach - Throw someone to the shadow realm
 - /unbreach - Save someone from the shadow realm
 - /fires - See data about nearby fires
+- /summarize - Summarize a person's recent messages in a channel
+- /summarize_this - Summarize a single post
 
 When using (un)pin, you need the ID of the message. Enable developer \
 mode in Settings -> Advanced, and then right click a message -> Copy ID \
@@ -74,6 +76,15 @@ pub struct UnbreachCommand {
 pub struct SummarizeCommand {
     /// User to read from
     pub user: User,
+}
+
+#[derive(Debug, CommandModel, CreateCommand)]
+#[command(
+    name = "summarize_this",
+    desc = "When someone hits you with a big post"
+)]
+pub struct SummarizeThisCommand {
+    // TODO replied-to message
 }
 
 #[derive(Debug, CommandModel, CreateCommand)]
