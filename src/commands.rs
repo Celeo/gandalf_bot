@@ -380,6 +380,12 @@ pub async fn handler(
                     }
                 }
                 "summarize" => {
+                    /*
+                        It would be better to instead pull messages from the current channel,
+                        starting at the targeted user's last message, moving backward until there's
+                        a large/meaingful gap in message timestamps, then filter to just the
+                        targeted user, combine, and use that as the context for summarization.
+                    */
                     let channel_id = event.channel.as_ref().unwrap().id;
                     let messages = http.channel_messages(channel_id).await?.models().await?;
                     let cmd = SummarizeCommand::from_interaction(input_data)?;
