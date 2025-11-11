@@ -302,7 +302,7 @@ pub async fn handler(
                     let roles = http.roles(event.guild_id.unwrap()).await?.model().await?;
                     let member = event.member.as_ref().unwrap().clone();
                     for role in &roles {
-                        if member.roles.contains(&role.id) {
+                        if role.name.starts_with("name-") && member.roles.contains(&role.id) {
                             http.remove_guild_member_role(
                                 event.guild_id.unwrap(),
                                 event.member.as_ref().unwrap().user.as_ref().unwrap().id,
