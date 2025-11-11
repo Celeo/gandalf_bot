@@ -25,6 +25,7 @@ use twilight_util::builder::{
 const HELP_CONTENT: &str = r"**Available commands**:
 
 - /color_me - Set your username's color in the server
+- /color_none - Remove your username color in the server
 - /pin - Pin a message to a channel
 - /unpin - Unpin a pinned message from a channel
 - /breach - Throw someone to the shadow realm
@@ -140,6 +141,10 @@ pub struct ColorMeCommand {
     /// The color you want to be.
     pub color: Color,
 }
+
+#[derive(Debug, CommandModel, CreateCommand)]
+#[command(name = "color_none", desc = "Remove username color")]
+pub struct ColorNoneCommand;
 
 async fn resp(
     event: &InteractionCreate,
@@ -292,6 +297,18 @@ pub async fn handler(
                             .await?;
                         }
                     }
+                }
+                "color_none" => {
+                    let roles = http.roles(event.guild_id.unwrap()).await?.model().await?;
+                    for role in &roles {
+                        http.remove_guild_member_role(
+                            event.guild_id.unwrap(),
+                            event.member.as_ref().unwrap().user.as_ref().unwrap().id,
+                            role.id,
+                        )
+                        .await?;
+                    }
+                    resp(event, &interaction, "👍").await?;
                 }
                 "fires" => {
                     let response = reqwest::get(

@@ -112,6 +112,7 @@ async fn main() {
             commands::BreachCommand::create_command().into(),
             commands::UnbreachCommand::create_command().into(),
             commands::ColorMeCommand::create_command().into(),
+            commands::ColorNoneCommand::create_command().into(),
             commands::FiresCommand::create_command().into(),
             commands::SummarizeCommand::create_command().into(),
             commands::SummarizeThisCommand::create_command().into(),
