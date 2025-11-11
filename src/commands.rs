@@ -1,7 +1,7 @@
 use crate::{config::Config, fires, openai};
 use anyhow::Result;
 use chrono::{TimeDelta, TimeZone, Utc};
-use log::error;
+use log::{error, info};
 use std::{fmt::Write, str::FromStr, sync::Arc};
 use twilight_gateway::Event;
 use twilight_http::{client::InteractionClient, Client};
@@ -403,12 +403,12 @@ pub async fn handler(
                     /*
                         It would be better to instead pull messages from the current channel,
                         starting at the targeted user's last message, moving backward until there's
-                        a large/meaingful gap in message timestamps, then filter to just the
+                        a large/meaningful gap in message timestamps, then filter to just the
                         targeted user, combine, and use that as the context for summarization.
                     */
+                    let cmd = SummarizeCommand::from_interaction(input_data)?;
                     let channel_id = event.channel.as_ref().unwrap().id;
                     let messages = http.channel_messages(channel_id).await?.models().await?;
-                    let cmd = SummarizeCommand::from_interaction(input_data)?;
                     let now = Utc::now();
                     let text = messages.iter().filter(|m| m.author.id == cmd.user.id).fold(
                         String::new(),
@@ -423,6 +423,12 @@ pub async fn handler(
                     if text.trim().is_empty() {
                         resp(event, &interaction, "No recent messages found").await?;
                     } else {
+                        info!(
+                            "Summarizing {} chars from user {} in channel {}",
+                            text.len(),
+                            cmd.user.name,
+                            channel_id
+                        );
                         let summary = openai::summarize(config, &text).await?;
                         resp(
                         event,
@@ -445,6 +451,7 @@ pub async fn handler(
                         .await?
                         .model()
                         .await?;
+
                     if selected_msg.content.len() <= 100 {
                         interaction
                             .create_response(
@@ -454,7 +461,7 @@ pub async fn handler(
                                     kind: InteractionResponseType::ChannelMessageWithSource,
                                     data: Some(
                                         InteractionResponseDataBuilder::new()
-                                            .content("Targetted message is too short")
+                                            .content("Targeted message is too short")
                                             .flags(MessageFlags::EPHEMERAL)
                                             .components(None)
                                             .build(),
@@ -463,6 +470,11 @@ pub async fn handler(
                             )
                             .await?;
                     } else {
+                        info!(
+                            "Summarizing {} chars from message {}",
+                            selected_msg.content.len(),
+                            cmd.message_id
+                        );
                         let summary = openai::summarize(config, &selected_msg.content).await?;
                         resp(
                             event,
