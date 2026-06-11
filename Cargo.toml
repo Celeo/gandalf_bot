@@ -12,18 +12,18 @@ exclude = [
 ]
 
 [dependencies]
-anyhow = "1.0.98"
+anyhow = "1.0.102"
 base64 = "0.22.1"
-chrono = "0.4.40"
+chrono = "0.4.45"
 chrono-tz = "0.9.0"
-log = "0.4.27"
+log = "0.4.32"
 pretty_env_logger = "0.5.0"
-rand = "0.8.5"
-regex = "1.11.1"
-reqwest = { version = "0.12.15", features = ["json"] }
-serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.140"
-tokio = { version = "1.44.2", features = ["full"] }
+rand = "0.8.6"
+regex = "1.12.4"
+reqwest = { version = "0.12.28", features = ["json"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.150"
+tokio = { version = "1.52.3", features = ["full"] }
 twilight-gateway = "0.15.4"
 twilight-http = "0.15.4"
 twilight-interactions = "0.15.2"

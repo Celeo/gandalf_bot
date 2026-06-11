@@ -415,7 +415,7 @@ pub async fn handler(
                         |mut acc, m| {
                             let created = Utc.timestamp_opt(m.timestamp.as_secs(), 0).unwrap();
                             if (now - created) <= TimeDelta::hours(6) {
-                                writeln!(acc, "{}", &m.content).unwrap();
+                                writeln!(acc, "{}", m.content).unwrap();
                             }
                             acc
                         },
