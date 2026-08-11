@@ -35,7 +35,6 @@ pub struct Config {
     pub reaction_roles: Vec<ReactionRole>,
     pub birthday_channel: u64,
     pub birthdays: Vec<Birthday>,
-    pub game_channel: u64,
     pub home: Location,
     pub openai_key: String,
 }
