@@ -4,21 +4,21 @@ use log::{debug, warn};
 use std::sync::Arc;
 use twilight_gateway::Event;
 use twilight_http::Client;
-use twilight_model::{channel::message::ReactionType, guild::Role};
+use twilight_model::{channel::message::EmojiReactionType, guild::Role};
 
 fn handle_reaction<'a>(
     config: &Arc<Config>,
     guild_roles: &'a [Role],
     channel_id: u64,
     message_id: u64,
-    emoji: &ReactionType,
+    emoji: &EmojiReactionType,
 ) -> Result<Option<&'a Role>> {
     let mut partial_match = false;
     let emoji = match emoji {
-        ReactionType::Custom { name, .. } => name
+        EmojiReactionType::Custom { name, .. } => name
             .as_ref()
             .ok_or_else(|| anyhow!("Missing custom emoji name"))?,
-        ReactionType::Unicode { name } => name,
+        EmojiReactionType::Unicode { name } => name,
     };
 
     for entry in &config.reaction_roles {
@@ -68,7 +68,7 @@ pub async fn handler(e: &Event, config: &Arc<Config>, http: &Arc<Client>) -> Res
                 .model()
                 .await?;
             http.create_message(dm.id)
-                .content(&format!("Added the \"{}\" role to you", role.name))?
+                .content(&format!("Added the \"{}\" role to you", role.name))
                 .await?;
         }
     } else if let Event::ReactionRemove(event) = e {
@@ -88,7 +88,7 @@ pub async fn handler(e: &Event, config: &Arc<Config>, http: &Arc<Client>) -> Res
                 .model()
                 .await?;
             http.create_message(dm.id)
-                .content(&format!("Removed the \"{}\" role from you", role.name))?
+                .content(&format!("Removed the \"{}\" role from you", role.name))
                 .await?;
         }
     }
@@ -101,8 +101,8 @@ mod tests {
     use crate::config::{Config, ReactionRole};
     use std::sync::Arc;
     use twilight_model::{
-        channel::message::ReactionType,
-        guild::{Permissions, Role, RoleFlags},
+        channel::message::EmojiReactionType,
+        guild::{Permissions, Role, RoleColors, RoleFlags},
         id::Id,
     };
 
@@ -113,7 +113,7 @@ mod tests {
             &vec![],
             1,
             2,
-            &ReactionType::Unicode {
+            &EmojiReactionType::Unicode {
                 name: String::from("🤧"),
             },
         )
@@ -138,7 +138,7 @@ mod tests {
             &vec![],
             1,
             2,
-            &ReactionType::Unicode {
+            &EmojiReactionType::Unicode {
                 name: String::from("2️⃣"),
             },
         )
@@ -158,8 +158,14 @@ mod tests {
             });
             Arc::new(config)
         };
+        #[allow(deprecated)]
         let roles = vec![Role {
             color: 0,
+            colors: RoleColors {
+                primary_color: 0,
+                secondary_color: None,
+                tertiary_color: None,
+            },
             hoist: true,
             icon: None,
             id: Id::new(3),
@@ -178,7 +184,7 @@ mod tests {
                 &roles,
                 1,
                 2,
-                &ReactionType::Unicode {
+                &EmojiReactionType::Unicode {
                     name: String::from("1️⃣"),
                 },
             )

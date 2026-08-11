@@ -323,7 +323,7 @@ pub async fn handler(
                             Ok(data) => {
                                 if data.is_empty() {
                                     http.create_message(event.channel.as_ref().unwrap().id)
-                                        .content("No local fires")?
+                                        .content("No local fires")
                                         .await?;
                                 } else {
                                     interaction
@@ -385,8 +385,8 @@ pub async fn handler(
                                         embeds.push(embed);
                                     }
                                     http.create_message(event.channel.as_ref().unwrap().id)
-                                        .content("## Local fire data")?
-                                        .embeds(&embeds)?
+                                        .content("## Local fire data")
+                                        .embeds(&embeds)
                                         .await?;
                                 }
                             }

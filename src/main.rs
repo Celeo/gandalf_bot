@@ -7,7 +7,7 @@ use chrono::{Datelike, TimeZone, Timelike, Weekday};
 use log::{debug, error, info, warn};
 use std::{collections::HashMap, env, sync::Arc, time::Duration};
 use tokio::time::sleep;
-use twilight_gateway::{Event, Intents, Shard, ShardId};
+use twilight_gateway::{Event, EventTypeFlags, Intents, Shard, ShardId, StreamExt};
 use twilight_http::Client as HttpClient;
 use twilight_interactions::command::CreateCommand;
 use twilight_model::id::Id;
@@ -56,7 +56,7 @@ async fn birthday_loop(
             }
             info!("Sending birthday message");
             http.create_message(Id::new(config.birthday_channel))
-                .content(&format!("Happy birthday to <@!{}>!", entry.who))?
+                .content(&format!("Happy birthday to <@!{}>!", entry.who))
                 .await?;
             posted
                 .entry(entry.who)
@@ -71,7 +71,7 @@ async fn aspirations_reminder(config: Arc<Config>, http: Arc<HttpClient>) -> Res
     debug!("Checking for aspiration reminder");
     let now = chrono_tz::US::Pacific.from_utc_datetime(&chrono::offset::Utc::now().naive_utc());
     if now.weekday() == Weekday::Tue && now.hour() >= 8 && now.hour() < 14 {
-        http.create_message(Id::new(config.game_channel)).content("Think of your aspirations for this afternoon!\n\nMessage the Storyteller with them if they've changed.")?.await?;
+        http.create_message(Id::new(config.game_channel)).content("Think of your aspirations for this afternoon!\n\nMessage the Storyteller with them if they've changed.").await?;
     }
     Ok(())
 }
@@ -158,13 +158,13 @@ async fn main() {
 
     info!("Waiting for events");
     loop {
-        let event = match shard.next_event().await {
+        let Some(event) = shard.next_event(EventTypeFlags::all()).await else {
+            break;
+        };
+        let event = match event {
             Ok(event) => event,
             Err(source) => {
                 warn!("Error receiving event: {source:?}");
-                if source.is_fatal() {
-                    break;
-                }
                 continue;
             }
         };

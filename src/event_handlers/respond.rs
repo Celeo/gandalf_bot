@@ -1,6 +1,6 @@
 use crate::quotes::MESSAGES;
 use anyhow::Result;
-use rand::{seq::SliceRandom, Rng};
+use rand::{seq::IndexedRandom, RngExt};
 use std::sync::Arc;
 use twilight_gateway::Event;
 use twilight_http::Client;
@@ -13,14 +13,14 @@ pub async fn handler(e: &Event, http: &Arc<Client>, bot_id: u64) -> Result<()> {
             .iter()
             .any(|mention| mention.id == Id::new(bot_id));
         if mentioned_self && !event.mention_everyone {
-            let response = if rand::thread_rng().gen_range(0..500) == 1 {
+            let response = if rand::rng().random_range(0..500) == 1 {
                 "All right then, keep your fucking secrets."
             } else {
-                MESSAGES.choose(&mut rand::thread_rng()).unwrap()
+                MESSAGES.choose(&mut rand::rng()).unwrap()
             };
             http.create_message(event.channel_id)
                 .reply(event.id)
-                .content(response)?
+                .content(response)
                 .await?;
         }
     }
