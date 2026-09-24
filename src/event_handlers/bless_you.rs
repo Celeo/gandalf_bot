@@ -56,10 +56,7 @@ fn should_react(author_id: u64, content: &str, config: &Arc<Config>) -> bool {
             return false;
         }
     }
-    if load_words().contains(&content) {
-        return false;
-    }
-    true
+    !load_words().contains(&content)
 }
 
 pub async fn handler(e: &Event, config: &Arc<Config>, http: &Arc<Client>) -> Result<()> {

@@ -4,7 +4,6 @@ version = "1.0.0"
 edition = "2021"
 description = ""
 readme = "README.md"
-homepage = "https://github.com/celeo/gandalf_bot"
 repository = "https://github.com/celeo/gandalf_bot"
 license = "MIT OR Apache-2.0"
 exclude = [
